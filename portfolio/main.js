@@ -203,6 +203,8 @@ scene.add(overhead);
 const bootEl = document.getElementById('boot');
 const bootBar = document.getElementById('boot-progress');
 const bootStatus = document.getElementById('boot-status');
+const blinkLidLeft = document.getElementById('blink-lid-left');
+const blinkLidRight = document.getElementById('blink-lid-right');
 
 // the whole head group turns toward the pointer (androids watch you)
 const headGroup = new THREE.Group();
@@ -536,8 +538,43 @@ const motion = {
   roll: 0,
 };
 
+const living = {
+  eyeDriftX: 0,
+  eyeDriftY: 0,
+  eyeTargetX: 0,
+  eyeTargetY: 0,
+  browDrift: 0,
+  mouthDrift: 0,
+  browTarget: 0,
+  mouthTarget: 0,
+  nextSaccadeAt: 0.7,
+  nextBlinkAt: 1.6,
+  blinkStartedAt: -10,
+  blinkEchoAt: -10,
+  blinkDuration: 0.18,
+};
+
+function rand(min, max) {
+  return min + Math.random() * (max - min);
+}
+
 function getCurrentPose() {
   return motion.panelOpen ? PANEL_POSES[motion.active] : MENU_POSES[motion.active];
+}
+
+function getUiFocusPoint() {
+  const target = motion.panelOpen
+    ? panel.querySelector('.panel-body:not([hidden])') || panel
+    : items[selected];
+  if (!target) return { x: 0, y: 0 };
+
+  const rect = target.getBoundingClientRect();
+  const x = ((rect.left + rect.width * 0.5) / window.innerWidth - 0.5) * 2;
+  const y = ((rect.top + rect.height * 0.34) / window.innerHeight - 0.5) * 2;
+  return {
+    x: THREE.MathUtils.clamp(x, -1, 1),
+    y: THREE.MathUtils.clamp(y, -1, 1),
+  };
 }
 
 function blinkWave(time, interval, width, offset = 0) {
@@ -545,6 +582,76 @@ function blinkWave(time, interval, width, offset = 0) {
   if (phase > width) return 0;
   const t = phase / width;
   return Math.sin(t * Math.PI);
+}
+
+function pulseWave(time, startAt, duration) {
+  if (time <= startAt || time >= startAt + duration) return 0;
+  return Math.sin(((time - startAt) / duration) * Math.PI);
+}
+
+function updateLivingMotion(time, dt) {
+  if (time >= living.nextSaccadeAt) {
+    living.eyeTargetX = rand(-0.045, 0.045);
+    living.eyeTargetY = rand(-0.022, 0.022);
+    living.browTarget = rand(-0.08, 0.1);
+    living.mouthTarget = rand(-0.06, 0.08);
+    living.nextSaccadeAt = time + rand(1.2, 3.1);
+  }
+
+  if (time >= living.nextBlinkAt) {
+    living.blinkStartedAt = time;
+    living.blinkDuration = rand(0.16, 0.24);
+    living.blinkEchoAt = Math.random() < 0.22
+      ? time + living.blinkDuration + rand(0.08, 0.16)
+      : -10;
+    living.nextBlinkAt = time + rand(2.8, 5.4);
+  }
+
+  living.eyeDriftX = THREE.MathUtils.damp(living.eyeDriftX, living.eyeTargetX, 9.5, dt);
+  living.eyeDriftY = THREE.MathUtils.damp(living.eyeDriftY, living.eyeTargetY, 9.5, dt);
+  living.browDrift = THREE.MathUtils.damp(living.browDrift, living.browTarget, 4.2, dt);
+  living.mouthDrift = THREE.MathUtils.damp(living.mouthDrift, living.mouthTarget, 3.8, dt);
+
+  const scheduledBlink = Math.max(
+    pulseWave(time, living.blinkStartedAt, living.blinkDuration),
+    pulseWave(time, living.blinkEchoAt, living.blinkDuration * 0.88)
+  );
+  const idleBlink = Math.max(
+    blinkWave(time, 7.4, 0.1, 2.1) * 0.55,
+    blinkWave(time, 11.2, 0.08, 6.5) * 0.42
+  );
+
+  return Math.max(scheduledBlink, idleBlink);
+}
+
+function updateBlinkOverlay(blinkAmount) {
+  if (blinkAmount <= 0.01) {
+    blinkLidLeft.style.opacity = '0';
+    blinkLidRight.style.opacity = '0';
+    return;
+  }
+
+  const viewportW = window.innerWidth;
+  const viewportH = window.innerHeight;
+  const faceCenterX = viewportW * 0.468 + motion.lookX * 86 + motion.bodyX * 160;
+  const faceCenterY = viewportH * 0.545 + motion.lookY * 42 + motion.bodyY * 110;
+  const spread = viewportW * 0.062;
+  const lidWidth = THREE.MathUtils.clamp(viewportW * 0.058, 44, 74);
+  const lidHeight = lidWidth * (0.08 + blinkAmount * 0.58);
+  const lidOpacity = Math.min(0.96, blinkAmount * 2.4);
+
+  for (const [el, direction] of [
+    [blinkLidLeft, -1],
+    [blinkLidRight, 1],
+  ]) {
+    el.style.width = `${lidWidth}px`;
+    el.style.height = `${lidHeight}px`;
+    el.style.left = `${faceCenterX + spread * direction}px`;
+    el.style.top = `${faceCenterY - lidWidth * 0.14}px`;
+    el.style.opacity = lidOpacity.toFixed(3);
+    el.style.borderRadius = `999px 999px ${16 + blinkAmount * 18}px ${16 + blinkAmount * 18}px`;
+    el.style.transform = `translate(-50%, -100%) rotate(${direction * blinkAmount * 4}deg)`;
+  }
 }
 
 function select(i) {
@@ -605,8 +712,19 @@ function animate() {
   if (mixer) mixer.update(dt);
 
   const pose = getCurrentPose();
-  motion.lookX = THREE.MathUtils.damp(motion.lookX, pose.lookX + mouse.x * 0.09, 4.5, dt);
-  motion.lookY = THREE.MathUtils.damp(motion.lookY, pose.lookY - mouse.y * 0.05, 4.5, dt);
+  const uiFocus = getUiFocusPoint();
+  motion.lookX = THREE.MathUtils.damp(
+    motion.lookX,
+    pose.lookX + uiFocus.x * 0.24 + mouse.x * 0.06,
+    4.5,
+    dt
+  );
+  motion.lookY = THREE.MathUtils.damp(
+    motion.lookY,
+    pose.lookY + uiFocus.y * 0.16 - mouse.y * 0.03,
+    4.5,
+    dt
+  );
   motion.camX = THREE.MathUtils.damp(motion.camX, pose.camX, 3.4, dt);
   motion.camY = THREE.MathUtils.damp(motion.camY, pose.camY, 3.4, dt);
   motion.bodyX = THREE.MathUtils.damp(motion.bodyX, pose.bodyX, 3.6, dt);
@@ -623,39 +741,58 @@ function animate() {
 
   const idleYaw = Math.sin(t * 0.42) * 0.025;
   const idlePitch = Math.sin(t * 0.53) * 0.018;
-  const blink = Math.max(
-    blinkWave(t, 4.3, 0.12, 0.18),
-    blinkWave(t, 7.4, 0.08, 1.92)
-  );
+  const blink = updateLivingMotion(t, dt);
 
   const rig = headGroup.userData.rig;
   if (rig) {
-    const headPitch = motion.lookY * 0.9 + idlePitch;
-    const headYaw = motion.lookX * 0.78 + idleYaw;
+    const attentiveLookX = motion.lookX + living.eyeDriftX * 0.55;
+    const attentiveLookY = motion.lookY + living.eyeDriftY * 0.7;
+    const expressiveMouth = motion.mouth + living.mouthDrift;
+    const expressiveBrow = motion.brow + living.browDrift;
+    const headPitch = motion.lookY * 0.9 + living.eyeDriftY * 0.14 + idlePitch;
+    const headYaw = motion.lookX * 0.78 + living.eyeDriftX * 0.1 + idleYaw;
     const shoulderBreath = Math.sin(t * 0.8) * 0.015;
+    const browAsym = Math.sin(t * 0.92) * 0.003 + living.eyeDriftX * 0.01;
 
-    setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * 0.08, motion.roll * 0.08);
-    setBoneRotationDeltas(rig, rig.spineUpper, headPitch * -0.12, headYaw * 0.12, motion.roll * 0.14);
+    setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * -0.08, motion.roll * 0.08);
+    setBoneRotationDeltas(rig, rig.spineUpper, headPitch * -0.12, headYaw * -0.12, motion.roll * 0.14);
     setBoneRotationDeltas(rig, rig.clavicles, shoulderBreath, 0, 0);
-    setBoneRotationDelta(rig, rig.neck, headPitch * -0.24, headYaw * 0.32, motion.roll * 0.18);
-    setBoneRotationDelta(rig, rig.head, headPitch * -0.72, headYaw * 0.72, motion.roll + Math.sin(t * 0.67) * 0.012);
-    setBoneRotationDelta(rig, rig.eyeL, -motion.lookY * 0.22 + blink * 0.04, motion.lookX * 0.45, 0);
-    setBoneRotationDelta(rig, rig.eyeR, -motion.lookY * 0.22 + blink * 0.04, motion.lookX * 0.45, 0);
+    setBoneRotationDelta(rig, rig.neck, headPitch * -0.24, headYaw * -0.32, motion.roll * 0.18);
+    setBoneRotationDelta(rig, rig.head, headPitch * -0.72, headYaw * -0.72, motion.roll + Math.sin(t * 0.67) * 0.012);
+    setBoneRotationDelta(
+      rig,
+      rig.eyeL,
+      -attentiveLookY * 0.24 + blink * 0.042,
+      attentiveLookX * -0.42,
+      -living.eyeDriftX * 0.018
+    );
+    setBoneRotationDelta(
+      rig,
+      rig.eyeR,
+      -attentiveLookY * 0.24 + blink * 0.042,
+      attentiveLookX * -0.42,
+      living.eyeDriftX * 0.018
+    );
 
-    const jawOpen = 0.026 + motion.mouth * 0.042 + Math.sin(t * 1.45) * 0.003;
+    const jawOpen = 0.02 + expressiveMouth * 0.03 + Math.sin(t * 1.45) * 0.0035;
     setBoneRotationDeltas(rig, rig.jaw, jawOpen, 0, 0);
-    setBoneRotationDeltas(rig, rig.upperLip, -motion.mouth * 0.014, 0, 0);
+    setBoneRotationDeltas(rig, rig.upperLip, -expressiveMouth * 0.023 - Math.sin(t * 1.1) * 0.002, 0, 0);
 
-    const browLift = 0.006 + motion.brow * 0.03;
-    setBoneRotationDeltas(rig, rig.browsL, -browLift, 0, -motion.brow * 0.005);
-    setBoneRotationDeltas(rig, rig.browsR, -browLift, 0, motion.brow * 0.005);
+    const browLift = 0.005 + expressiveBrow * 0.03;
+    setBoneRotationDeltas(rig, rig.browsL, -browLift - browAsym, 0, -expressiveBrow * 0.006);
+    setBoneRotationDeltas(rig, rig.browsR, -browLift + browAsym, 0, expressiveBrow * 0.006);
 
-    const upperLid = blink * 0.26 + motion.squint * 0.05;
-    const lowerLid = blink * 0.08 + motion.squint * 0.02;
+    const upperLid = blink * 0.065 + motion.squint * 0.018 + Math.max(0, attentiveLookY) * 0.01;
+    const lowerLid = blink * 0.026 + motion.squint * 0.01 + Math.max(0, -attentiveLookY) * 0.004;
     setBoneRotationDeltas(rig, rig.lidsUpperL, upperLid, 0, 0);
     setBoneRotationDeltas(rig, rig.lidsUpperR, upperLid, 0, 0);
     setBoneRotationDeltas(rig, rig.lidsLowerL, -lowerLid, 0, 0);
     setBoneRotationDeltas(rig, rig.lidsLowerR, -lowerLid, 0, 0);
+
+    updateBlinkOverlay(blink * 0.95 + motion.squint * 0.14);
+  } else {
+    blinkLidLeft.style.opacity = '0';
+    blinkLidRight.style.opacity = '0';
   }
 
   // LED pulse
