@@ -26,7 +26,7 @@ renderer.toneMappingExposure = 1.05;
 // ---------------------------------------------------------------- scene
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xe9f2f7);
+scene.background = new THREE.Color(0xecf6fb);
 
 // studio wall: blurred bright panels, like the blown-out DBH backdrop
 function wallTexture() {
@@ -36,34 +36,72 @@ function wallTexture() {
   const ctx = c.getContext('2d');
 
   const base = ctx.createLinearGradient(0, 0, 0, 576);
-  base.addColorStop(0, '#f2f8fb');
-  base.addColorStop(0.6, '#dfecf3');
-  base.addColorStop(1, '#cbdde8');
+  base.addColorStop(0, '#fafdff');
+  base.addColorStop(0.5, '#edf5fb');
+  base.addColorStop(1, '#d8e9f4');
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, 1024, 576);
 
+  const topGlow = ctx.createRadialGradient(512, 86, 40, 512, 86, 380);
+  topGlow.addColorStop(0, 'rgba(255,255,255,0.95)');
+  topGlow.addColorStop(0.45, 'rgba(255,255,255,0.38)');
+  topGlow.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = topGlow;
+  ctx.fillRect(0, 0, 1024, 320);
+
   // soft vertical light panels
-  ctx.filter = 'blur(26px)';
+  ctx.filter = 'blur(24px)';
   const panels = [
-    [60, 130, '#ffffff', 0.95],
-    [250, 90, '#eef7fc', 0.8],
-    [420, 150, '#ffffff', 1.0],
-    [660, 110, '#f4fafd', 0.85],
-    [850, 140, '#ffffff', 0.95],
+    [30, 120, '#e6f5ff', 0.78],
+    [175, 90, '#ffffff', 0.92],
+    [322, 120, '#d9f0ff', 0.84],
+    [470, 160, '#ffffff', 1.0],
+    [690, 110, '#dbf2ff', 0.88],
+    [840, 134, '#ffffff', 0.94],
   ];
   for (const [x, w, color, a] of panels) {
     ctx.globalAlpha = a;
     ctx.fillStyle = color;
     ctx.fillRect(x, -40, w, 660);
   }
-  // horizontal band structure, barely visible
-  ctx.globalAlpha = 0.35;
-  ctx.fillStyle = '#bcd3e0';
-  ctx.fillRect(-40, 300, 1104, 30);
-  ctx.fillRect(-40, 430, 1104, 22);
+
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = '#b3d5ea';
+  ctx.fillRect(-40, 322, 1104, 26);
+  ctx.fillRect(-40, 448, 1104, 22);
+
+  ctx.filter = 'blur(12px)';
+  ctx.globalAlpha = 0.42;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(90, 306, 844, 40);
+
+  const lowerFog = ctx.createLinearGradient(0, 260, 0, 576);
+  lowerFog.addColorStop(0, 'rgba(255,255,255,0)');
+  lowerFog.addColorStop(0.42, 'rgba(240,248,252,0.28)');
+  lowerFog.addColorStop(1, 'rgba(230,241,247,0.86)');
+  ctx.fillStyle = lowerFog;
+  ctx.fillRect(0, 250, 1024, 326);
+
   ctx.filter = 'none';
   ctx.globalAlpha = 1;
 
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+function haloTexture() {
+  const c = document.createElement('canvas');
+  c.width = 512;
+  c.height = 512;
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(256, 256, 30, 256, 256, 256);
+  g.addColorStop(0, 'rgba(255,255,255,0.85)');
+  g.addColorStop(0.28, 'rgba(255,255,255,0.52)');
+  g.addColorStop(0.62, 'rgba(215,235,248,0.18)');
+  g.addColorStop(1, 'rgba(215,235,248,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 512, 512);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
@@ -75,6 +113,34 @@ const wall = new THREE.Mesh(
 );
 wall.position.set(0, 1.5, -2.2);
 scene.add(wall);
+
+const halo = new THREE.Mesh(
+  new THREE.PlaneGeometry(2.65, 2.65),
+  new THREE.MeshBasicMaterial({
+    map: haloTexture(),
+    transparent: true,
+    opacity: 0.65,
+    toneMapped: false,
+    depthWrite: false,
+  })
+);
+halo.position.set(0.05, 1.92, -2.04);
+halo.material.opacity = 0.32;
+scene.add(halo);
+
+const lowerWash = new THREE.Mesh(
+  new THREE.PlaneGeometry(7.8, 1.9),
+  new THREE.MeshBasicMaterial({
+    color: new THREE.Color(0.96, 1.0, 1.08),
+    transparent: true,
+    opacity: 0.22,
+    toneMapped: false,
+    depthWrite: false,
+  })
+);
+lowerWash.position.set(0, 0.28, -1.96);
+lowerWash.material.opacity = 0.05;
+scene.add(lowerWash);
 
 // hot glow strips that feed the bloom halo around the silhouette
 function glowStrip(x, w, intensity) {
@@ -90,43 +156,47 @@ function glowStrip(x, w, intensity) {
   m.position.set(x, 1.5, -2.1);
   scene.add(m);
 }
-glowStrip(-1.55, 0.5, 1.25);
-glowStrip(0.1, 0.65, 1.35);
-glowStrip(1.5, 0.55, 1.25);
+glowStrip(-1.62, 0.46, 1.15);
+glowStrip(0.08, 0.68, 1.55);
+glowStrip(1.56, 0.52, 1.2);
 
 // image-based lighting
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-scene.environmentIntensity = 0.65;
+scene.environmentIntensity = 0.74;
 pmrem.dispose();
 
 // ---------------------------------------------------------------- camera
 
-const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.05, 30);
-const FOCUS = new THREE.Vector3(0, 1.55, 0); // face / upper-chest band
-const CAM_Z = 0.92;
-camera.position.set(0, FOCUS.y + 0.02, CAM_Z);
+const camera = new THREE.PerspectiveCamera(28.5, window.innerWidth / window.innerHeight, 0.05, 30);
+const FOCUS = new THREE.Vector3(0, 1.57, 0); // face / upper-chest band
+const CAM_Z = 0.9;
+camera.position.set(0.012, FOCUS.y + 0.008, CAM_Z);
 camera.lookAt(FOCUS);
 
 // ---------------------------------------------------------------- lights
 
 // soft frontal key — the bright studio look
-const key = new THREE.DirectionalLight(0xffe4c8, 1.6);
-key.position.set(0.6, 2.7, 2.2);
+const key = new THREE.DirectionalLight(0xffebd9, 1.86);
+key.position.set(0.3, 2.85, 2.45);
 scene.add(key);
 
 // cool fill from the other side
-const fill = new THREE.DirectionalLight(0xdcecf7, 0.5);
-fill.position.set(-1.4, 1.7, 1.6);
+const fill = new THREE.DirectionalLight(0xd7ecfb, 0.82);
+fill.position.set(-1.55, 1.88, 1.45);
 scene.add(fill);
 
 // back/rim lights — edge glow that melts into the background
-const rimL = new THREE.DirectionalLight(0xeaf6ff, 1.5);
-rimL.position.set(-1.6, 2.3, -1.4);
+const rimL = new THREE.DirectionalLight(0xe9f7ff, 1.5);
+rimL.position.set(-1.8, 2.45, -1.15);
 scene.add(rimL);
-const rimR = new THREE.DirectionalLight(0xeaf6ff, 1.2);
-rimR.position.set(1.7, 2.1, -1.2);
+const rimR = new THREE.DirectionalLight(0xf7fdff, 1.22);
+rimR.position.set(1.42, 2.35, -0.96);
 scene.add(rimR);
+
+const overhead = new THREE.DirectionalLight(0xf3fbff, 0.58);
+overhead.position.set(0, 3.3, 0.85);
+scene.add(overhead);
 
 // ---------------------------------------------------------------- character
 
@@ -170,6 +240,48 @@ function onProgress(xhr) {
   bootStatus.textContent = 'LOADING GEOMETRY & TEXTURES…';
 }
 
+function buildRig(root) {
+  const bones = new Map();
+  root.traverse((obj) => {
+    if (obj.isBone) bones.set(obj.name, obj);
+  });
+
+  const names = [...bones.keys()];
+  const pick = (...list) => list.map((name) => bones.get(name)).filter(Boolean);
+  const filter = (fn) => names.filter(fn).map((name) => bones.get(name));
+
+  return {
+    bones,
+    baseRotations: new Map([...bones.values()].map((bone) => [bone, bone.rotation.clone()])),
+    neck: bones.get('Bip_Neck'),
+    head: bones.get('Bip_Head'),
+    eyeL: bones.get('Bip_Eye_L'),
+    eyeR: bones.get('Bip_Eye_R'),
+    spineUpper: pick('Bip_Spine4', 'Bip_Spine3'),
+    spineMid: pick('Bip_Spine2', 'Bip_Spine1'),
+    clavicles: pick('Bip_Clavicle_L', 'Bip_Clavicle_R'),
+    jaw: filter((name) => name.startsWith('Bip_FaceJawJoint')),
+    upperLip: filter((name) => name.startsWith('Bip_FaceUpperLipUp')),
+    browsL: filter((name) => /^Bip_FaceBrow(Up|Lo).*_L$/.test(name)),
+    browsR: filter((name) => /^Bip_FaceBrow(Up|Lo).*_R$/.test(name)),
+    lidsUpperL: filter((name) => /^Bip_Face(EyeCover|Eyelid)\d{2}_L$/.test(name)),
+    lidsUpperR: filter((name) => /^Bip_Face(EyeCover|Eyelid)\d{2}_R$/.test(name)),
+    lidsLowerL: filter((name) => /^Bip_FaceEyelidLo\d{2}.*_L$/.test(name)),
+    lidsLowerR: filter((name) => /^Bip_FaceEyelidLo\d{2}.*_R$/.test(name)),
+  };
+}
+
+function setBoneRotationDelta(rig, bone, x = 0, y = 0, z = 0) {
+  if (!bone) return;
+  const base = rig.baseRotations.get(bone);
+  if (!base) return;
+  bone.rotation.set(base.x + x, base.y + y, base.z + z);
+}
+
+function setBoneRotationDeltas(rig, bones, x = 0, y = 0, z = 0) {
+  for (const bone of bones) setBoneRotationDelta(rig, bone, x, y, z);
+}
+
 // ---- primary character: Chloe (bundled with the portfolio) ----
 // If these assets are removed, the free facecap head still loads as fallback.
 
@@ -204,10 +316,10 @@ function chloeMaterials() {
     Chloe_Eyes: new THREE.MeshPhysicalMaterial({
       map: tex(A + 'eye_alb.jpg', true),
       normalMap: tex(A + 'eye_nrm.jpg'),
-      roughness: 0.12,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.08,
-      envMapIntensity: 1.1,
+      roughness: 0.2,
+      clearcoat: 0.92,
+      clearcoatRoughness: 0.12,
+      envMapIntensity: 0.82,
     }),
     Chloe_Hair: cutout('hair.png'),
     Chloe_Lashes: cutout('lashes.png', { roughness: 0.5 }),
@@ -282,7 +394,9 @@ function setupChloe(gltf) {
   model.position.x -= center.x * s;
   model.position.z -= center.z * s;
   model.position.y -= box.min.y * s;
+  model.position.y -= 0.07;
 
+  headGroup.userData.rig = buildRig(model);
   headGroup.add(model);
   return { headY: 1.49 }; // vertical focus: face/upper chest band
 }
@@ -361,9 +475,9 @@ const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(
   new THREE.Vector2(window.innerWidth, window.innerHeight),
-  0.4, // strength — halo bleeding over the silhouette edges
-  0.85, // radius
-  0.96 // threshold — only the hot strips and LED bloom
+  0.48, // strength — halo bleeding over the silhouette edges
+  0.82, // radius
+  0.93 // threshold — only the hot strips and LED bloom
 );
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
@@ -390,18 +504,67 @@ const panel = document.getElementById('panel');
 const bodies = panel.querySelectorAll('.panel-body');
 let selected = 0;
 
+const MENU_POSES = {
+  about:    { lookX: 0.01, lookY: 0.03, camX: 0.0,  camY: 0.006, bodyX: 0.0,   bodyY: 0.0,   mouth: 0.86, brow: 0.4, led: 1.0, squint: 0.08, roll: 0.0 },
+  projects: { lookX: -0.16, lookY: 0.015, camX: -0.02, camY: 0.003, bodyX: -0.02, bodyY: -0.005, mouth: 0.34, brow: 0.18, led: 0.92, squint: 0.02, roll: -0.03 },
+  skills:   { lookX: 0.035, lookY: 0.045, camX: 0.01, camY: 0.008, bodyX: 0.0,   bodyY: 0.01,  mouth: 0.46, brow: 0.3, led: 1.12, squint: 0.1,  roll: 0.0 },
+  exp:      { lookX: 0.12, lookY: 0.01,  camX: 0.018, camY: -0.004, bodyX: 0.018, bodyY: -0.01, mouth: 0.28, brow: 0.14, led: 0.88, squint: 0.02, roll: 0.03 },
+  contact:  { lookX: 0.18, lookY: 0.028, camX: 0.028, camY: 0.002, bodyX: 0.03,  bodyY: 0.0,   mouth: 0.62, brow: 0.34, led: 1.06, squint: 0.04, roll: 0.02 },
+};
+
+const PANEL_POSES = {
+  about:    { lookX: -0.05, lookY: 0.02,  camX: -0.012, camY: 0.012, bodyX: 0.07, bodyY: 0.008, mouth: 0.62, brow: 0.24, led: 0.76, squint: 0.0,  roll: -0.02 },
+  projects: { lookX: -0.15, lookY: 0.015, camX: -0.025, camY: 0.004, bodyX: 0.08, bodyY: 0.0,   mouth: 0.26, brow: 0.1,  led: 0.7,  squint: 0.0,  roll: -0.04 },
+  skills:   { lookX: -0.03, lookY: 0.04,  camX: -0.01,  camY: 0.012, bodyX: 0.06, bodyY: 0.015, mouth: 0.34, brow: 0.2,  led: 0.8,  squint: 0.03, roll: -0.015 },
+  exp:      { lookX: 0.05,  lookY: 0.01,  camX: 0.0,    camY: 0.002, bodyX: 0.05, bodyY: -0.004, mouth: 0.22, brow: 0.08, led: 0.68, squint: 0.0,  roll: 0.015 },
+  contact:  { lookX: 0.1,   lookY: 0.028, camX: 0.012,  camY: 0.012, bodyX: 0.04, bodyY: 0.004, mouth: 0.42, brow: 0.18, led: 0.74, squint: 0.01, roll: 0.02 },
+};
+
+const motion = {
+  active: items[selected].dataset.panel,
+  panelOpen: false,
+  lookX: 0,
+  lookY: 0,
+  camX: 0,
+  camY: 0,
+  bodyX: 0,
+  bodyY: 0,
+  mouth: 0,
+  brow: 0,
+  led: 1,
+  squint: 0,
+  roll: 0,
+};
+
+function getCurrentPose() {
+  return motion.panelOpen ? PANEL_POSES[motion.active] : MENU_POSES[motion.active];
+}
+
+function blinkWave(time, interval, width, offset = 0) {
+  const phase = (time + offset) % interval;
+  if (phase > width) return 0;
+  const t = phase / width;
+  return Math.sin(t * Math.PI);
+}
+
 function select(i) {
   selected = (i + items.length) % items.length;
+  motion.active = items[selected].dataset.panel;
   items.forEach((el, n) => el.classList.toggle('selected', n === selected));
 }
 function openPanel(name) {
+  motion.active = name;
+  motion.panelOpen = true;
   menu.classList.add('hidden');
   panel.hidden = false;
+  document.body.classList.add('panel-open');
   for (const b of bodies) b.hidden = b.id !== `panel-${name}`;
 }
 function closePanel() {
+  motion.panelOpen = false;
   panel.hidden = true;
   menu.classList.remove('hidden');
+  document.body.classList.remove('panel-open');
 }
 
 items.forEach((el, n) => {
@@ -441,20 +604,70 @@ function animate() {
 
   if (mixer) mixer.update(dt);
 
-  // subtle idle sway (interactivity comes later)
-  const targetY = mouse.x * 0.06 + Math.sin(t * 0.3) * 0.015;
-  headGroup.rotation.y += (targetY - headGroup.rotation.y) * Math.min(1, dt * 2.2);
+  const pose = getCurrentPose();
+  motion.lookX = THREE.MathUtils.damp(motion.lookX, pose.lookX + mouse.x * 0.09, 4.5, dt);
+  motion.lookY = THREE.MathUtils.damp(motion.lookY, pose.lookY - mouse.y * 0.05, 4.5, dt);
+  motion.camX = THREE.MathUtils.damp(motion.camX, pose.camX, 3.4, dt);
+  motion.camY = THREE.MathUtils.damp(motion.camY, pose.camY, 3.4, dt);
+  motion.bodyX = THREE.MathUtils.damp(motion.bodyX, pose.bodyX, 3.6, dt);
+  motion.bodyY = THREE.MathUtils.damp(motion.bodyY, pose.bodyY, 3.6, dt);
+  motion.mouth = THREE.MathUtils.damp(motion.mouth, pose.mouth, 4.8, dt);
+  motion.brow = THREE.MathUtils.damp(motion.brow, pose.brow, 4.8, dt);
+  motion.led = THREE.MathUtils.damp(motion.led, pose.led, 5.2, dt);
+  motion.squint = THREE.MathUtils.damp(motion.squint, pose.squint, 4.4, dt);
+  motion.roll = THREE.MathUtils.damp(motion.roll, pose.roll, 3.8, dt);
+
+  headGroup.position.x = motion.bodyX;
+  headGroup.position.y = motion.bodyY;
+  headGroup.rotation.z = motion.roll * 0.4;
+
+  const idleYaw = Math.sin(t * 0.42) * 0.025;
+  const idlePitch = Math.sin(t * 0.53) * 0.018;
+  const blink = Math.max(
+    blinkWave(t, 4.3, 0.12, 0.18),
+    blinkWave(t, 7.4, 0.08, 1.92)
+  );
+
+  const rig = headGroup.userData.rig;
+  if (rig) {
+    const headPitch = motion.lookY * 0.9 + idlePitch;
+    const headYaw = motion.lookX * 0.78 + idleYaw;
+    const shoulderBreath = Math.sin(t * 0.8) * 0.015;
+
+    setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * 0.08, motion.roll * 0.08);
+    setBoneRotationDeltas(rig, rig.spineUpper, headPitch * -0.12, headYaw * 0.12, motion.roll * 0.14);
+    setBoneRotationDeltas(rig, rig.clavicles, shoulderBreath, 0, 0);
+    setBoneRotationDelta(rig, rig.neck, headPitch * -0.24, headYaw * 0.32, motion.roll * 0.18);
+    setBoneRotationDelta(rig, rig.head, headPitch * -0.72, headYaw * 0.72, motion.roll + Math.sin(t * 0.67) * 0.012);
+    setBoneRotationDelta(rig, rig.eyeL, -motion.lookY * 0.22 + blink * 0.04, motion.lookX * 0.45, 0);
+    setBoneRotationDelta(rig, rig.eyeR, -motion.lookY * 0.22 + blink * 0.04, motion.lookX * 0.45, 0);
+
+    const jawOpen = 0.026 + motion.mouth * 0.042 + Math.sin(t * 1.45) * 0.003;
+    setBoneRotationDeltas(rig, rig.jaw, jawOpen, 0, 0);
+    setBoneRotationDeltas(rig, rig.upperLip, -motion.mouth * 0.014, 0, 0);
+
+    const browLift = 0.006 + motion.brow * 0.03;
+    setBoneRotationDeltas(rig, rig.browsL, -browLift, 0, -motion.brow * 0.005);
+    setBoneRotationDeltas(rig, rig.browsR, -browLift, 0, motion.brow * 0.005);
+
+    const upperLid = blink * 0.26 + motion.squint * 0.05;
+    const lowerLid = blink * 0.08 + motion.squint * 0.02;
+    setBoneRotationDeltas(rig, rig.lidsUpperL, upperLid, 0, 0);
+    setBoneRotationDeltas(rig, rig.lidsUpperR, upperLid, 0, 0);
+    setBoneRotationDeltas(rig, rig.lidsLowerL, -lowerLid, 0, 0);
+    setBoneRotationDeltas(rig, rig.lidsLowerR, -lowerLid, 0, 0);
+  }
 
   // LED pulse
   const mats = headGroup.userData.ledMats;
   if (mats) {
-    const pulse = 0.75 + 0.25 * Math.sin(t * 2.4);
+    const pulse = (0.72 + 0.28 * Math.sin(t * 2.8)) * motion.led;
     for (const m of mats) m.opacity = pulse;
   }
 
-  // slight camera breathing
-  camera.position.x = Math.sin(t * 0.35) * 0.008 + mouse.x * 0.012;
-  camera.position.y = FOCUS.y + 0.02 + Math.sin(t * 0.5) * 0.005 - mouse.y * 0.008;
+  // slight camera breathing + UI-driven framing
+  camera.position.x = 0.015 + motion.camX + Math.sin(t * 0.34) * 0.008 + mouse.x * 0.008;
+  camera.position.y = FOCUS.y + 0.01 + motion.camY + Math.sin(t * 0.46) * 0.004 - mouse.y * 0.004;
   camera.lookAt(FOCUS);
 
   composer.render();
