@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VI.VLASOV — PORTFOLIO</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%2335c8e8'/></svg>">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.min.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+
+<!-- 3D scene -->
+<canvas id="scene"></canvas>
+
+<!-- android LED (follows the head bone) -->
+<div id="led" aria-hidden="true"></div>
+
+<!-- screen-space overlays -->
+<div class="vignette" aria-hidden="true"></div>
+<div class="scanlines" aria-hidden="true"></div>
+
+<!-- top bar -->
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-name">VI.VLASOV</span>
+    <span class="brand-sub">PORTFOLIO&nbsp;//&nbsp;2026</span>
+  </div>
+  <div class="status">
+    <span id="clock">--:--</span>
+    <span class="sep"></span>
+    <span class="cloud"><i class="dot"></i>CLOUD: CONNECTED</span>
+  </div>
+</header>
+
+<!-- main menu (DBH style) -->
+<nav class="menu" id="menu">
+  <button class="menu-item" data-panel="about"><span class="marker"></span><span class="label">Обо мне</span></button>
+  <button class="menu-item" data-panel="projects"><span class="marker"></span><span class="label">Проекты</span></button>
+  <button class="menu-item" data-panel="skills"><span class="marker"></span><span class="label">Навыки</span></button>
+  <button class="menu-item" data-panel="contact"><span class="marker"></span><span class="label">Контакты</span></button>
+</nav>
+
+<!-- content panels -->
+<section class="panel" id="panel" hidden>
+  <button class="panel-back" id="panel-back"><span class="marker"></span>Назад</button>
+  <div class="panel-body" id="panel-about" hidden>
+    <h2>Обо мне</h2>
+    <p class="panel-tag">SOFTWARE ENGINEER · МОДЕЛЬ VK-2026</p>
+    <p>Привет! Я разработчик, который любит выразительные интерфейсы,
+    3D-графику в вебе и аккуратный код. Эта страница — небольшой
+    эксперимент по мотивам главного меню Detroit: Become Human:
+    физически корректный рендеринг, HDR-освещение и скелетная
+    анимация прямо в браузере.</p>
+    <p>Замените этот текст своей историей — файл
+    <code>portfolio/index.html</code>.</p>
+  </div>
+  <div class="panel-body" id="panel-projects" hidden>
+    <h2>Проекты</h2>
+    <p class="panel-tag">ИЗБРАННЫЕ РАБОТЫ</p>
+    <article class="card">
+      <h3>Проект №1</h3>
+      <p>Краткое описание проекта: чем он полезен, что внутри, ссылка на репозиторий.</p>
+      <span class="card-meta">WEBGL · THREE.JS</span>
+    </article>
+    <article class="card">
+      <h3>Проект №2</h3>
+      <p>Краткое описание проекта: стек, роль, результат.</p>
+      <span class="card-meta">TYPESCRIPT · NODE</span>
+    </article>
+    <article class="card">
+      <h3>Проект №3</h3>
+      <p>Краткое описание проекта: что было сложным и как решилось.</p>
+      <span class="card-meta">PYTHON · ML</span>
+    </article>
+  </div>
+  <div class="panel-body" id="panel-skills" hidden>
+    <h2>Навыки</h2>
+    <p class="panel-tag">SOFTWARE MODULES · DIAGNOSTICS OK</p>
+    <div class="skill"><span>JavaScript / TypeScript</span><div class="bar"><i style="--v:92%"></i></div></div>
+    <div class="skill"><span>Three.js / WebGL</span><div class="bar"><i style="--v:85%"></i></div></div>
+    <div class="skill"><span>React / UI Engineering</span><div class="bar"><i style="--v:88%"></i></div></div>
+    <div class="skill"><span>Node.js / Backend</span><div class="bar"><i style="--v:80%"></i></div></div>
+    <div class="skill"><span>Python</span><div class="bar"><i style="--v:75%"></i></div></div>
+  </div>
+  <div class="panel-body" id="panel-contact" hidden>
+    <h2>Контакты</h2>
+    <p class="panel-tag">УСТАНОВИТЬ СОЕДИНЕНИЕ</p>
+    <ul class="contacts">
+      <li><span>EMAIL</span><a href="mailto:vikubik452@gmail.com">vikubik452@gmail.com</a></li>
+      <li><span>GITHUB</span><a href="https://github.com/vi-vlasov" target="_blank" rel="noopener">github.com/vi-vlasov</a></li>
+      <li><span>TELEGRAM</span><a href="#">@your_handle</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- bottom serial line -->
+<footer class="serial">
+  <span>VK300&nbsp;#313&nbsp;248&nbsp;317&nbsp;-&nbsp;51</span>
+  <span class="serial-right">SYSTEM&nbsp;NOMINAL&nbsp;·&nbsp;RENDER:&nbsp;PBR&nbsp;/&nbsp;ACES&nbsp;/&nbsp;HDR&nbsp;IBL</span>
+</footer>
+
+<!-- boot / loading screen -->
+<div class="boot" id="boot">
+  <div class="boot-inner">
+    <div class="boot-ring"></div>
+    <div class="boot-title">LOADING&nbsp;MODEL&nbsp;VK-2026</div>
+    <div class="boot-bar"><i id="boot-progress"></i></div>
+    <div class="boot-sub" id="boot-status">INITIALIZING…</div>
+  </div>
+</div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
