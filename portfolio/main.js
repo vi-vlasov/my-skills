@@ -170,8 +170,8 @@ function onProgress(xhr) {
   bootStatus.textContent = 'LOADING GEOMETRY & TEXTURES…';
 }
 
-// ---- primary character: Chloe (user-provided, not in the repo) ----
-// assets/chloe/ is gitignored; when absent the free facecap head loads instead.
+// ---- primary character: Chloe (bundled with the portfolio) ----
+// If these assets are removed, the free facecap head still loads as fallback.
 
 function chloeMaterials() {
   const A = 'assets/chloe/';
