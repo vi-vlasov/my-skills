@@ -153,123 +153,6 @@ function haloTexture() {
   return tex;
 }
 
-function catchlightTexture() {
-  const c = document.createElement('canvas');
-  c.width = 96;
-  c.height = 96;
-  const ctx = c.getContext('2d');
-  const g = ctx.createRadialGradient(42, 38, 1, 42, 38, 30);
-  g.addColorStop(0, 'rgba(255,255,255,0.82)');
-  g.addColorStop(0.28, 'rgba(238,250,255,0.48)');
-  g.addColorStop(0.58, 'rgba(166,220,255,0.1)');
-  g.addColorStop(1, 'rgba(166,220,255,0)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, 96, 96);
-
-  const pin = ctx.createRadialGradient(57, 54, 0, 57, 54, 10);
-  pin.addColorStop(0, 'rgba(255,255,255,0.38)');
-  pin.addColorStop(0.34, 'rgba(255,255,255,0.14)');
-  pin.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = pin;
-  ctx.fillRect(0, 0, 96, 96);
-
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
-function blinkVeilTexture() {
-  const c = document.createElement('canvas');
-  c.width = 256;
-  c.height = 128;
-  const ctx = c.getContext('2d');
-
-  const lid = ctx.createRadialGradient(128, 58, 12, 128, 62, 112);
-  lid.addColorStop(0, 'rgba(218,188,176,0.92)');
-  lid.addColorStop(0.44, 'rgba(178,139,132,0.78)');
-  lid.addColorStop(0.76, 'rgba(86,66,72,0.42)');
-  lid.addColorStop(1, 'rgba(154,126,120,0)');
-  ctx.fillStyle = lid;
-  ctx.beginPath();
-  ctx.ellipse(128, 64, 108, 30, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  const crease = ctx.createLinearGradient(0, 26, 0, 84);
-  crease.addColorStop(0, 'rgba(48,40,45,0.32)');
-  crease.addColorStop(0.46, 'rgba(70,52,58,0.14)');
-  crease.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = crease;
-  ctx.beginPath();
-  ctx.ellipse(128, 52, 106, 17, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.strokeStyle = 'rgba(42,32,39,0.44)';
-  ctx.lineWidth = 2.6;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo(48, 79);
-  ctx.quadraticCurveTo(128, 86, 208, 79);
-  ctx.stroke();
-
-  ctx.strokeStyle = 'rgba(248,224,216,0.16)';
-  ctx.lineWidth = 1.4;
-  ctx.beginPath();
-  ctx.moveTo(64, 68);
-  ctx.quadraticCurveTo(128, 76, 192, 68);
-  ctx.stroke();
-
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
-function mouthLineTexture() {
-  const c = document.createElement('canvas');
-  c.width = 256;
-  c.height = 96;
-  const ctx = c.getContext('2d');
-
-  const sideShade = ctx.createLinearGradient(0, 0, 256, 0);
-  sideShade.addColorStop(0, 'rgba(46,30,32,0)');
-  sideShade.addColorStop(0.16, 'rgba(42,27,30,0.42)');
-  sideShade.addColorStop(0.36, 'rgba(42,27,30,0.14)');
-  sideShade.addColorStop(0.5, 'rgba(28,22,24,0.1)');
-  sideShade.addColorStop(0.64, 'rgba(42,27,30,0.14)');
-  sideShade.addColorStop(0.84, 'rgba(42,27,30,0.42)');
-  sideShade.addColorStop(1, 'rgba(46,30,32,0)');
-  ctx.fillStyle = sideShade;
-  ctx.beginPath();
-  ctx.ellipse(128, 50, 118, 24, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  const line = ctx.createLinearGradient(0, 0, 256, 0);
-  line.addColorStop(0, 'rgba(20,15,16,0)');
-  line.addColorStop(0.24, 'rgba(20,15,16,0.62)');
-  line.addColorStop(0.5, 'rgba(20,15,16,0.34)');
-  line.addColorStop(0.76, 'rgba(20,15,16,0.62)');
-  line.addColorStop(1, 'rgba(20,15,16,0)');
-  ctx.strokeStyle = line;
-  ctx.lineWidth = 5;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo(42, 48);
-  ctx.quadraticCurveTo(128, 43, 214, 48);
-  ctx.stroke();
-
-  const softLipReflection = ctx.createLinearGradient(0, 0, 0, 96);
-  softLipReflection.addColorStop(0, 'rgba(255,205,190,0)');
-  softLipReflection.addColorStop(0.56, 'rgba(255,205,190,0.1)');
-  softLipReflection.addColorStop(1, 'rgba(255,205,190,0)');
-  ctx.fillStyle = softLipReflection;
-  ctx.beginPath();
-  ctx.ellipse(128, 54, 84, 12, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
 const wall = new THREE.Mesh(
   new THREE.PlaneGeometry(7.2, 4.05),
   new THREE.MeshBasicMaterial({ map: wallTexture() })
@@ -348,7 +231,7 @@ pmrem.dispose();
 
 const camera = new THREE.PerspectiveCamera(23.8, window.innerWidth / window.innerHeight, 0.05, 30);
 const FOCUS = new THREE.Vector3(0, 1.512, 0); // close-up portrait framing, DBH main-menu style
-const CAM_Z = 0.665;
+const CAM_Z = 0.78;
 camera.position.set(0.004, FOCUS.y + 0.005, CAM_Z);
 camera.lookAt(FOCUS);
 
@@ -497,183 +380,10 @@ function setBonePositionDeltas(rig, bones, x = 0, y = 0, z = 0) {
   for (const bone of bones) setBonePositionDelta(rig, bone, x, y, z);
 }
 
-const eyeCatchlightMap = catchlightTexture();
-const eyeBlinkVeilMap = blinkVeilTexture();
-const mouthLineMap = mouthLineTexture();
-const eyeWorld = new THREE.Vector3();
-const mouthWorld = new THREE.Vector3();
-const eyeToCamera = new THREE.Vector3();
-const mouthToCamera = new THREE.Vector3();
-const cameraRight = new THREE.Vector3();
-const cameraUp = new THREE.Vector3();
-const cameraForward = new THREE.Vector3();
-
-function createEyeCatchlight(name) {
-  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: eyeCatchlightMap,
-    color: new THREE.Color(0.82, 0.92, 1.02),
-    transparent: true,
-    opacity: 0.54,
-    depthWrite: false,
-    depthTest: true,
-    blending: THREE.AdditiveBlending,
-    toneMapped: false,
-  }));
-  sprite.name = name;
-  sprite.scale.setScalar(0.012);
-  sprite.visible = false;
-  scene.add(sprite);
-  return sprite;
-}
-
-function createEyeBlinkVeil(name) {
-  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: eyeBlinkVeilMap,
-    transparent: true,
-    opacity: 0,
-    depthWrite: false,
-    depthTest: false,
-    toneMapped: false,
-  }));
-  sprite.name = name;
-  sprite.renderOrder = 14;
-  sprite.scale.set(0.055, 0.026, 1);
-  sprite.visible = false;
-  scene.add(sprite);
-  return sprite;
-}
-
-function createMouthLine(name) {
-  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: mouthLineMap,
-    transparent: true,
-    opacity: 0,
-    depthWrite: false,
-    depthTest: false,
-    toneMapped: false,
-  }));
-  sprite.name = name;
-  sprite.renderOrder = 12;
-  sprite.scale.set(0.088, 0.026, 1);
-  sprite.visible = false;
-  scene.add(sprite);
-  return sprite;
-}
-
-function setupEyeCatchlights() {
-  const prev = headGroup.userData.eyeCatchlights;
-  if (prev) {
-    scene.remove(prev.left, prev.right);
-  }
-  headGroup.userData.eyeCatchlights = {
-    left: createEyeCatchlight('Chloe_EyeCatchlight_L'),
-    right: createEyeCatchlight('Chloe_EyeCatchlight_R'),
-  };
-  document.body.dataset.eyeCatchlights = '2';
-}
-
-function setupEyeBlinkVeils() {
-  const prev = headGroup.userData.eyeBlinkVeils;
-  if (prev) {
-    scene.remove(prev.left, prev.right);
-  }
-  headGroup.userData.eyeBlinkVeils = {
-    left: createEyeBlinkVeil('Chloe_EyeBlinkVeil_L'),
-    right: createEyeBlinkVeil('Chloe_EyeBlinkVeil_R'),
-  };
-  document.body.dataset.eyeBlinkVeils = '2';
-}
-
-function setupMouthLine() {
-  const prev = headGroup.userData.mouthLine;
-  if (prev) scene.remove(prev);
-  headGroup.userData.mouthLine = createMouthLine('Chloe_MouthLine');
-  document.body.dataset.mouthLine = '1';
-}
-
-function updateEyeCatchlight(sprite, eyeBone, blinkClose, side, smile) {
-  if (!sprite || !eyeBone) return;
-  const openFade = 1 - THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.24, 0.56);
-  sprite.material.opacity = openFade * (0.16 + smile * 0.045);
-  sprite.visible = sprite.material.opacity > 0.02;
-  if (!sprite.visible) return;
-
-  camera.matrixWorld.extractBasis(cameraRight, cameraUp, cameraForward);
-  eyeBone.getWorldPosition(eyeWorld);
-  eyeToCamera.copy(camera.position).sub(eyeWorld).normalize();
-  sprite.position
-    .copy(eyeWorld)
-    .addScaledVector(eyeToCamera, 0.023)
-    .addScaledVector(cameraRight, -0.0032 + side * 0.0011)
-    .addScaledVector(cameraUp, 0.0036);
-
-  const scale = 0.0068 + smile * 0.001;
-  sprite.scale.set(scale, scale, scale);
-}
-
-function updateEyeCatchlights(rig, blinkClose, smile) {
-  const catchlights = headGroup.userData.eyeCatchlights;
-  if (!catchlights) return;
-  headGroup.updateMatrixWorld(true);
-  updateEyeCatchlight(catchlights.left, rig.eyeL, blinkClose, -1, smile);
-  updateEyeCatchlight(catchlights.right, rig.eyeR, blinkClose, 1, smile);
-  document.body.dataset.eyeCatchlightOpacity = catchlights.left.material.opacity.toFixed(3);
-}
-
-function updateMouthLine(rig, open, smile) {
-  const sprite = headGroup.userData.mouthLine;
-  const mouthBone = rig.mouthRoot?.[0];
-  if (!sprite || !mouthBone) return;
-
-  const openness = THREE.MathUtils.clamp(open, 0, 1);
-  const smileLift = THREE.MathUtils.clamp(smile, 0, 1);
-  sprite.material.opacity = THREE.MathUtils.clamp(0.08 + openness * 0.42 + smileLift * 0.035, 0, 0.24);
-  sprite.visible = sprite.material.opacity > 0.02;
-  if (!sprite.visible) return;
-
-  camera.matrixWorld.extractBasis(cameraRight, cameraUp, cameraForward);
-  mouthBone.getWorldPosition(mouthWorld);
-  mouthToCamera.copy(camera.position).sub(mouthWorld).normalize();
-  sprite.position
-    .copy(mouthWorld)
-    .addScaledVector(mouthToCamera, 0.032)
-    .addScaledVector(cameraUp, -0.0042);
-
-  sprite.scale.set(0.074 + smileLift * 0.032, 0.012 + openness * 0.034, 1);
-  document.body.dataset.mouthLineOpacity = sprite.material.opacity.toFixed(3);
-}
-
-function updateEyeBlinkVeil(sprite, eyeBone, blinkClose, side) {
-  if (!sprite || !eyeBone) return;
-  const close = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.28, 0.9);
-  sprite.material.opacity = close * 0.96;
-  sprite.visible = sprite.material.opacity > 0.02;
-  if (!sprite.visible) return;
-
-  camera.matrixWorld.extractBasis(cameraRight, cameraUp, cameraForward);
-  eyeBone.getWorldPosition(eyeWorld);
-  eyeToCamera.copy(camera.position).sub(eyeWorld).normalize();
-  sprite.position
-    .copy(eyeWorld)
-    .addScaledVector(eyeToCamera, 0.026)
-    .addScaledVector(cameraRight, side * 0.001)
-    .addScaledVector(cameraUp, -0.0049 - close * 0.0002);
-
-  sprite.scale.set(0.052 + close * 0.004, 0.014 + close * 0.011, 1);
-}
-
-function updateEyeBlinkVeils(rig, blinkClose) {
-  const veils = headGroup.userData.eyeBlinkVeils;
-  if (!veils) return;
-  headGroup.updateMatrixWorld(true);
-  updateEyeBlinkVeil(veils.left, rig.eyeL, blinkClose, -1);
-  updateEyeBlinkVeil(veils.right, rig.eyeR, blinkClose, 1);
-  document.body.dataset.eyeBlinkVeilOpacity = veils.left.material.opacity.toFixed(3);
-}
-
 const BLINK_NATIVE = {
   restClose: 0.12,
-  closeScale: 1.24,
+  maxClose: 0.82,
+  closeScale: 1.36,
   closeBias: -0.08,
   upperDrop: 0.000118,
   coverDrop: 0.000096,
@@ -682,8 +392,10 @@ const BLINK_NATIVE = {
   upperFold: -0.052,
   coverFold: -0.038,
   lowerFold: 0.021,
-  closedEyeOpacity: 0,
+  closedEyeOpacity: 0.2,
+  closedLashOpacity: 0.24,
 };
+const closedEyeColor = new THREE.Color(0.58, 0.5, 0.46);
 
 function smootherStep01(value) {
   const x = THREE.MathUtils.clamp(value, 0, 1);
@@ -693,7 +405,11 @@ function smootherStep01(value) {
 function getNativeBlinkClose(blink) {
   const weightedBlink = THREE.MathUtils.clamp(blink * BLINK_NATIVE.closeScale + BLINK_NATIVE.closeBias, 0, 1);
   const animatedClose = THREE.MathUtils.smoothstep(weightedBlink, 0, 1);
-  return THREE.MathUtils.clamp(BLINK_NATIVE.restClose + animatedClose * (1 - BLINK_NATIVE.restClose), 0, 1);
+  return THREE.MathUtils.clamp(
+    BLINK_NATIVE.restClose + animatedClose * (BLINK_NATIVE.maxClose - BLINK_NATIVE.restClose),
+    BLINK_NATIVE.restClose,
+    BLINK_NATIVE.maxClose
+  );
 }
 
 function applyNativeBlink(rig, blink, squint, lookY) {
@@ -731,51 +447,43 @@ function applyNativeBlink(rig, blink, squint, lookY) {
 
 function applyEyeBlinkVisibility(eyeMats, close) {
   if (!eyeMats) return;
-  const hide = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(close, 0, 1), 0.18, 0.88);
+  const hide = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(close, 0, 1), 0.18, BLINK_NATIVE.maxClose);
   for (const mat of eyeMats) {
+    if (!mat.userData.openBlinkColor) mat.userData.openBlinkColor = mat.color.clone();
+    if (mat.userData.openBlinkEnv == null) mat.userData.openBlinkEnv = mat.envMapIntensity ?? 0;
     mat.opacity = 1 - hide * (1 - BLINK_NATIVE.closedEyeOpacity);
+    mat.color.copy(mat.userData.openBlinkColor).lerp(closedEyeColor, hide * 0.82);
+    mat.envMapIntensity = THREE.MathUtils.lerp(mat.userData.openBlinkEnv, 0, hide);
   }
   document.body.dataset.eyeOpacity = eyeMats[0]?.opacity?.toFixed?.(3) ?? '';
+}
+
+function applyLashBlinkVisibility(lashMats, close) {
+  if (!lashMats) return;
+  const hide = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(close, 0, 1), 0.32, BLINK_NATIVE.maxClose);
+  for (const mat of lashMats) {
+    if (mat.userData.openBlinkOpacity == null) mat.userData.openBlinkOpacity = mat.opacity ?? 1;
+    mat.opacity = THREE.MathUtils.lerp(mat.userData.openBlinkOpacity, BLINK_NATIVE.closedLashOpacity, hide);
+  }
+  document.body.dataset.lashOpacity = lashMats[0]?.opacity?.toFixed?.(3) ?? '';
 }
 
 function applyNativeSmile(rig, smile, asymmetry = 0) {
   const liftL = THREE.MathUtils.clamp(smile + asymmetry, 0, 1);
   const liftR = THREE.MathUtils.clamp(smile - asymmetry, 0, 1);
-  const cornerUpL = -0.000082 * liftL;
-  const cornerUpR = -0.000082 * liftR;
-  const cornerOutL = 0.000038 * liftL;
-  const cornerOutR = -0.000038 * liftR;
-  const cheekLiftL = -0.000068 * liftL;
-  const cheekLiftR = -0.000068 * liftR;
+  const cornerUpL = -0.00004 * liftL;
+  const cornerUpR = -0.00004 * liftR;
+  const cornerOutL = 0.000018 * liftL;
+  const cornerOutR = -0.000018 * liftR;
+  const cheekLiftL = -0.000018 * liftL;
+  const cheekLiftR = -0.000018 * liftR;
 
-  setBonePositionDeltas(rig, rig.mouthCornersL, cornerUpL, 0.000014 * liftL, cornerOutL);
-  setBonePositionDeltas(rig, rig.mouthCornersR, cornerUpR, 0.000014 * liftR, cornerOutR);
-  setBonePositionDeltas(rig, rig.lipEdgesL, cornerUpL * 0.64, 0, cornerOutL * 0.7);
-  setBonePositionDeltas(rig, rig.lipEdgesR, cornerUpR * 0.64, 0, cornerOutR * 0.7);
-  setBonePositionDeltas(rig, rig.cheeksL, cheekLiftL, 0.000012 * liftL, 0.000012 * liftL);
-  setBonePositionDeltas(rig, rig.cheeksR, cheekLiftR, 0.000012 * liftR, -0.000012 * liftR);
-}
-
-function applyNativeMouth(rig, openness, smile, speechPulse = 0) {
-  const open = THREE.MathUtils.clamp(openness, 0, 1);
-  const smileLift = THREE.MathUtils.clamp(smile, 0, 1);
-  const pulse = THREE.MathUtils.clamp(speechPulse, -1, 1);
-  const upperLift = -0.000084 * smileLift - 0.000072 * open + 0.000002 * pulse;
-  const lowerDrop = 0.000062 * open + 0.000002 * Math.max(0, pulse);
-  const lowerOut = 0.000018 * open;
-  const sideSeal = 0.000024 * open;
-
-  setBoneRotationDeltas(rig, rig.mouthRoot, open * 0.03, 0, 0);
-  setBoneRotationDeltas(rig, rig.mandiblesL, open * 0.018, 0, -open * 0.003);
-  setBoneRotationDeltas(rig, rig.mandiblesR, open * 0.018, 0, open * 0.003);
-  setBonePositionDeltas(rig, rig.lipMidUpper, upperLift, 0.000003 * pulse, 0);
-  setBonePositionDeltas(rig, rig.lipMidLower, lowerDrop, -0.000004 * pulse, 0);
-  setBonePositionDeltas(rig, rig.lipLowerL, lowerDrop * 0.22 - sideSeal, 0, lowerOut);
-  setBonePositionDeltas(rig, rig.lipLowerR, lowerDrop * 0.22 - sideSeal, 0, -lowerOut);
-  setBoneRotationDeltas(rig, rig.tongue, open * 0.007, 0, 0);
-
-  document.body.dataset.facialMouthOpen = open.toFixed(3);
-  document.body.dataset.facialSmile = smileLift.toFixed(3);
+  setBonePositionDeltas(rig, rig.mouthCornersL, cornerUpL, 0.000006 * liftL, cornerOutL);
+  setBonePositionDeltas(rig, rig.mouthCornersR, cornerUpR, 0.000006 * liftR, cornerOutR);
+  setBonePositionDeltas(rig, rig.lipEdgesL, cornerUpL * 0.45, 0, cornerOutL * 0.36);
+  setBonePositionDeltas(rig, rig.lipEdgesR, cornerUpR * 0.45, 0, cornerOutR * 0.36);
+  setBonePositionDeltas(rig, rig.cheeksL, cheekLiftL, 0.000005 * liftL, 0.000006 * liftL);
+  setBonePositionDeltas(rig, rig.cheeksR, cheekLiftR, 0.000005 * liftR, -0.000006 * liftR);
 }
 
 // ---- primary character: Chloe (bundled with the portfolio) ----
@@ -826,14 +534,14 @@ function chloeMaterials() {
       envMapIntensity: 0.18,
       color: new THREE.Color(0.9, 0.82, 0.68),
     }),
-    Chloe_Lashes: cutout('lashes.png', { roughness: 0.86, envMapIntensity: 0.08, color: new THREE.Color(0.34, 0.3, 0.3) }),
+    Chloe_Lashes: cutout('lashes.png', { roughness: 0.5 }),
     Chloe_Brows: cutout('brows.png', { roughness: 0.58, envMapIntensity: 0.28, color: new THREE.Color(0.7, 0.57, 0.48) }),
     Chloe_Teeth: new THREE.MeshStandardMaterial({
       map: tex(A + 'teeth_alb.jpg', true),
       normalMap: tex(A + 'teeth_nrm.jpg'),
-      roughness: 0.82,
-      envMapIntensity: 0.052,
-      color: new THREE.Color(0.72, 0.7, 0.66),
+      roughness: 0.8,
+      envMapIntensity: 0.075,
+      color: new THREE.Color(0.72, 0.68, 0.62),
     }),
     Chloe_Duct: new THREE.MeshStandardMaterial({ map: tex(A + 'duct_alb.jpg', true), roughness: 0.35 }),
     Chloe_tear: new THREE.MeshPhysicalMaterial({
@@ -892,6 +600,7 @@ function setupChloe(gltf) {
     else if (mats[name]) obj.material = mats[name];
     obj.material.vertexColors = false;
     if (name === 'Chloe_Eyes') headGroup.userData.eyeMats = [obj.material];
+    if (name === 'Chloe_Lashes') headGroup.userData.lashMats = [obj.material];
     if (name === 'Chloe_Circle') headGroup.userData.ledMats = [obj.material];
   });
 
@@ -907,9 +616,6 @@ function setupChloe(gltf) {
   model.position.y -= 0.07;
 
   headGroup.userData.rig = buildRig(model);
-  setupEyeCatchlights();
-  setupEyeBlinkVeils();
-  setupMouthLine();
   document.body.dataset.orbitsUpperL = String(headGroup.userData.rig.orbitsUpperL.length);
   document.body.dataset.orbitsUpperR = String(headGroup.userData.rig.orbitsUpperR.length);
   document.body.dataset.eyeCoversL = String(headGroup.userData.rig.eyeCoversL.length);
@@ -1362,10 +1068,8 @@ function animate() {
     const shoulderBreath = Math.sin(t * 0.8) * 0.012;
     const expressionAsym = Math.sin(t * 0.61) * 0.026 + Math.sin(t * 0.27 + 1.2) * 0.012 + living.eyeDriftX * 0.18;
     const browAsym = Math.sin(t * 0.92) * 0.0048 + expressionAsym * 0.24 + living.eyeDriftX * 0.008;
-    const speechPulse = Math.sin(t * 1.35) * 0.45 + Math.sin(t * 0.58 + 1.7) * 0.22;
-    const smile = THREE.MathUtils.clamp(0.46 + expressiveMouth * 0.32 + Math.sin(t * 0.72) * 0.01, 0.34, 0.72);
-    const mouthOpen = THREE.MathUtils.clamp(0.17 + expressiveMouth * 0.2 + speechPulse * 0.005, 0.1, 0.32);
-    const smileAsym = expressionAsym * 1.16;
+    const smile = THREE.MathUtils.clamp(0.18 + expressiveMouth * 0.52 + Math.sin(t * 0.72) * 0.018, 0, 0.68);
+    const smileAsym = expressionAsym * 0.7;
 
     setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * -0.08, motion.roll * 0.08);
     setBoneRotationDeltas(rig, rig.spineUpper, headPitch * -0.12, headYaw * -0.12, motion.roll * 0.14);
@@ -1389,12 +1093,10 @@ function animate() {
     document.body.dataset.attentiveLookX = attentiveLookX.toFixed(4);
     document.body.dataset.attentiveLookY = attentiveLookY.toFixed(4);
 
-    const jawOpen = 0.01 + mouthOpen * 0.13 + Math.sin(t * 1.45) * 0.0003;
+    const jawOpen = 0.01 + expressiveMouth * 0.045 + Math.sin(t * 1.45) * 0.0015;
     setBoneRotationDeltas(rig, rig.jaw, jawOpen, 0, 0);
-    setBoneRotationDeltas(rig, rig.upperLip, -mouthOpen * 0.045 - Math.sin(t * 1.1) * 0.0008, 0, 0);
+    setBoneRotationDeltas(rig, rig.upperLip, -expressiveMouth * 0.02 - Math.sin(t * 1.1) * 0.001, 0, 0);
     applyNativeSmile(rig, smile, smileAsym);
-    applyNativeMouth(rig, mouthOpen, smile, speechPulse);
-    updateMouthLine(rig, mouthOpen, smile);
     document.body.dataset.facialJawOpen = jawOpen.toFixed(3);
     document.body.dataset.facialSmileAsym = smileAsym.toFixed(3);
 
@@ -1404,8 +1106,7 @@ function animate() {
 
     const blinkClose = applyNativeBlink(rig, blink, motion.squint + smile * 0.09, attentiveLookY);
     applyEyeBlinkVisibility(headGroup.userData.eyeMats, blinkClose);
-    updateEyeBlinkVeils(rig, blinkClose);
-    updateEyeCatchlights(rig, blinkClose, smile);
+    applyLashBlinkVisibility(headGroup.userData.lashMats, blinkClose);
   }
 
   // LED pulse
