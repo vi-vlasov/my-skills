@@ -184,38 +184,38 @@ function blinkVeilTexture() {
   c.height = 128;
   const ctx = c.getContext('2d');
 
-  const lid = ctx.createRadialGradient(128, 58, 10, 128, 62, 116);
-  lid.addColorStop(0, 'rgba(216,176,164,1)');
-  lid.addColorStop(0.44, 'rgba(190,145,136,0.96)');
-  lid.addColorStop(0.76, 'rgba(122,88,91,0.66)');
+  const lid = ctx.createRadialGradient(128, 58, 12, 128, 62, 112);
+  lid.addColorStop(0, 'rgba(218,188,176,0.92)');
+  lid.addColorStop(0.44, 'rgba(178,139,132,0.78)');
+  lid.addColorStop(0.76, 'rgba(86,66,72,0.42)');
   lid.addColorStop(1, 'rgba(154,126,120,0)');
   ctx.fillStyle = lid;
   ctx.beginPath();
-  ctx.ellipse(128, 64, 112, 34, 0, 0, Math.PI * 2);
+  ctx.ellipse(128, 64, 108, 30, 0, 0, Math.PI * 2);
   ctx.fill();
 
   const crease = ctx.createLinearGradient(0, 26, 0, 84);
-  crease.addColorStop(0, 'rgba(62,50,54,0.34)');
-  crease.addColorStop(0.46, 'rgba(82,61,64,0.16)');
+  crease.addColorStop(0, 'rgba(48,40,45,0.32)');
+  crease.addColorStop(0.46, 'rgba(70,52,58,0.14)');
   crease.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = crease;
   ctx.beginPath();
-  ctx.ellipse(128, 52, 108, 18, 0, 0, Math.PI * 2);
+  ctx.ellipse(128, 52, 106, 17, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.strokeStyle = 'rgba(42,32,39,0.64)';
-  ctx.lineWidth = 5;
+  ctx.strokeStyle = 'rgba(42,32,39,0.44)';
+  ctx.lineWidth = 2.6;
   ctx.lineCap = 'round';
   ctx.beginPath();
-  ctx.moveTo(42, 78);
-  ctx.quadraticCurveTo(128, 92, 214, 78);
+  ctx.moveTo(48, 79);
+  ctx.quadraticCurveTo(128, 86, 208, 79);
   ctx.stroke();
 
-  ctx.strokeStyle = 'rgba(248,221,212,0.24)';
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(248,224,216,0.16)';
+  ctx.lineWidth = 1.4;
   ctx.beginPath();
-  ctx.moveTo(58, 68);
-  ctx.quadraticCurveTo(128, 79, 198, 68);
+  ctx.moveTo(64, 68);
+  ctx.quadraticCurveTo(128, 76, 192, 68);
   ctx.stroke();
 
   const tex = new THREE.CanvasTexture(c);
@@ -645,8 +645,8 @@ function updateMouthLine(rig, open, smile) {
 
 function updateEyeBlinkVeil(sprite, eyeBone, blinkClose, side) {
   if (!sprite || !eyeBone) return;
-  const close = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.38, 0.96);
-  sprite.material.opacity = close;
+  const close = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.28, 0.9);
+  sprite.material.opacity = close * 0.96;
   sprite.visible = sprite.material.opacity > 0.02;
   if (!sprite.visible) return;
 
@@ -657,9 +657,9 @@ function updateEyeBlinkVeil(sprite, eyeBone, blinkClose, side) {
     .copy(eyeWorld)
     .addScaledVector(eyeToCamera, 0.026)
     .addScaledVector(cameraRight, side * 0.001)
-    .addScaledVector(cameraUp, -0.0068 - close * 0.0005);
+    .addScaledVector(cameraUp, -0.0049 - close * 0.0002);
 
-  sprite.scale.set(0.057, 0.016 + close * 0.012, 1);
+  sprite.scale.set(0.052 + close * 0.004, 0.014 + close * 0.011, 1);
 }
 
 function updateEyeBlinkVeils(rig, blinkClose) {
@@ -673,16 +673,16 @@ function updateEyeBlinkVeils(rig, blinkClose) {
 
 const BLINK_NATIVE = {
   restClose: 0.12,
-  closeScale: 1.48,
-  closeBias: -0.055,
-  upperDrop: 0.000104,
-  coverDrop: 0.000086,
-  lowerRise: -0.00003,
-  orbitDrop: 0.000022,
-  upperFold: -0.046,
-  coverFold: -0.033,
-  lowerFold: 0.018,
-  closedEyeOpacity: 0.06,
+  closeScale: 1.24,
+  closeBias: -0.08,
+  upperDrop: 0.000118,
+  coverDrop: 0.000096,
+  lowerRise: -0.000034,
+  orbitDrop: 0.000026,
+  upperFold: -0.052,
+  coverFold: -0.038,
+  lowerFold: 0.021,
+  closedEyeOpacity: 0,
 };
 
 function smootherStep01(value) {
@@ -820,9 +820,14 @@ function chloeMaterials() {
       transparent: true,
       opacity: 1,
     }),
-    Chloe_Hair: cutout('hair.png'),
-    Chloe_Lashes: cutout('lashes.png', { roughness: 0.5 }),
-    Chloe_Brows: cutout('brows.png', { roughness: 0.5 }),
+    Chloe_Hair: cutout('hair.png', {
+      alphaTest: 0.28,
+      roughness: 0.84,
+      envMapIntensity: 0.18,
+      color: new THREE.Color(0.9, 0.82, 0.68),
+    }),
+    Chloe_Lashes: cutout('lashes.png', { roughness: 0.86, envMapIntensity: 0.08, color: new THREE.Color(0.34, 0.3, 0.3) }),
+    Chloe_Brows: cutout('brows.png', { roughness: 0.58, envMapIntensity: 0.28, color: new THREE.Color(0.7, 0.57, 0.48) }),
     Chloe_Teeth: new THREE.MeshStandardMaterial({
       map: tex(A + 'teeth_alb.jpg', true),
       normalMap: tex(A + 'teeth_nrm.jpg'),
@@ -1076,19 +1081,19 @@ const living = {
   queuedBlinks: 0,
   queuedBlinkAt: -1,
   blinkDebugMode: 'animate',
-  blinkSpeed: 0.96,
+  blinkSpeed: 0.84,
 };
 
 const BLINK_POSES = {
   open: 0,
-  half: 0.46,
+  half: 0.56,
   closed: 1,
 };
 
 const BLINK_PHASE_DURATION = {
-  closing: 0.096,
-  closed: 0.42,
-  opening: 0.285,
+  closing: 0.145,
+  closed: 0.34,
+  opening: 0.36,
 };
 
 function rand(min, max) {
@@ -1140,6 +1145,7 @@ window.addEventListener('portrait:blink-debug', (event) => {
   }
   if (detail.action === 'blink') {
     living.blinkDebugMode = 'animate';
+    document.body.dataset.blinkMode = 'animate';
     queueBlink(performance.now() / 1000, !!detail.double);
   }
 });
