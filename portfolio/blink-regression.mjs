@@ -28,7 +28,10 @@ assert.match(source, /const smile = THREE\.MathUtils\.clamp\(0\.34 \+ expressive
 assert.match(source, /const mouthOpen = THREE\.MathUtils\.clamp\(0\.15 \+ expressiveMouth \* 0\.26/, 'menu expression should keep a reference-like soft open mouth without fangy teeth');
 assert.match(source, /const jawOpen = 0\.01 \+ mouthOpen \* 0\.11/, 'jaw opening should stay soft enough for a relaxed DBH menu expression');
 assert.match(source, /Chloe_Teeth:[\s\S]*?roughness: 0\.8,[\s\S]*?envMapIntensity: 0\.075/, 'teeth should stay softly visible for the central open-mouth expression');
-assert.match(source, /const expressionAsym = Math\.sin\(t \* 0\.61\) \* 0\.022/, 'face should keep subtle expression asymmetry');
+assert.match(source, /about:\s*\{[\s\S]*?roll: -0\.006 \}/, 'main portrait pose should keep a subtle reference-like head roll instead of looking passport-flat');
+assert.match(source, /headGroup\.rotation\.z = motion\.roll \* 0\.52/, 'head roll should be visible enough to soften the portrait pose');
+assert.match(source, /const expressionAsym = Math\.sin\(t \* 0\.61\) \* 0\.026/, 'face should keep subtle expression asymmetry');
+assert.match(source, /const smileAsym = expressionAsym \* 1\.16/, 'smile asymmetry should be visible enough to avoid a mirrored mask expression');
 assert.match(source, /document\.body\.dataset\.facialSmileAsym = smileAsym\.toFixed\(3\)/, 'smile asymmetry should be exposed for visual checks');
 assert.match(source, /function catchlightTexture\(\)/, 'eye catchlight texture should exist');
 assert.match(source, /function updateEyeCatchlights\(rig, blinkClose, smile\)/, 'eye catchlights should follow the native eye bones');

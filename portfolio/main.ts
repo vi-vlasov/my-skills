@@ -928,7 +928,7 @@ const bodies = panel.querySelectorAll<HTMLElement>('.panel-body');
 let selected = 0;
 
 const MENU_POSES = {
-  about:    { lookX: 0.0,   lookY: 0.008, camX: 0.0,    camY: 0.002, bodyX: 0.0,    bodyY: 0.0,   mouth: 0.48, brow: 0.24, led: 1.0,  squint: 0.015, roll: 0.0 },
+  about:    { lookX: 0.0,   lookY: 0.008, camX: 0.0,    camY: 0.002, bodyX: 0.0,    bodyY: 0.0,   mouth: 0.48, brow: 0.24, led: 1.0,  squint: 0.015, roll: -0.006 },
   projects: { lookX: -0.012,lookY: 0.006, camX: -0.008, camY: 0.001, bodyX: -0.006, bodyY: -0.002,mouth: 0.24, brow: 0.12, led: 0.94, squint: 0.005, roll: -0.01 },
   skills:   { lookX: 0.008, lookY: 0.012, camX: 0.004,  camY: 0.003, bodyX: 0.0,    bodyY: 0.004, mouth: 0.3,  brow: 0.18, led: 1.05, squint: 0.012, roll: 0.0 },
   exp:      { lookX: 0.014, lookY: 0.004, camX: 0.007,  camY: -0.002,bodyX: 0.006,  bodyY: -0.004,mouth: 0.18, brow: 0.1,  led: 0.9,  squint: 0.0,   roll: 0.008 },
@@ -1232,7 +1232,7 @@ function animate() {
 
   headGroup.position.x = motion.bodyX;
   headGroup.position.y = motion.bodyY;
-  headGroup.rotation.z = motion.roll * 0.4;
+  headGroup.rotation.z = motion.roll * 0.52;
 
   const idleYaw = Math.sin(t * 0.42) * 0.025;
   const idlePitch = Math.sin(t * 0.53) * 0.018;
@@ -1247,12 +1247,12 @@ function animate() {
     const headPitch = motion.lookY * 0.66 + living.eyeDriftY * 0.08 + idlePitch;
     const headYaw = motion.lookX * 0.42 + living.eyeDriftX * 0.05 + idleYaw;
     const shoulderBreath = Math.sin(t * 0.8) * 0.012;
-    const expressionAsym = Math.sin(t * 0.61) * 0.022 + Math.sin(t * 0.27 + 1.2) * 0.01 + living.eyeDriftX * 0.16;
-    const browAsym = Math.sin(t * 0.92) * 0.0035 + expressionAsym * 0.18 + living.eyeDriftX * 0.006;
+    const expressionAsym = Math.sin(t * 0.61) * 0.026 + Math.sin(t * 0.27 + 1.2) * 0.012 + living.eyeDriftX * 0.18;
+    const browAsym = Math.sin(t * 0.92) * 0.0048 + expressionAsym * 0.24 + living.eyeDriftX * 0.008;
     const speechPulse = Math.sin(t * 1.35) * 0.45 + Math.sin(t * 0.58 + 1.7) * 0.22;
     const smile = THREE.MathUtils.clamp(0.34 + expressiveMouth * 0.26 + Math.sin(t * 0.72) * 0.012, 0.2, 0.56);
     const mouthOpen = THREE.MathUtils.clamp(0.15 + expressiveMouth * 0.26 + speechPulse * 0.006, 0.09, 0.4);
-    const smileAsym = expressionAsym;
+    const smileAsym = expressionAsym * 1.16;
 
     setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * -0.08, motion.roll * 0.08);
     setBoneRotationDeltas(rig, rig.spineUpper, headPitch * -0.12, headYaw * -0.12, motion.roll * 0.14);
