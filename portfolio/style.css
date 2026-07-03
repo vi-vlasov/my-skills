@@ -34,7 +34,9 @@ html, body {
   overflow: hidden;
   pointer-events: none;
   mix-blend-mode: screen;
-  opacity: 0.92;
+  opacity: 0.76;
+  -webkit-mask-image: radial-gradient(ellipse 34% 45% at 50% 48%, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 48%, rgba(0,0,0,0.58) 72%, rgba(0,0,0,1) 100%);
+  mask-image: radial-gradient(ellipse 34% 45% at 50% 48%, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 48%, rgba(0,0,0,0.58) 72%, rgba(0,0,0,1) 100%);
 }
 
 .cinematic-backdrop i {
@@ -69,7 +71,7 @@ html, body {
     radial-gradient(ellipse at 50% 46%, rgba(255,255,255,0.82) 0%, rgba(235,248,255,0.42) 38%, rgba(206,231,245,0) 73%),
     linear-gradient(90deg, rgba(192,224,242,0), rgba(255,255,255,0.78) 18%, rgba(255,255,255,0.82) 50%, rgba(255,255,255,0.66) 82%, rgba(192,224,242,0));
   filter: blur(18px);
-  opacity: 0.52;
+  opacity: 0.42;
 }
 
 .lens-bloom {
@@ -93,7 +95,7 @@ html, body {
     radial-gradient(ellipse at 52% 20%, rgba(255,255,255,0.52) 0%, rgba(238,248,253,0.28) 42%, rgba(226,238,246,0) 72%),
     linear-gradient(180deg, rgba(255,255,255,0), rgba(232,243,249,0.46) 58%, rgba(221,235,244,0.66));
   filter: blur(10px);
-  opacity: 0.74;
+  opacity: 0.6;
 }
 
 body::before,
