@@ -92,26 +92,26 @@ html, body {
 .torso-haze {
   left: 18vw;
   right: 14vw;
-  top: 66vh;
-  height: 19vh;
+  top: 68vh;
+  height: 17vh;
   border-radius: 50%;
   background:
     radial-gradient(ellipse at 48% 40%, rgba(255,255,255,0.64) 0%, rgba(222,240,250,0.36) 42%, rgba(192,220,238,0) 74%),
     linear-gradient(90deg, rgba(190,220,238,0), rgba(238,248,253,0.48) 48%, rgba(190,220,238,0));
   filter: blur(18px);
-  opacity: 0.52;
+  opacity: 0.42;
 }
 
 .floor-mist {
   left: -10vw;
   right: -10vw;
   bottom: -6vh;
-  height: 39vh;
+  height: 34vh;
   background:
     radial-gradient(ellipse at 52% 20%, rgba(255,255,255,0.54) 0%, rgba(226,242,250,0.32) 42%, rgba(208,229,242,0) 72%),
     linear-gradient(180deg, rgba(255,255,255,0), rgba(222,239,248,0.46) 54%, rgba(199,222,236,0.72));
   filter: blur(10px);
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
 .glass-band {
@@ -160,8 +160,8 @@ body::before {
 body::after {
   z-index: 2;
   inset: auto 0 0 0;
-  height: 34vh;
-  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(224,240,248,0.12) 26%, rgba(204,226,240,0.34) 100%);
+  height: 31vh;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(224,240,248,0.1) 26%, rgba(204,226,240,0.26) 100%);
 }
 
 /* ---------- top corners ---------- */

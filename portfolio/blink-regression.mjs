@@ -56,10 +56,12 @@ assert.match(source, /living\.eyeDriftX = THREE\.MathUtils\.damp\(living\.eyeDri
 assert.match(htmlSource, /<i class="torso-haze"><\/i>/, 'reference haze layer should exist in the cinematic backdrop');
 assert.match(htmlSource, /<i class="glass-band glass-band-a"><\/i>/, 'glass band layer should exist for the Detroit-like menu pane');
 assert.match(htmlSource, /<i class="menu-flare"><\/i>/, 'menu flare layer should exist for the selected-row lens bloom');
-assert.match(styleSource, /\.torso-haze[\s\S]*?top: 66vh;[\s\S]*?opacity: 0\.52;/, 'torso haze should soften the dress area like the reference menu');
-assert.match(styleSource, /\.floor-mist[\s\S]*?height: 39vh;[\s\S]*?opacity: 0\.5;/, 'floor mist should keep the lower torso subdued');
+assert.match(styleSource, /\.torso-haze[\s\S]*?top: 68vh;[\s\S]*?opacity: 0\.42;/, 'torso haze should soften the dress area without erasing the silhouette');
+assert.match(styleSource, /\.floor-mist[\s\S]*?height: 34vh;[\s\S]*?opacity: 0\.4;/, 'floor mist should keep the lower torso subdued without washing out the straps');
 assert.match(styleSource, /\.glass-band[\s\S]*?height: 1px;[\s\S]*?opacity: 0\.52;/, 'glass bands should add thin horizontal camera-glass lines like the reference');
 assert.match(styleSource, /\.menu-flare[\s\S]*?top: 79\.2vh;[\s\S]*?opacity: 0\.42;/, 'menu flare should add a subtle selected-row bloom without washing out the portrait');
+assert.match(source, /Chloe_DressMain:[\s\S]*?roughness: 0\.93,[\s\S]*?envMapIntensity: 0\.085,[\s\S]*?color: new THREE\.Color\(0\.76, 0\.82, 0\.9\)/, 'main dress material should stay matte enough to reveal torso structure through the haze');
+assert.match(source, /Chloe_DressDark:[\s\S]*?roughness: 0\.9,[\s\S]*?envMapIntensity: 0\.075,[\s\S]*?color: new THREE\.Color\(0\.58, 0\.66, 0\.78\)/, 'dark dress straps should stay visible like the reference silhouette');
 assert.match(styleSource, /\.menu::before[\s\S]*?height: 138px;[\s\S]*?rgba\(255,255,255,0\.36\)/, 'menu glow should veil the lower portrait behind the UI');
 assert.match(styleSource, /\.item[\s\S]*?height: 42px;[\s\S]*?font-size: clamp\(12px, 1\.02vw, 17px\)/, 'menu items should stay slim like the reference UI');
 assert.match(styleSource, /\.item::after[\s\S]*?rgba\(237,244,248,0\.38\)[\s\S]*?opacity: 0\.46;/, 'inactive menu panels should stay faint instead of heavy cards');

@@ -744,24 +744,24 @@ function chloeMaterials() {
     Chloe_DressMain: new THREE.MeshStandardMaterial({
       map: tex(A + 'dress_alb.jpg', true),
       normalMap: tex(A + 'dress_nrm.jpg'),
-      roughness: 0.88,
-      envMapIntensity: 0.14,
-      color: new THREE.Color(0.86, 0.89, 0.95),
+      roughness: 0.93,
+      envMapIntensity: 0.085,
+      color: new THREE.Color(0.76, 0.82, 0.9),
     }),
     Chloe_DressDark: new THREE.MeshStandardMaterial({
       map: tex(A + 'dress_alb.jpg', true),
-      roughness: 0.82,
-      envMapIntensity: 0.18,
-      color: new THREE.Color(0.84, 0.88, 0.94),
+      roughness: 0.9,
+      envMapIntensity: 0.075,
+      color: new THREE.Color(0.58, 0.66, 0.78),
     }),
     Chloe_DressTrans: new THREE.MeshStandardMaterial({
       map: tex(A + 'white_alb.jpg', true),
       transparent: true,
-      opacity: 0.24,
+      opacity: 0.18,
       side: THREE.DoubleSide,
       roughness: 0.92,
       envMapIntensity: 0.04,
-      color: new THREE.Color(0.8, 0.86, 0.93),
+      color: new THREE.Color(0.74, 0.82, 0.92),
     }),
     // the temple LED: the in-game mesh, plain HDR cyan so bloom picks it up
     Chloe_Circle: new THREE.MeshBasicMaterial({
