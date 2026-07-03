@@ -26,7 +26,7 @@ renderer.toneMappingExposure = 0.9;
 // ---------------------------------------------------------------- scene
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xeaf5fb);
+scene.background = new THREE.Color(0xddeff8);
 
 // studio wall: blurred bright panels, like the blown-out DBH backdrop
 function wallTexture() {
@@ -36,39 +36,39 @@ function wallTexture() {
   const ctx = c.getContext('2d');
 
   const base = ctx.createLinearGradient(0, 0, 0, 576);
-  base.addColorStop(0, '#ffffff');
-  base.addColorStop(0.34, '#f5fbff');
-  base.addColorStop(0.68, '#dcecf6');
-  base.addColorStop(1, '#c8deec');
+  base.addColorStop(0, '#fbfdff');
+  base.addColorStop(0.3, '#eff8fd');
+  base.addColorStop(0.62, '#d8ebf6');
+  base.addColorStop(1, '#b8d6e8');
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, 1024, 576);
 
   const topGlow = ctx.createRadialGradient(508, 98, 44, 508, 98, 460);
-  topGlow.addColorStop(0, 'rgba(255,255,255,0.98)');
-  topGlow.addColorStop(0.42, 'rgba(255,255,255,0.5)');
+  topGlow.addColorStop(0, 'rgba(255,255,255,0.82)');
+  topGlow.addColorStop(0.42, 'rgba(255,255,255,0.34)');
   topGlow.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = topGlow;
   ctx.fillRect(0, 0, 1024, 360);
 
   const paneWash = ctx.createLinearGradient(0, 0, 1024, 0);
-  paneWash.addColorStop(0, 'rgba(180,215,235,0.42)');
-  paneWash.addColorStop(0.16, 'rgba(255,255,255,0.22)');
-  paneWash.addColorStop(0.5, 'rgba(255,255,255,0.08)');
-  paneWash.addColorStop(0.84, 'rgba(205,230,244,0.24)');
-  paneWash.addColorStop(1, 'rgba(155,202,228,0.44)');
+  paneWash.addColorStop(0, 'rgba(136,194,226,0.5)');
+  paneWash.addColorStop(0.16, 'rgba(225,244,252,0.22)');
+  paneWash.addColorStop(0.5, 'rgba(255,255,255,0.04)');
+  paneWash.addColorStop(0.84, 'rgba(202,232,247,0.26)');
+  paneWash.addColorStop(1, 'rgba(121,190,226,0.5)');
   ctx.fillStyle = paneWash;
   ctx.fillRect(0, 0, 1024, 576);
 
   // tall luminous columns, closer to the Detroit main menu backdrop
   ctx.filter = 'blur(18px)';
   const panels: Array<[number, number, string, number]> = [
-    [34, 64, '#bfe1f4', 0.78],
-    [106, 110, '#ffffff', 0.84],
-    [260, 94, '#d3ebf8', 0.76],
-    [404, 132, '#ffffff', 0.94],
-    [602, 120, '#d1e9f8', 0.78],
-    [784, 82, '#ffffff', 0.82],
-    [910, 76, '#aed8ef', 0.62],
+    [18, 58, '#9ed2ee', 0.92],
+    [104, 84, '#ffffff', 0.78],
+    [238, 78, '#bfe1f4', 0.78],
+    [380, 116, '#ffffff', 0.72],
+    [590, 100, '#c6e6f7', 0.72],
+    [768, 70, '#ffffff', 0.78],
+    [900, 72, '#92caea', 0.8],
   ];
   for (const [x, w, color, a] of panels) {
     ctx.globalAlpha = a;
@@ -77,33 +77,33 @@ function wallTexture() {
   }
 
   ctx.filter = 'blur(4px)';
-  ctx.globalAlpha = 0.38;
-  ctx.fillStyle = '#e7f6ff';
-  for (const x of [118, 236, 378, 552, 734, 884]) {
-    ctx.fillRect(x, 0, 3, 576);
+  ctx.globalAlpha = 0.54;
+  ctx.fillStyle = '#f8fdff';
+  for (const x of [92, 198, 334, 520, 710, 884, 984]) {
+    ctx.fillRect(x, 0, 4, 576);
   }
 
-  ctx.filter = 'blur(16px)';
-  ctx.globalAlpha = 0.5;
+  ctx.filter = 'blur(12px)';
+  ctx.globalAlpha = 0.68;
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(-60, 310, 1144, 30);
-  ctx.globalAlpha = 0.24;
-  ctx.fillStyle = '#c5ddeb';
-  ctx.fillRect(-40, 380, 1104, 8);
-  ctx.fillRect(-40, 462, 1104, 10);
+  ctx.fillRect(-60, 304, 1144, 42);
+  ctx.globalAlpha = 0.34;
+  ctx.fillStyle = '#b7d8eb';
+  ctx.fillRect(-40, 372, 1104, 10);
+  ctx.fillRect(-40, 462, 1104, 12);
 
   const sideFog = ctx.createLinearGradient(0, 0, 1024, 0);
-  sideFog.addColorStop(0, 'rgba(190,219,236,0.42)');
-  sideFog.addColorStop(0.18, 'rgba(240,249,253,0.08)');
-  sideFog.addColorStop(0.78, 'rgba(240,249,253,0.04)');
-  sideFog.addColorStop(1, 'rgba(170,211,235,0.35)');
+  sideFog.addColorStop(0, 'rgba(136,194,226,0.48)');
+  sideFog.addColorStop(0.18, 'rgba(232,247,253,0.1)');
+  sideFog.addColorStop(0.78, 'rgba(232,247,253,0.06)');
+  sideFog.addColorStop(1, 'rgba(118,187,224,0.46)');
   ctx.fillStyle = sideFog;
   ctx.fillRect(0, 0, 1024, 576);
 
   const lowerFog = ctx.createLinearGradient(0, 260, 0, 576);
   lowerFog.addColorStop(0, 'rgba(255,255,255,0)');
-  lowerFog.addColorStop(0.46, 'rgba(237,247,252,0.24)');
-  lowerFog.addColorStop(1, 'rgba(215,232,242,0.72)');
+  lowerFog.addColorStop(0.46, 'rgba(226,242,250,0.22)');
+  lowerFog.addColorStop(1, 'rgba(189,216,232,0.68)');
   ctx.fillStyle = lowerFog;
   ctx.fillRect(0, 250, 1024, 326);
 
@@ -211,7 +211,7 @@ const halo = new THREE.Mesh(
   })
 );
 halo.position.set(0.02, 1.9, -2.04);
-halo.material.opacity = 0.28;
+halo.material.opacity = 0.2;
 scene.add(halo);
 
 const lowerWash = new THREE.Mesh(
@@ -225,40 +225,41 @@ const lowerWash = new THREE.Mesh(
   })
 );
 lowerWash.position.set(0, 0.28, -1.96);
-lowerWash.material.opacity = 0.025;
+lowerWash.material.opacity = 0.015;
 scene.add(lowerWash);
 
 const menuGlow = new THREE.Mesh(
-  new THREE.PlaneGeometry(7.8, 0.22),
+  new THREE.PlaneGeometry(7.8, 0.32),
   new THREE.MeshBasicMaterial({
-    color: new THREE.Color(1.0, 1.08, 1.16),
+    color: new THREE.Color(0.88, 1.02, 1.18),
     transparent: true,
-    opacity: 0.2,
+    opacity: 0.36,
     toneMapped: false,
     depthWrite: false,
   })
 );
-menuGlow.position.set(0, 0.86, -2.0);
+menuGlow.position.set(0, 0.91, -2.0);
 scene.add(menuGlow);
 
 // hot glow strips that feed the bloom halo around the silhouette
-function glowStrip(x, w, intensity) {
+function glowStrip(x, w, intensity, opacity = 0.82) {
   const m = new THREE.Mesh(
     new THREE.PlaneGeometry(w, 4.2),
     new THREE.MeshBasicMaterial({
       color: new THREE.Color(intensity, intensity, intensity),
       toneMapped: false,
       transparent: true,
-      opacity: 0.9,
+      opacity,
     })
   );
   m.position.set(x, 1.5, -2.1);
   scene.add(m);
 }
-glowStrip(-1.72, 0.34, 1.18);
-glowStrip(-0.18, 0.28, 0.92);
-glowStrip(0.42, 0.42, 1.24);
-glowStrip(1.72, 0.34, 1.0);
+glowStrip(-2.9, 0.16, 1.24, 0.82);
+glowStrip(-1.62, 0.24, 1.1, 0.68);
+glowStrip(0.28, 0.34, 0.92, 0.46);
+glowStrip(1.78, 0.2, 1.14, 0.72);
+glowStrip(2.92, 0.16, 1.28, 0.86);
 
 // image-based lighting
 const pmrem = new THREE.PMREMGenerator(renderer);
@@ -602,12 +603,12 @@ function applyEyeBlinkVisibility(eyeMats, close) {
 function applyNativeSmile(rig, smile, asymmetry = 0) {
   const liftL = THREE.MathUtils.clamp(smile + asymmetry, 0, 1);
   const liftR = THREE.MathUtils.clamp(smile - asymmetry, 0, 1);
-  const cornerUpL = -0.000072 * liftL;
-  const cornerUpR = -0.000072 * liftR;
-  const cornerOutL = 0.00003 * liftL;
-  const cornerOutR = -0.00003 * liftR;
-  const cheekLiftL = -0.000036 * liftL;
-  const cheekLiftR = -0.000036 * liftR;
+  const cornerUpL = -0.000056 * liftL;
+  const cornerUpR = -0.000056 * liftR;
+  const cornerOutL = 0.000022 * liftL;
+  const cornerOutR = -0.000022 * liftR;
+  const cheekLiftL = -0.000032 * liftL;
+  const cheekLiftR = -0.000032 * liftR;
 
   setBonePositionDeltas(rig, rig.mouthCornersL, cornerUpL, 0.000006 * liftL, cornerOutL);
   setBonePositionDeltas(rig, rig.mouthCornersR, cornerUpR, 0.000006 * liftR, cornerOutR);
@@ -621,18 +622,18 @@ function applyNativeMouth(rig, openness, smile, speechPulse = 0) {
   const open = THREE.MathUtils.clamp(openness, 0, 1);
   const smileLift = THREE.MathUtils.clamp(smile, 0, 1);
   const pulse = THREE.MathUtils.clamp(speechPulse, -1, 1);
-  const upperLift = -0.000043 * smileLift - 0.000008 * open + 0.000003 * pulse;
-  const lowerDrop = 0.000024 * open + 0.000004 * Math.max(0, pulse);
-  const lowerOut = 0.000004 * open;
+  const upperLift = -0.000056 * smileLift - 0.00004 * open + 0.000004 * pulse;
+  const lowerDrop = 0.000078 * open + 0.000005 * Math.max(0, pulse);
+  const lowerOut = 0.000008 * open;
 
-  setBoneRotationDeltas(rig, rig.mouthRoot, open * 0.009, 0, 0);
-  setBoneRotationDeltas(rig, rig.mandiblesL, open * 0.005, 0, -open * 0.003);
-  setBoneRotationDeltas(rig, rig.mandiblesR, open * 0.005, 0, open * 0.003);
+  setBoneRotationDeltas(rig, rig.mouthRoot, open * 0.014, 0, 0);
+  setBoneRotationDeltas(rig, rig.mandiblesL, open * 0.009, 0, -open * 0.004);
+  setBoneRotationDeltas(rig, rig.mandiblesR, open * 0.009, 0, open * 0.004);
   setBonePositionDeltas(rig, rig.lipMidUpper, upperLift, 0.000002 * pulse, 0);
-  setBonePositionDeltas(rig, rig.lipMidLower, lowerDrop, -0.000002 * pulse, 0);
-  setBonePositionDeltas(rig, rig.lipLowerL, lowerDrop * 0.56, 0, lowerOut);
-  setBonePositionDeltas(rig, rig.lipLowerR, lowerDrop * 0.56, 0, -lowerOut);
-  setBoneRotationDeltas(rig, rig.tongue, open * 0.004, 0, 0);
+  setBonePositionDeltas(rig, rig.lipMidLower, lowerDrop, -0.000003 * pulse, 0);
+  setBonePositionDeltas(rig, rig.lipLowerL, lowerDrop * 0.92, 0, lowerOut);
+  setBonePositionDeltas(rig, rig.lipLowerR, lowerDrop * 0.92, 0, -lowerOut);
+  setBoneRotationDeltas(rig, rig.tongue, open * 0.006, 0, 0);
 
   document.body.dataset.facialMouthOpen = open.toFixed(3);
   document.body.dataset.facialSmile = smileLift.toFixed(3);
@@ -686,9 +687,9 @@ function chloeMaterials() {
     Chloe_Teeth: new THREE.MeshStandardMaterial({
       map: tex(A + 'teeth_alb.jpg', true),
       normalMap: tex(A + 'teeth_nrm.jpg'),
-      roughness: 0.36,
-      envMapIntensity: 0.42,
-      color: new THREE.Color(1.0, 0.96, 0.9),
+      roughness: 0.68,
+      envMapIntensity: 0.12,
+      color: new THREE.Color(0.78, 0.72, 0.66),
     }),
     Chloe_Duct: new THREE.MeshStandardMaterial({ map: tex(A + 'duct_alb.jpg', true), roughness: 0.35 }),
     Chloe_tear: new THREE.MeshPhysicalMaterial({
@@ -1202,8 +1203,8 @@ function animate() {
     const shoulderBreath = Math.sin(t * 0.8) * 0.012;
     const browAsym = Math.sin(t * 0.92) * 0.002 + living.eyeDriftX * 0.006;
     const speechPulse = Math.sin(t * 1.35) * 0.45 + Math.sin(t * 0.58 + 1.7) * 0.22;
-    const smile = THREE.MathUtils.clamp(0.34 + expressiveMouth * 0.38 + Math.sin(t * 0.72) * 0.018, 0.16, 0.74);
-    const mouthOpen = THREE.MathUtils.clamp(0.08 + expressiveMouth * 0.27 + speechPulse * 0.01, 0.04, 0.38);
+    const smile = THREE.MathUtils.clamp(0.34 + expressiveMouth * 0.34 + Math.sin(t * 0.72) * 0.014, 0.18, 0.66);
+    const mouthOpen = THREE.MathUtils.clamp(0.1 + expressiveMouth * 0.34 + speechPulse * 0.012, 0.06, 0.48);
     const smileAsym = Math.sin(t * 0.61) * 0.015 + living.eyeDriftX * 0.14;
 
     setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * -0.08, motion.roll * 0.08);
@@ -1228,9 +1229,9 @@ function animate() {
     document.body.dataset.attentiveLookX = attentiveLookX.toFixed(4);
     document.body.dataset.attentiveLookY = attentiveLookY.toFixed(4);
 
-    const jawOpen = 0.006 + mouthOpen * 0.038 + Math.sin(t * 1.45) * 0.0008;
+    const jawOpen = 0.008 + mouthOpen * 0.064 + Math.sin(t * 1.45) * 0.0009;
     setBoneRotationDeltas(rig, rig.jaw, jawOpen, 0, 0);
-    setBoneRotationDeltas(rig, rig.upperLip, -mouthOpen * 0.018 - Math.sin(t * 1.1) * 0.001, 0, 0);
+    setBoneRotationDeltas(rig, rig.upperLip, -mouthOpen * 0.028 - Math.sin(t * 1.1) * 0.0012, 0, 0);
     applyNativeSmile(rig, smile, smileAsym);
     applyNativeMouth(rig, mouthOpen, smile, speechPulse);
     document.body.dataset.facialJawOpen = jawOpen.toFixed(3);

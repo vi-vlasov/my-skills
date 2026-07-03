@@ -16,6 +16,12 @@ assert.match(source, /lipMidLower: pick\('Bip_FaceLipMiLoOut', 'Bip_FaceLipMiLoI
 assert.match(source, /function applyNativeMouth\(rig, openness, smile, speechPulse = 0\)/, 'native mouth expression layer should exist');
 assert.match(source, /document\.body\.dataset\.facialMouthOpen = open\.toFixed\(3\)/, 'mouth openness should be exposed for visual state checks');
 assert.match(source, /document\.body\.dataset\.facialJawOpen = jawOpen\.toFixed\(3\)/, 'jaw openness should be exposed for visual state checks');
+assert.match(source, /const cornerUpL = -0\.000056 \* liftL/, 'mouth corners should stay soft rather than exposing only side teeth');
+assert.match(source, /const upperLift = -0\.000056 \* smileLift - 0\.00004 \* open/, 'upper lip should lift enough for a readable soft smile');
+assert.match(source, /const lowerDrop = 0\.000078 \* open/, 'lower lip should drop enough for a readable open-mouth expression');
+assert.match(source, /const mouthOpen = THREE\.MathUtils\.clamp\(0\.1 \+ expressiveMouth \* 0\.34/, 'menu expression should keep the reference-like mouth opening visible');
+assert.match(source, /const jawOpen = 0\.008 \+ mouthOpen \* 0\.064/, 'jaw opening should be strong enough to show teeth in the portrait');
+assert.match(source, /Chloe_Teeth:[\s\S]*?roughness: 0\.68,[\s\S]*?envMapIntensity: 0\.12/, 'teeth should stay soft enough for the open-mouth expression');
 assert.match(source, /function catchlightTexture\(\)/, 'eye catchlight texture should exist');
 assert.match(source, /function updateEyeCatchlights\(rig, blinkClose, smile\)/, 'eye catchlights should follow the native eye bones');
 assert.match(source, /setupEyeCatchlights\(\)/, 'Chloe setup should create eye catchlights');
