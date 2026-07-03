@@ -18,12 +18,12 @@ assert.match(source, /lipMidLower: pick\('Bip_FaceLipMiLoOut', 'Bip_FaceLipMiLoI
 assert.match(source, /function applyNativeMouth\(rig, openness, smile, speechPulse = 0\)/, 'native mouth expression layer should exist');
 assert.match(source, /document\.body\.dataset\.facialMouthOpen = open\.toFixed\(3\)/, 'mouth openness should be exposed for visual state checks');
 assert.match(source, /document\.body\.dataset\.facialJawOpen = jawOpen\.toFixed\(3\)/, 'jaw openness should be exposed for visual state checks');
-assert.match(source, /const cornerUpL = -0\.000056 \* liftL/, 'mouth corners should stay soft rather than exposing only side teeth');
-assert.match(source, /const upperLift = -0\.000056 \* smileLift - 0\.00004 \* open/, 'upper lip should lift enough for a readable soft smile');
-assert.match(source, /const lowerDrop = 0\.000078 \* open/, 'lower lip should drop enough for a readable open-mouth expression');
-assert.match(source, /const mouthOpen = THREE\.MathUtils\.clamp\(0\.1 \+ expressiveMouth \* 0\.34/, 'menu expression should keep the reference-like mouth opening visible');
-assert.match(source, /const jawOpen = 0\.008 \+ mouthOpen \* 0\.064/, 'jaw opening should be strong enough to show teeth in the portrait');
-assert.match(source, /Chloe_Teeth:[\s\S]*?roughness: 0\.68,[\s\S]*?envMapIntensity: 0\.12/, 'teeth should stay soft enough for the open-mouth expression');
+assert.match(source, /const cornerUpL = -0\.000046 \* liftL/, 'mouth corners should stay soft rather than exposing only side teeth');
+assert.match(source, /const upperLift = -0\.00005 \* smileLift - 0\.000032 \* open/, 'upper lip should lift enough for a readable soft smile');
+assert.match(source, /const lowerDrop = 0\.000066 \* open/, 'lower lip should drop softly for a relaxed open-mouth expression');
+assert.match(source, /const mouthOpen = THREE\.MathUtils\.clamp\(0\.07 \+ expressiveMouth \* 0\.24/, 'menu expression should keep a reference-like soft open mouth without fangy teeth');
+assert.match(source, /const jawOpen = 0\.005 \+ mouthOpen \* 0\.044/, 'jaw opening should stay soft enough for a relaxed DBH menu expression');
+assert.match(source, /Chloe_Teeth:[\s\S]*?roughness: 0\.76,[\s\S]*?envMapIntensity: 0\.07/, 'teeth should stay matte enough for the open-mouth expression');
 assert.match(source, /const expressionAsym = Math\.sin\(t \* 0\.61\) \* 0\.022/, 'face should keep subtle expression asymmetry');
 assert.match(source, /document\.body\.dataset\.facialSmileAsym = smileAsym\.toFixed\(3\)/, 'smile asymmetry should be exposed for visual checks');
 assert.match(source, /function catchlightTexture\(\)/, 'eye catchlight texture should exist');
@@ -39,8 +39,13 @@ assert.match(source, /function blinkVeilTexture\(\)/, 'blink veil texture should
 assert.match(source, /function updateEyeBlinkVeils\(rig, blinkClose\)/, 'blink veils should follow the native eye bones');
 assert.match(source, /setupEyeBlinkVeils\(\)/, 'Chloe setup should create blink veils');
 assert.match(source, /document\.body\.dataset\.eyeBlinkVeilOpacity/, 'blink veil opacity should be exposed for visual checks');
+assert.match(source, /sprite\.material\.opacity = close \* 0\.92/, 'closed eyelid veil should visibly cover the eye surface');
+assert.match(source, /restClose: 0\.16/, 'open eyes should keep a relaxed lid baseline instead of a wide puppet stare');
+assert.match(source, /function smootherStep01\(value\)/, 'blink states should use eased motion instead of jerky linear eye snaps');
+assert.match(source, /living\.blinkSpeed = THREE\.MathUtils\.clamp\(detail\.speed, 0\.55, 1\.8\)/, 'blink debug events should be able to force animation speed for testing');
 assert.match(source, /living\.eyeDriftX \* 1\.35/, 'idle gaze should be amplified enough to read on the portrait');
-assert.match(source, /attentiveLookX \* -1\.65/, 'eye yaw should be strong enough to create eye-contact movement');
+assert.match(source, /attentiveLookX \* -1\.75/, 'eye yaw should be strong enough to create eye-contact movement');
+assert.match(source, /living\.eyeDriftX = THREE\.MathUtils\.damp\(living\.eyeDriftX, living\.eyeTargetX, 1\.75, dt\)/, 'gaze drift should move calmly rather than twitching');
 assert.match(htmlSource, /<i class="torso-haze"><\/i>/, 'reference haze layer should exist in the cinematic backdrop');
 assert.match(styleSource, /\.torso-haze[\s\S]*?top: 66vh;[\s\S]*?opacity: 0\.58;/, 'torso haze should soften the dress area like the reference menu');
 assert.match(styleSource, /\.floor-mist[\s\S]*?height: 39vh;[\s\S]*?opacity: 0\.54;/, 'floor mist should keep the lower torso subdued');
@@ -78,6 +83,7 @@ function smoothstep(value, min, max) {
 
 const closeScale = numberFor('closeScale');
 const closeBias = numberFor('closeBias');
+const restClose = numberFor('restClose');
 const closedEyeOpacity = numberFor('closedEyeOpacity');
 const blinkClosing = blockNumberFor(blinkDurationBlock, 'closing');
 const blinkClosed = blockNumberFor(blinkDurationBlock, 'closed');
@@ -96,7 +102,8 @@ const [nextSaccadeMin, nextSaccadeMax] = numberRangeFor(
 );
 
 function nativeClose(blink) {
-  return smoothstep(clamp(blink * closeScale + closeBias, 0, 1), 0, 1);
+  const animatedClose = smoothstep(clamp(blink * closeScale + closeBias, 0, 1), 0, 1);
+  return clamp(restClose + animatedClose * (1 - restClose), 0, 1);
 }
 
 function eyeOpacity(close) {
@@ -104,15 +111,15 @@ function eyeOpacity(close) {
   return 1 - hide * (1 - closedEyeOpacity);
 }
 
-assert.ok(nativeClose(0) <= 0.001, 'open state should stay open');
+assert.ok(nativeClose(0) >= 0.12 && nativeClose(0) <= 0.22, 'open state should keep relaxed lids without becoming a blink');
 assert.ok(nativeClose(0.46) >= 0.4, 'half debug pose should visibly close the lids');
 assert.equal(nativeClose(1), 1, 'closed debug pose should reach full native close');
 assert.ok(
-  eyeOpacity(nativeClose(1)) >= 0.75,
-  'closed blink should keep eye surfaces mostly present so blink veils do not reveal socket holes'
+  eyeOpacity(nativeClose(1)) <= 0.65,
+  'closed blink should fade the eye surface enough that the eyelid reads as closed'
 );
 assert.ok(blinkClosing >= 0.08, 'blink closing phase should last long enough to read');
-assert.ok(blinkClosed >= 0.2, 'closed blink state should be held long enough for screenshots and perception');
+assert.ok(blinkClosed >= 0.16, 'closed blink state should be held long enough for screenshots and perception');
 assert.ok(blinkOpening >= 0.15, 'blink opening phase should not snap back too quickly');
 assert.ok(eyeTargetMaxX - eyeTargetMinX >= 0.024, 'idle eye gaze should have visible horizontal range');
 assert.ok(eyeTargetMaxY - eyeTargetMinY >= 0.012, 'idle eye gaze should have visible vertical range');
