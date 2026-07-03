@@ -54,8 +54,12 @@ assert.match(source, /living\.eyeDriftX \* 1\.35/, 'idle gaze should be amplifie
 assert.match(source, /attentiveLookX \* -1\.75/, 'eye yaw should be strong enough to create eye-contact movement');
 assert.match(source, /living\.eyeDriftX = THREE\.MathUtils\.damp\(living\.eyeDriftX, living\.eyeTargetX, 1\.75, dt\)/, 'gaze drift should move calmly rather than twitching');
 assert.match(htmlSource, /<i class="torso-haze"><\/i>/, 'reference haze layer should exist in the cinematic backdrop');
+assert.match(htmlSource, /<i class="glass-band glass-band-a"><\/i>/, 'glass band layer should exist for the Detroit-like menu pane');
+assert.match(htmlSource, /<i class="menu-flare"><\/i>/, 'menu flare layer should exist for the selected-row lens bloom');
 assert.match(styleSource, /\.torso-haze[\s\S]*?top: 66vh;[\s\S]*?opacity: 0\.52;/, 'torso haze should soften the dress area like the reference menu');
 assert.match(styleSource, /\.floor-mist[\s\S]*?height: 39vh;[\s\S]*?opacity: 0\.5;/, 'floor mist should keep the lower torso subdued');
+assert.match(styleSource, /\.glass-band[\s\S]*?height: 1px;[\s\S]*?opacity: 0\.52;/, 'glass bands should add thin horizontal camera-glass lines like the reference');
+assert.match(styleSource, /\.menu-flare[\s\S]*?top: 79\.2vh;[\s\S]*?opacity: 0\.42;/, 'menu flare should add a subtle selected-row bloom without washing out the portrait');
 assert.match(styleSource, /\.menu::before[\s\S]*?height: 138px;[\s\S]*?rgba\(255,255,255,0\.36\)/, 'menu glow should veil the lower portrait behind the UI');
 assert.match(styleSource, /\.item[\s\S]*?height: 42px;[\s\S]*?font-size: clamp\(12px, 1\.02vw, 17px\)/, 'menu items should stay slim like the reference UI');
 assert.match(styleSource, /\.item::after[\s\S]*?rgba\(237,244,248,0\.38\)[\s\S]*?opacity: 0\.46;/, 'inactive menu panels should stay faint instead of heavy cards');

@@ -114,6 +114,33 @@ html, body {
   opacity: 0.5;
 }
 
+.glass-band {
+  left: 4vw;
+  right: 4vw;
+  height: 1px;
+  background:
+    linear-gradient(90deg, rgba(116,155,184,0), rgba(255,255,255,0.7) 14%, rgba(142,177,204,0.2) 46%, rgba(255,255,255,0.58) 82%, rgba(116,155,184,0)),
+    linear-gradient(90deg, rgba(75,105,128,0), rgba(75,105,128,0.18) 50%, rgba(75,105,128,0));
+  filter: blur(0.4px);
+  opacity: 0.52;
+}
+.glass-band-a { top: 72.5vh; }
+.glass-band-b { top: 80.8vh; opacity: 0.42; }
+
+.menu-flare {
+  left: 31vw;
+  top: 79.2vh;
+  width: min(20vw, 300px);
+  height: min(10vw, 142px);
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 35% 48%, rgba(255,255,255,0.86) 0%, rgba(208,236,255,0.34) 25%, rgba(126,167,226,0.16) 48%, rgba(255,255,255,0) 72%),
+    linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,0.48) 48%, rgba(255,255,255,0));
+  filter: blur(13px);
+  opacity: 0.42;
+  transform: rotate(-11deg);
+}
+
 body::before,
 body::after {
   content: "";
