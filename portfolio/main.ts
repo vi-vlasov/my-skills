@@ -346,16 +346,34 @@ function setBonePositionDeltas(rig, bones, x = 0, y = 0, z = 0) {
   for (const bone of bones) setBonePositionDelta(rig, bone, x, y, z);
 }
 
+const BLINK_NATIVE = {
+  closeScale: 1.32,
+  closeBias: -0.08,
+  upperDrop: 0.00017,
+  coverDrop: 0.000135,
+  lowerRise: -0.000052,
+  orbitDrop: 0.000035,
+  upperFold: -0.095,
+  coverFold: -0.064,
+  lowerFold: 0.034,
+  closedEyeOpacity: 0.08,
+};
+
+function getNativeBlinkClose(blink) {
+  const weightedBlink = THREE.MathUtils.clamp(blink * BLINK_NATIVE.closeScale + BLINK_NATIVE.closeBias, 0, 1);
+  return THREE.MathUtils.smoothstep(weightedBlink, 0, 1);
+}
+
 function applyNativeBlink(rig, blink, squint, lookY) {
-  const close = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blink * 0.72, 0, 1), 0, 1);
+  const close = getNativeBlinkClose(blink);
   const gazeSquint = THREE.MathUtils.clamp(squint + Math.max(0, lookY) * 0.08, 0, 0.08);
-  const upperDrop = 0.000078 * close + 0.000016 * gazeSquint;
-  const coverDrop = 0.000058 * close + 0.000012 * gazeSquint;
-  const lowerRise = -0.000021 * close - 0.000006 * gazeSquint;
-  const orbitDrop = 0.000017 * close + 0.000004 * gazeSquint;
-  const upperFold = -0.044 * close - 0.006 * gazeSquint;
-  const coverFold = -0.026 * close - 0.004 * gazeSquint;
-  const lowerFold = 0.014 * close + 0.004 * gazeSquint;
+  const upperDrop = BLINK_NATIVE.upperDrop * close + 0.000018 * gazeSquint;
+  const coverDrop = BLINK_NATIVE.coverDrop * close + 0.000014 * gazeSquint;
+  const lowerRise = BLINK_NATIVE.lowerRise * close - 0.000009 * gazeSquint;
+  const orbitDrop = BLINK_NATIVE.orbitDrop * close + 0.000006 * gazeSquint;
+  const upperFold = BLINK_NATIVE.upperFold * close - 0.008 * gazeSquint;
+  const coverFold = BLINK_NATIVE.coverFold * close - 0.006 * gazeSquint;
+  const lowerFold = BLINK_NATIVE.lowerFold * close + 0.006 * gazeSquint;
 
   setBonePositionDeltas(rig, rig.orbitsUpperL, orbitDrop, 0, 0);
   setBonePositionDeltas(rig, rig.orbitsUpperR, orbitDrop, 0, 0);
@@ -374,14 +392,18 @@ function applyNativeBlink(rig, blink, squint, lookY) {
   setBoneRotationDeltas(rig, rig.lidsUpperR, upperFold, 0, -close * 0.055);
   setBoneRotationDeltas(rig, rig.lidsLowerL, lowerFold, 0, -close * 0.018);
   setBoneRotationDeltas(rig, rig.lidsLowerR, lowerFold, 0, close * 0.018);
+
+  document.body.dataset.blinkNativeClose = close.toFixed(3);
+  return close;
 }
 
-function applyEyeBlinkVisibility(eyeMats, blink) {
+function applyEyeBlinkVisibility(eyeMats, close) {
   if (!eyeMats) return;
-  const hide = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blink, 0, 1), 0.48, 1);
+  const hide = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(close, 0, 1), 0.18, 0.88);
   for (const mat of eyeMats) {
-    mat.opacity = 1 - hide * 0.28;
+    mat.opacity = 1 - hide * (1 - BLINK_NATIVE.closedEyeOpacity);
   }
+  document.body.dataset.eyeOpacity = eyeMats[0]?.opacity?.toFixed?.(3) ?? '';
 }
 
 function applyNativeSmile(rig, smile, asymmetry = 0) {
@@ -685,7 +707,7 @@ const living = {
   browTarget: 0,
   mouthTarget: 0,
   nextSaccadeAt: 0.9,
-  nextBlinkAt: 1.8,
+  nextBlinkAt: 1.1,
   blinkPhase: 'open',
   blinkElapsed: 0,
   blinkAmount: 0,
@@ -701,9 +723,9 @@ const BLINK_POSES = {
 };
 
 const BLINK_PHASE_DURATION = {
-  closing: 0.09,
-  closed: 0.11,
-  opening: 0.14,
+  closing: 0.06,
+  closed: 0.16,
+  opening: 0.12,
 };
 
 function rand(min, max) {
@@ -725,11 +747,11 @@ function queueBlink(time, forceDouble = false) {
   } else {
     living.queuedBlinks += 1;
   }
-  if (forceDouble || Math.random() < 0.16) {
+  if (forceDouble || Math.random() < 0.12) {
     living.queuedBlinks += 1;
-    living.queuedBlinkAt = time + rand(0.08, 0.16);
+    living.queuedBlinkAt = time + rand(0.18, 0.28);
   }
-  living.nextBlinkAt = time + rand(2.6, 4.8);
+  living.nextBlinkAt = time + rand(1.9, 3.8);
 }
 
 function setBlinkDebugMode(mode) {
@@ -803,7 +825,11 @@ function updateBlinkState(time, dt) {
 }
 
 function updateLivingMotion(time, dt) {
-  if (time >= living.nextSaccadeAt) {
+  const blink = updateBlinkState(time, dt);
+  const blinkHold = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blink, 0, 1), 0.18, 0.95);
+  document.body.dataset.eyeDriftHold = blinkHold.toFixed(3);
+
+  if (time >= living.nextSaccadeAt && blinkHold < 0.15) {
     living.eyeTargetX = rand(-0.008, 0.008);
     living.eyeTargetY = rand(-0.004, 0.004);
     living.browTarget = rand(-0.045, 0.055);
@@ -811,11 +837,16 @@ function updateLivingMotion(time, dt) {
     living.nextSaccadeAt = time + rand(2.2, 4.4);
   }
 
-  living.eyeDriftX = THREE.MathUtils.damp(living.eyeDriftX, living.eyeTargetX, 5.2, dt);
-  living.eyeDriftY = THREE.MathUtils.damp(living.eyeDriftY, living.eyeTargetY, 5.2, dt);
+  if (blinkHold < 0.2) {
+    living.eyeDriftX = THREE.MathUtils.damp(living.eyeDriftX, living.eyeTargetX, 5.2, dt);
+    living.eyeDriftY = THREE.MathUtils.damp(living.eyeDriftY, living.eyeTargetY, 5.2, dt);
+  } else {
+    living.eyeTargetX = THREE.MathUtils.damp(living.eyeTargetX, living.eyeDriftX, 14, dt);
+    living.eyeTargetY = THREE.MathUtils.damp(living.eyeTargetY, living.eyeDriftY, 14, dt);
+  }
   living.browDrift = THREE.MathUtils.damp(living.browDrift, living.browTarget, 4.2, dt);
   living.mouthDrift = THREE.MathUtils.damp(living.mouthDrift, living.mouthTarget, 3.8, dt);
-  return updateBlinkState(time, dt);
+  return blink;
 }
 function select(i) {
   selected = (i + items.length) % items.length;
@@ -965,8 +996,8 @@ function animate() {
     setBoneRotationDeltas(rig, rig.browsL, -browLift - browAsym, 0, -expressiveBrow * 0.003);
     setBoneRotationDeltas(rig, rig.browsR, -browLift + browAsym, 0, expressiveBrow * 0.003);
 
-    applyNativeBlink(rig, blink, motion.squint, attentiveLookY);
-    applyEyeBlinkVisibility(headGroup.userData.eyeMats, blink);
+    const blinkClose = applyNativeBlink(rig, blink, motion.squint, attentiveLookY);
+    applyEyeBlinkVisibility(headGroup.userData.eyeMats, blinkClose);
   }
 
   // LED pulse

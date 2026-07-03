@@ -11,6 +11,7 @@
   "scripts": {
     "build:portfolio": "tsc -p portfolio/tsconfig.json",
     "check:portfolio": "tsc -p portfolio/tsconfig.json --noEmit",
+    "test:portfolio:blink": "node portfolio/blink-regression.mjs",
     "changeset": "changeset",
     "version": "changeset version"
   },
