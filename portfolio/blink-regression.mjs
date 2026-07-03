@@ -18,12 +18,13 @@ assert.match(source, /lipMidLower: pick\('Bip_FaceLipMiLoOut', 'Bip_FaceLipMiLoI
 assert.match(source, /function applyNativeMouth\(rig, openness, smile, speechPulse = 0\)/, 'native mouth expression layer should exist');
 assert.match(source, /document\.body\.dataset\.facialMouthOpen = open\.toFixed\(3\)/, 'mouth openness should be exposed for visual state checks');
 assert.match(source, /document\.body\.dataset\.facialJawOpen = jawOpen\.toFixed\(3\)/, 'jaw openness should be exposed for visual state checks');
-assert.match(source, /const cornerUpL = -0\.000046 \* liftL/, 'mouth corners should stay soft rather than exposing only side teeth');
-assert.match(source, /const upperLift = -0\.00005 \* smileLift - 0\.000032 \* open/, 'upper lip should lift enough for a readable soft smile');
-assert.match(source, /const lowerDrop = 0\.000066 \* open/, 'lower lip should drop softly for a relaxed open-mouth expression');
-assert.match(source, /const mouthOpen = THREE\.MathUtils\.clamp\(0\.07 \+ expressiveMouth \* 0\.24/, 'menu expression should keep a reference-like soft open mouth without fangy teeth');
-assert.match(source, /const jawOpen = 0\.005 \+ mouthOpen \* 0\.044/, 'jaw opening should stay soft enough for a relaxed DBH menu expression');
-assert.match(source, /Chloe_Teeth:[\s\S]*?roughness: 0\.76,[\s\S]*?envMapIntensity: 0\.07/, 'teeth should stay matte enough for the open-mouth expression');
+assert.match(source, /const cornerUpL = -0\.000038 \* liftL/, 'mouth corners should stay soft rather than exposing only side teeth');
+assert.match(source, /const upperLift = -0\.000044 \* smileLift - 0\.000028 \* open/, 'upper lip should lift enough for a readable soft smile');
+assert.match(source, /const lowerDrop = 0\.000062 \* open/, 'lower lip should drop softly for a relaxed open-mouth expression');
+assert.match(source, /const sideSeal = 0\.000026 \* open/, 'side lips should seal the corners so teeth stay centered');
+assert.match(source, /const mouthOpen = THREE\.MathUtils\.clamp\(0\.065 \+ expressiveMouth \* 0\.21/, 'menu expression should keep a reference-like soft open mouth without fangy teeth');
+assert.match(source, /const jawOpen = 0\.0045 \+ mouthOpen \* 0\.04/, 'jaw opening should stay soft enough for a relaxed DBH menu expression');
+assert.match(source, /Chloe_Teeth:[\s\S]*?roughness: 0\.82,[\s\S]*?envMapIntensity: 0\.04/, 'teeth should stay matte enough for the open-mouth expression');
 assert.match(source, /const expressionAsym = Math\.sin\(t \* 0\.61\) \* 0\.022/, 'face should keep subtle expression asymmetry');
 assert.match(source, /document\.body\.dataset\.facialSmileAsym = smileAsym\.toFixed\(3\)/, 'smile asymmetry should be exposed for visual checks');
 assert.match(source, /function catchlightTexture\(\)/, 'eye catchlight texture should exist');
@@ -53,6 +54,8 @@ assert.match(styleSource, /\.menu::before[\s\S]*?height: 138px;[\s\S]*?rgba\(255
 assert.match(styleSource, /\.item[\s\S]*?height: 42px;[\s\S]*?font-size: clamp\(12px, 1\.02vw, 17px\)/, 'menu items should stay slim like the reference UI');
 assert.match(styleSource, /\.item::after[\s\S]*?rgba\(237,244,248,0\.38\)[\s\S]*?opacity: 0\.46;/, 'inactive menu panels should stay faint instead of heavy cards');
 assert.match(styleSource, /\.item::before[\s\S]*?#10233b 0%[\s\S]*?#47759c 100%/, 'selected menu bar should keep the dark Detroit-like blue ramp');
+assert.match(source, /\[100, 66, '#ffffff', 0\.9\]/, 'background should keep bright vertical panes like the Detroit reference');
+assert.match(source, /ctx\.globalAlpha = 0\.84;[\s\S]*?ctx\.fillRect\(-60, 292, 1144, 52\)/, 'background should keep a strong horizontal light band behind the portrait');
 
 function numberFor(key) {
   const match = nativeBlock[1].match(new RegExp(`${key}:\\s*(-?\\d+(?:\\.\\d+)?)`));
