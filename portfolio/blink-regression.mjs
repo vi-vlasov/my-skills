@@ -36,8 +36,10 @@ assert.match(source, /sprite\.material\.opacity = openFade \* \(0\.28 \+ smile \
 assert.match(source, /const scale = 0\.0088 \+ smile \* 0\.0018/, 'eye catchlights should remain small enough to avoid fake overlay eyes');
 assert.match(source, /Chloe_Eyes:[\s\S]*?roughness: 0\.9,[\s\S]*?envMapIntensity: 0\.006/, 'eye material should stay matte enough to avoid glassy reflections');
 assert.match(source, /color: new THREE\.Color\(0\.43, 0\.52, 0\.58\)/, 'iris color should stay lighter and reference-like without adding glass');
-assert.match(source, /specularIntensity: 0\.24,[\s\S]*?clearcoat: 0\.05,[\s\S]*?clearcoatRoughness: 0\.72/, 'skin should stay soft rather than waxy');
-assert.match(source, /const portraitFill = new THREE\.PointLight\(0xeaf7ff, 0\.32, 1\.2, 2\.0\)/, 'portrait should keep a subtle front fill for reference-like skin softness');
+assert.match(source, /renderer\.toneMappingExposure = 0\.93/, 'renderer exposure should keep the bright studio portrait look');
+assert.match(source, /specularIntensity: 0\.2,[\s\S]*?clearcoat: 0\.05,[\s\S]*?clearcoatRoughness: 0\.72/, 'skin should stay soft rather than waxy');
+assert.match(source, /envMapIntensity: 0\.36,[\s\S]*?color: new THREE\.Color\(1\.09, 1\.035, 1\.0\)/, 'skin should stay pale and softly lit like the reference');
+assert.match(source, /const portraitFill = new THREE\.PointLight\(0xeaf7ff, 0\.46, 1\.35, 2\.0\)/, 'portrait should keep a reference-like front fill for skin softness');
 assert.match(source, /function blinkVeilTexture\(\)/, 'blink veil texture should exist for closed-eye states');
 assert.match(source, /function updateEyeBlinkVeils\(rig, blinkClose\)/, 'blink veils should follow the native eye bones');
 assert.match(source, /setupEyeBlinkVeils\(\)/, 'Chloe setup should create blink veils');

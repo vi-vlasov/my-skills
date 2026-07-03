@@ -21,7 +21,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.9;
+renderer.toneMappingExposure = 0.93;
 
 // ---------------------------------------------------------------- scene
 
@@ -284,12 +284,12 @@ camera.lookAt(FOCUS);
 // ---------------------------------------------------------------- lights
 
 // soft frontal key — the bright studio look
-const key = new THREE.DirectionalLight(0xfff1e9, 1.44);
+const key = new THREE.DirectionalLight(0xfff1e9, 1.48);
 key.position.set(0.3, 2.85, 2.45);
 scene.add(key);
 
 // cool fill from the other side
-const fill = new THREE.DirectionalLight(0xd8efff, 0.78);
+const fill = new THREE.DirectionalLight(0xd8efff, 0.92);
 fill.position.set(-1.55, 1.88, 1.45);
 scene.add(fill);
 
@@ -305,7 +305,7 @@ const overhead = new THREE.DirectionalLight(0xf3fbff, 0.34);
 overhead.position.set(0, 3.3, 0.85);
 scene.add(overhead);
 
-const portraitFill = new THREE.PointLight(0xeaf7ff, 0.32, 1.2, 2.0);
+const portraitFill = new THREE.PointLight(0xeaf7ff, 0.46, 1.35, 2.0);
 portraitFill.position.set(0, 1.62, 0.58);
 scene.add(portraitFill);
 
@@ -668,11 +668,11 @@ function chloeMaterials() {
       normalMap: tex(A + nrm),
       roughnessMap: tex(A + rough),
       roughness: 0.86,
-      specularIntensity: 0.24,
+      specularIntensity: 0.2,
       clearcoat: 0.05,
       clearcoatRoughness: 0.72,
-      envMapIntensity: 0.42,
-      color: new THREE.Color(1.06, 0.99, 0.96),
+      envMapIntensity: 0.36,
+      color: new THREE.Color(1.09, 1.035, 1.0),
     });
   const cutout = (map, opts = {}) =>
     new THREE.MeshStandardMaterial({
