@@ -27,6 +27,75 @@ html, body {
 
 #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
 
+.cinematic-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.92;
+}
+
+.cinematic-backdrop i {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.cinematic-backdrop .pane {
+  top: -8vh;
+  height: 118vh;
+  width: clamp(74px, 10vw, 150px);
+  border-radius: 42px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.78), rgba(213,237,250,0.22) 44%, rgba(255,255,255,0.36) 100%),
+    linear-gradient(90deg, rgba(171,211,236,0), rgba(255,255,255,0.78), rgba(171,211,236,0));
+  filter: blur(20px);
+  opacity: 0.34;
+}
+
+.cinematic-backdrop .pane-a { left: 5.5vw; }
+.cinematic-backdrop .pane-b { left: 33vw; width: clamp(88px, 12vw, 190px); opacity: 0.26; }
+.cinematic-backdrop .pane-c { right: 23vw; width: clamp(90px, 13vw, 205px); opacity: 0.3; }
+.cinematic-backdrop .pane-d { right: 4vw; width: clamp(70px, 9vw, 140px); opacity: 0.38; }
+
+.horizon-glow {
+  left: -8vw;
+  right: -8vw;
+  top: 39.4vh;
+  height: 11.5vh;
+  background:
+    radial-gradient(ellipse at 50% 46%, rgba(255,255,255,0.82) 0%, rgba(235,248,255,0.42) 38%, rgba(206,231,245,0) 73%),
+    linear-gradient(90deg, rgba(192,224,242,0), rgba(255,255,255,0.78) 18%, rgba(255,255,255,0.82) 50%, rgba(255,255,255,0.66) 82%, rgba(192,224,242,0));
+  filter: blur(18px);
+  opacity: 0.52;
+}
+
+.lens-bloom {
+  left: 8vw;
+  top: 64vh;
+  width: min(28vw, 360px);
+  height: min(20vw, 250px);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(210,235,255,0.26) 32%, rgba(195,220,255,0.08) 54%, rgba(255,255,255,0) 72%);
+  filter: blur(22px);
+  opacity: 0.28;
+  transform: rotate(-16deg);
+}
+
+.floor-mist {
+  left: -10vw;
+  right: -10vw;
+  bottom: -5vh;
+  height: 34vh;
+  background:
+    radial-gradient(ellipse at 52% 20%, rgba(255,255,255,0.52) 0%, rgba(238,248,253,0.28) 42%, rgba(226,238,246,0) 72%),
+    linear-gradient(180deg, rgba(255,255,255,0), rgba(232,243,249,0.46) 58%, rgba(221,235,244,0.66));
+  filter: blur(10px);
+  opacity: 0.74;
+}
+
 body::before,
 body::after {
   content: "";
@@ -38,8 +107,8 @@ body::after {
 body::before {
   z-index: 1;
   background:
-    radial-gradient(60% 44% at 50% 28%, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.08) 42%, rgba(255,255,255,0) 76%),
-    linear-gradient(90deg, rgba(187,220,242,0.12) 0%, rgba(255,255,255,0) 22%, rgba(255,255,255,0) 78%, rgba(176,216,241,0.14) 100%);
+    radial-gradient(60% 44% at 50% 28%, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.1) 42%, rgba(255,255,255,0) 76%),
+    linear-gradient(90deg, rgba(187,220,242,0.16) 0%, rgba(255,255,255,0) 22%, rgba(255,255,255,0) 78%, rgba(176,216,241,0.18) 100%);
   mix-blend-mode: screen;
 }
 
@@ -254,6 +323,10 @@ body::after {
   transform: translateY(-4px);
 }
 
+.panel-open .cinematic-backdrop {
+  opacity: 0.58;
+}
+
 .panel-open .menu {
   transform: translateY(10px);
 }
@@ -384,6 +457,9 @@ body::after {
   .menu { flex-wrap: wrap; gap: 10px 14px; justify-content: center; top: auto; bottom: 8vh; }
   .item { width: 42vw; height: 44px; }
   .telemetry { display: none; }
+  .cinematic-backdrop { opacity: 0.72; }
+  .horizon-glow { top: 36vh; }
+  .lens-bloom { opacity: 0.16; }
   .brand { left: 22px; }
   .spinner { right: 22px; }
 }
