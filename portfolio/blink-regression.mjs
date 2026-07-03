@@ -26,6 +26,11 @@ assert.match(source, /function catchlightTexture\(\)/, 'eye catchlight texture s
 assert.match(source, /function updateEyeCatchlights\(rig, blinkClose, smile\)/, 'eye catchlights should follow the native eye bones');
 assert.match(source, /setupEyeCatchlights\(\)/, 'Chloe setup should create eye catchlights');
 assert.match(source, /document\.body\.dataset\.eyeCatchlightOpacity/, 'eye catchlight opacity should be exposed for visual checks');
+assert.match(source, /sprite\.material\.opacity = openFade \* \(0\.2 \+ smile \* 0\.12\)/, 'eye catchlights should stay subtle instead of glassy');
+assert.match(source, /Chloe_Eyes:[\s\S]*?roughness: 0\.86,[\s\S]*?envMapIntensity: 0\.008/, 'eye material should stay matte enough to avoid glassy reflections');
+assert.match(source, /color: new THREE\.Color\(0\.34, 0\.41, 0\.46\)/, 'iris color should stay deep and reference-like');
+assert.match(source, /specularIntensity: 0\.24,[\s\S]*?clearcoat: 0\.05,[\s\S]*?clearcoatRoughness: 0\.72/, 'skin should stay soft rather than waxy');
+assert.match(source, /const portraitFill = new THREE\.PointLight\(0xeaf7ff, 0\.32, 1\.2, 2\.0\)/, 'portrait should keep a subtle front fill for reference-like skin softness');
 assert.match(source, /function blinkVeilTexture\(\)/, 'blink veil texture should exist for closed-eye states');
 assert.match(source, /function updateEyeBlinkVeils\(rig, blinkClose\)/, 'blink veils should follow the native eye bones');
 assert.match(source, /setupEyeBlinkVeils\(\)/, 'Chloe setup should create blink veils');

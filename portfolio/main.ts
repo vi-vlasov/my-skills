@@ -278,12 +278,12 @@ camera.lookAt(FOCUS);
 // ---------------------------------------------------------------- lights
 
 // soft frontal key — the bright studio look
-const key = new THREE.DirectionalLight(0xffead9, 1.54);
+const key = new THREE.DirectionalLight(0xfff1e9, 1.44);
 key.position.set(0.3, 2.85, 2.45);
 scene.add(key);
 
 // cool fill from the other side
-const fill = new THREE.DirectionalLight(0xd7ecfb, 0.62);
+const fill = new THREE.DirectionalLight(0xd8efff, 0.78);
 fill.position.set(-1.55, 1.88, 1.45);
 scene.add(fill);
 
@@ -298,6 +298,10 @@ scene.add(rimR);
 const overhead = new THREE.DirectionalLight(0xf3fbff, 0.34);
 overhead.position.set(0, 3.3, 0.85);
 scene.add(overhead);
+
+const portraitFill = new THREE.PointLight(0xeaf7ff, 0.32, 1.2, 2.0);
+portraitFill.position.set(0, 1.62, 0.58);
+scene.add(portraitFill);
 
 // ---------------------------------------------------------------- character
 
@@ -427,7 +431,7 @@ const cameraForward = new THREE.Vector3();
 function createEyeCatchlight(name) {
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
     map: eyeCatchlightMap,
-    color: new THREE.Color(0.92, 0.98, 1.08),
+    color: new THREE.Color(0.82, 0.92, 1.02),
     transparent: true,
     opacity: 0.54,
     depthWrite: false,
@@ -436,7 +440,7 @@ function createEyeCatchlight(name) {
     toneMapped: false,
   }));
   sprite.name = name;
-  sprite.scale.setScalar(0.017);
+  sprite.scale.setScalar(0.012);
   sprite.visible = false;
   scene.add(sprite);
   return sprite;
@@ -486,7 +490,7 @@ function setupEyeBlinkVeils() {
 function updateEyeCatchlight(sprite, eyeBone, blinkClose, side, smile) {
   if (!sprite || !eyeBone) return;
   const openFade = 1 - THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.46, 0.88);
-  sprite.material.opacity = openFade * (0.32 + smile * 0.2);
+  sprite.material.opacity = openFade * (0.2 + smile * 0.12);
   sprite.visible = sprite.material.opacity > 0.02;
   if (!sprite.visible) return;
 
@@ -499,7 +503,7 @@ function updateEyeCatchlight(sprite, eyeBone, blinkClose, side, smile) {
     .addScaledVector(cameraRight, -0.004 + side * 0.0015)
     .addScaledVector(cameraUp, 0.0065);
 
-  const scale = 0.0145 + smile * 0.0035;
+  const scale = 0.0105 + smile * 0.0025;
   sprite.scale.set(scale, scale, scale);
 }
 
@@ -650,11 +654,11 @@ function chloeMaterials() {
       normalMap: tex(A + nrm),
       roughnessMap: tex(A + rough),
       roughness: 0.86,
-      specularIntensity: 0.34,
-      clearcoat: 0.08,
-      clearcoatRoughness: 0.62,
-      envMapIntensity: 0.5,
-      color: new THREE.Color(1.06, 0.95, 0.9),
+      specularIntensity: 0.24,
+      clearcoat: 0.05,
+      clearcoatRoughness: 0.72,
+      envMapIntensity: 0.42,
+      color: new THREE.Color(1.06, 0.99, 0.96),
     });
   const cutout = (map, opts = {}) =>
     new THREE.MeshStandardMaterial({
@@ -674,10 +678,10 @@ function chloeMaterials() {
     Chloe_Eyes: new THREE.MeshStandardMaterial({
       map: tex(A + 'eye_alb.jpg', true),
       normalMap: tex(A + 'eye_nrm.jpg'),
-      roughness: 0.72,
+      roughness: 0.86,
       metalness: 0,
-      envMapIntensity: 0.025,
-      color: new THREE.Color(0.48, 0.58, 0.64),
+      envMapIntensity: 0.008,
+      color: new THREE.Color(0.34, 0.41, 0.46),
       transparent: true,
       opacity: 1,
     }),
