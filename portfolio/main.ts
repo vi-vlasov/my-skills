@@ -60,14 +60,14 @@ function wallTexture() {
   ctx.fillRect(0, 0, 1024, 576);
 
   // Broad luminous panes, not a picket fence: closer to the DBH overexposed window blocks.
-  ctx.filter = 'blur(22px)';
+  ctx.filter = 'blur(18px)';
   const broadWindowPanes: Array<[number, number, string, number]> = [
-    [-52, 128, '#f8fdff', 0.88],
-    [128, 142, '#d9f1fb', 0.58],
-    [330, 166, '#ffffff', 0.74],
-    [552, 178, '#e6f7fd', 0.64],
-    [794, 150, '#ffffff', 0.82],
-    [956, 102, '#ccebf8', 0.72],
+    [-70, 150, '#fbfeff', 0.96],
+    [118, 166, '#d5eef9', 0.62],
+    [330, 194, '#ffffff', 0.82],
+    [548, 204, '#e3f6fd', 0.7],
+    [792, 174, '#ffffff', 0.9],
+    [956, 122, '#c5e8f7', 0.78],
   ];
   for (const [x, w, color, a] of broadWindowPanes) {
     ctx.globalAlpha = a;
@@ -75,13 +75,13 @@ function wallTexture() {
     ctx.fillRect(x, -80, w, 736);
   }
 
-  ctx.filter = 'blur(11px)';
+  ctx.filter = 'blur(8px)';
   const windowPipes: Array<[number, number, number]> = [
-    [72, 10, 0.82],
-    [214, 8, 0.64],
-    [508, 7, 0.42],
-    [805, 10, 0.72],
-    [956, 9, 0.86],
+    [66, 14, 0.94],
+    [218, 10, 0.68],
+    [520, 9, 0.5],
+    [806, 12, 0.78],
+    [958, 14, 0.96],
   ];
   for (const [x, w, a] of windowPipes) {
     ctx.globalAlpha = a;
@@ -101,17 +101,17 @@ function wallTexture() {
     ctx.fillRect(x, 0, 2, 576);
   }
 
-  ctx.filter = 'blur(18px)';
-  ctx.globalAlpha = 0.94;
+  ctx.filter = 'blur(15px)';
+  ctx.globalAlpha = 0.98;
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(-80, 276, 1184, 82);
-  ctx.globalAlpha = 0.42;
+  ctx.fillRect(-80, 270, 1184, 96);
+  ctx.globalAlpha = 0.5;
   ctx.fillStyle = '#c7e5f4';
-  ctx.fillRect(-60, 222, 1144, 18);
-  ctx.fillRect(-60, 390, 1144, 16);
-  ctx.globalAlpha = 0.36;
+  ctx.fillRect(-60, 218, 1144, 22);
+  ctx.fillRect(-60, 392, 1144, 20);
+  ctx.globalAlpha = 0.44;
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(-80, 466, 1184, 24);
+  ctx.fillRect(-80, 462, 1184, 34);
 
   const sideFog = ctx.createLinearGradient(0, 0, 1024, 0);
   sideFog.addColorStop(0, 'rgba(136,194,226,0.48)');
