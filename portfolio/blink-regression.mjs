@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 
 const source = await fs.readFile(new URL('./main.ts', import.meta.url), 'utf8');
+const styleSource = await fs.readFile(new URL('./style.css', import.meta.url), 'utf8');
+const htmlSource = await fs.readFile(new URL('./index.html', import.meta.url), 'utf8');
 const nativeBlock = source.match(/const BLINK_NATIVE = \{([\s\S]*?)\};/);
 const blinkDurationBlock = source.match(/const BLINK_PHASE_DURATION = \{([\s\S]*?)\};/);
 
@@ -37,6 +39,10 @@ assert.match(source, /setupEyeBlinkVeils\(\)/, 'Chloe setup should create blink 
 assert.match(source, /document\.body\.dataset\.eyeBlinkVeilOpacity/, 'blink veil opacity should be exposed for visual checks');
 assert.match(source, /living\.eyeDriftX \* 1\.35/, 'idle gaze should be amplified enough to read on the portrait');
 assert.match(source, /attentiveLookX \* -1\.65/, 'eye yaw should be strong enough to create eye-contact movement');
+assert.match(htmlSource, /<i class="torso-haze"><\/i>/, 'reference haze layer should exist in the cinematic backdrop');
+assert.match(styleSource, /\.torso-haze[\s\S]*?top: 66vh;[\s\S]*?opacity: 0\.58;/, 'torso haze should soften the dress area like the reference menu');
+assert.match(styleSource, /\.floor-mist[\s\S]*?height: 39vh;[\s\S]*?opacity: 0\.54;/, 'floor mist should keep the lower torso subdued');
+assert.match(styleSource, /\.menu::before[\s\S]*?height: 138px;[\s\S]*?rgba\(255,255,255,0\.36\)/, 'menu glow should veil the lower portrait behind the UI');
 
 function numberFor(key) {
   const match = nativeBlock[1].match(new RegExp(`${key}:\\s*(-?\\d+(?:\\.\\d+)?)`));
