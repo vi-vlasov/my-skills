@@ -32,7 +32,8 @@ assert.match(source, /function catchlightTexture\(\)/, 'eye catchlight texture s
 assert.match(source, /function updateEyeCatchlights\(rig, blinkClose, smile\)/, 'eye catchlights should follow the native eye bones');
 assert.match(source, /setupEyeCatchlights\(\)/, 'Chloe setup should create eye catchlights');
 assert.match(source, /document\.body\.dataset\.eyeCatchlightOpacity/, 'eye catchlight opacity should be exposed for visual checks');
-assert.match(source, /sprite\.material\.opacity = openFade \* \(0\.28 \+ smile \* 0\.1\)/, 'eye catchlights should stay readable but controlled instead of glassy');
+assert.match(source, /smoothstep\(THREE\.MathUtils\.clamp\(blinkClose, 0, 1\), 0\.24, 0\.56\)/, 'eye catchlights should fade before the half-blink pose so closing eyes do not look glassy');
+assert.match(source, /sprite\.material\.opacity = openFade \* \(0\.24 \+ smile \* 0\.08\)/, 'eye catchlights should stay readable but controlled instead of glassy');
 assert.match(source, /const scale = 0\.0088 \+ smile \* 0\.0018/, 'eye catchlights should remain small enough to avoid fake overlay eyes');
 assert.match(source, /Chloe_Eyes:[\s\S]*?roughness: 0\.9,[\s\S]*?envMapIntensity: 0\.006/, 'eye material should stay matte enough to avoid glassy reflections');
 assert.match(source, /color: new THREE\.Color\(0\.43, 0\.52, 0\.58\)/, 'iris color should stay lighter and reference-like without adding glass');
@@ -44,10 +45,11 @@ assert.match(source, /function blinkVeilTexture\(\)/, 'blink veil texture should
 assert.match(source, /function updateEyeBlinkVeils\(rig, blinkClose\)/, 'blink veils should follow the native eye bones');
 assert.match(source, /setupEyeBlinkVeils\(\)/, 'Chloe setup should create blink veils');
 assert.match(source, /document\.body\.dataset\.eyeBlinkVeilOpacity/, 'blink veil opacity should be exposed for visual checks');
-assert.match(source, /sprite\.material\.opacity = close \* 0\.92/, 'closed eyelid veil should visibly cover the eye surface');
+assert.match(source, /sprite\.material\.opacity = close \* 0\.98/, 'closed eyelid veil should visibly cover the eye surface');
+assert.match(source, /sprite\.scale\.set\(0\.052, 0\.018 \+ close \* 0\.02, 1\)/, 'closed eyelid veil should stay fitted instead of becoming a large translucent oval');
 assert.match(source, /restClose: 0\.16/, 'open eyes should keep a relaxed lid baseline instead of a wide puppet stare');
 assert.match(source, /function smootherStep01\(value\)/, 'blink states should use eased motion instead of jerky linear eye snaps');
-assert.match(source, /living\.blinkSpeed = THREE\.MathUtils\.clamp\(detail\.speed, 0\.55, 1\.8\)/, 'blink debug events should be able to force animation speed for testing');
+assert.match(source, /living\.blinkSpeed = THREE\.MathUtils\.clamp\(detail\.speed, 0\.55, 2\.4\)/, 'blink debug events should be able to force animation speed for testing');
 assert.match(source, /living\.eyeDriftX \* 1\.35/, 'idle gaze should be amplified enough to read on the portrait');
 assert.match(source, /attentiveLookX \* -1\.75/, 'eye yaw should be strong enough to create eye-contact movement');
 assert.match(source, /living\.eyeDriftX = THREE\.MathUtils\.damp\(living\.eyeDriftX, living\.eyeTargetX, 1\.75, dt\)/, 'gaze drift should move calmly rather than twitching');
@@ -97,6 +99,8 @@ const closedEyeOpacity = numberFor('closedEyeOpacity');
 const blinkClosing = blockNumberFor(blinkDurationBlock, 'closing');
 const blinkClosed = blockNumberFor(blinkDurationBlock, 'closed');
 const blinkOpening = blockNumberFor(blinkDurationBlock, 'opening');
+const defaultBlinkSpeed = Number(source.match(/blinkSpeed:\s*(-?\d+(?:\.\d+)?)/)?.[1]);
+assert.ok(Number.isFinite(defaultBlinkSpeed), 'default blink speed should be declared');
 const [eyeTargetMinX, eyeTargetMaxX] = numberRangeFor(
   /living\.eyeTargetX = rand\((-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)\)/,
   'idle eye target X range'
@@ -124,12 +128,15 @@ assert.ok(nativeClose(0) >= 0.12 && nativeClose(0) <= 0.22, 'open state should k
 assert.ok(nativeClose(0.46) >= 0.4, 'half debug pose should visibly close the lids');
 assert.equal(nativeClose(1), 1, 'closed debug pose should reach full native close');
 assert.ok(
-  eyeOpacity(nativeClose(1)) <= 0.65,
+  eyeOpacity(nativeClose(1)) <= 0.4,
   'closed blink should fade the eye surface enough that the eyelid reads as closed'
 );
-assert.ok(blinkClosing >= 0.08, 'blink closing phase should last long enough to read');
-assert.ok(blinkClosed >= 0.16, 'closed blink state should be held long enough for screenshots and perception');
-assert.ok(blinkOpening >= 0.15, 'blink opening phase should not snap back too quickly');
+assert.ok(blinkClosing >= 0.075 && blinkClosing <= 0.095, 'blink should snap closed quickly enough to read as intentional instead of twitchy');
+assert.ok(blinkClosed >= 0.22, 'closed blink state should be held long enough for screenshots and perception');
+assert.ok(blinkOpening >= 0.17 && blinkOpening <= 0.22, 'blink opening should be calm but not so slow that the eye looks like it is drifting');
+assert.ok(defaultBlinkSpeed >= 1.05 && defaultBlinkSpeed <= 1.12, 'default blink speed should be slightly faster without erasing the closed hold');
+assert.match(source, /Math\.random\(\) < 0\.04/, 'random double blinks should be rare enough to avoid nervous eye twitching');
+assert.match(source, /living\.nextBlinkAt = time \+ rand\(2\.2, 4\.8\)/, 'natural blink cadence should not fire so often that it reads as jitter');
 assert.ok(eyeTargetMaxX - eyeTargetMinX >= 0.024, 'idle eye gaze should have visible horizontal range');
 assert.ok(eyeTargetMaxY - eyeTargetMinY >= 0.012, 'idle eye gaze should have visible vertical range');
 assert.ok(nextSaccadeMin >= 3, 'idle gaze retargets should not twitch too frequently');

@@ -170,9 +170,9 @@ function blinkVeilTexture() {
   const ctx = c.getContext('2d');
 
   const lid = ctx.createRadialGradient(128, 64, 12, 128, 66, 112);
-  lid.addColorStop(0, 'rgba(202,164,152,0.92)');
-  lid.addColorStop(0.48, 'rgba(178,140,132,0.74)');
-  lid.addColorStop(0.82, 'rgba(120,94,96,0.34)');
+  lid.addColorStop(0, 'rgba(194,150,139,0.98)');
+  lid.addColorStop(0.48, 'rgba(166,124,118,0.9)');
+  lid.addColorStop(0.82, 'rgba(104,78,84,0.5)');
   lid.addColorStop(1, 'rgba(154,126,120,0)');
   ctx.fillStyle = lid;
   ctx.beginPath();
@@ -188,10 +188,19 @@ function blinkVeilTexture() {
   ctx.ellipse(128, 56, 102, 22, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.strokeStyle = 'rgba(74,58,62,0.28)';
-  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(48,38,44,0.44)';
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
   ctx.beginPath();
-  ctx.ellipse(128, 84, 88, 13, 0, 0, Math.PI);
+  ctx.moveTo(44, 82);
+  ctx.quadraticCurveTo(128, 98, 212, 82);
+  ctx.stroke();
+
+  ctx.strokeStyle = 'rgba(244,214,204,0.22)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(58, 73);
+  ctx.quadraticCurveTo(128, 86, 198, 73);
   ctx.stroke();
 
   const tex = new THREE.CanvasTexture(c);
@@ -495,8 +504,8 @@ function setupEyeBlinkVeils() {
 
 function updateEyeCatchlight(sprite, eyeBone, blinkClose, side, smile) {
   if (!sprite || !eyeBone) return;
-  const openFade = 1 - THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.46, 0.88);
-  sprite.material.opacity = openFade * (0.28 + smile * 0.1);
+  const openFade = 1 - THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.24, 0.56);
+  sprite.material.opacity = openFade * (0.24 + smile * 0.08);
   sprite.visible = sprite.material.opacity > 0.02;
   if (!sprite.visible) return;
 
@@ -525,7 +534,7 @@ function updateEyeCatchlights(rig, blinkClose, smile) {
 function updateEyeBlinkVeil(sprite, eyeBone, blinkClose, side) {
   if (!sprite || !eyeBone) return;
   const close = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.18, 0.86);
-  sprite.material.opacity = close * 0.92;
+  sprite.material.opacity = close * 0.98;
   sprite.visible = sprite.material.opacity > 0.02;
   if (!sprite.visible) return;
 
@@ -536,9 +545,9 @@ function updateEyeBlinkVeil(sprite, eyeBone, blinkClose, side) {
     .copy(eyeWorld)
     .addScaledVector(eyeToCamera, 0.026)
     .addScaledVector(cameraRight, side * 0.001)
-    .addScaledVector(cameraUp, -0.0035 - close * 0.0012);
+    .addScaledVector(cameraUp, -0.0054 - close * 0.001);
 
-  sprite.scale.set(0.058, 0.024 + close * 0.03, 1);
+  sprite.scale.set(0.052, 0.018 + close * 0.02, 1);
 }
 
 function updateEyeBlinkVeils(rig, blinkClose) {
@@ -561,7 +570,7 @@ const BLINK_NATIVE = {
   upperFold: -0.04,
   coverFold: -0.028,
   lowerFold: 0.014,
-  closedEyeOpacity: 0.62,
+  closedEyeOpacity: 0.28,
 };
 
 function smootherStep01(value) {
@@ -954,7 +963,7 @@ const living = {
   queuedBlinks: 0,
   queuedBlinkAt: -1,
   blinkDebugMode: 'animate',
-  blinkSpeed: 1,
+  blinkSpeed: 1.08,
 };
 
 const BLINK_POSES = {
@@ -964,9 +973,9 @@ const BLINK_POSES = {
 };
 
 const BLINK_PHASE_DURATION = {
-  closing: 0.11,
-  closed: 0.18,
-  opening: 0.22,
+  closing: 0.09,
+  closed: 0.24,
+  opening: 0.2,
 };
 
 function rand(min, max) {
@@ -988,11 +997,11 @@ function queueBlink(time, forceDouble = false) {
   } else {
     living.queuedBlinks += 1;
   }
-  if (forceDouble || Math.random() < 0.12) {
+  if (forceDouble || Math.random() < 0.04) {
     living.queuedBlinks += 1;
-    living.queuedBlinkAt = time + rand(0.24, 0.36);
+    living.queuedBlinkAt = time + rand(0.34, 0.48);
   }
-  living.nextBlinkAt = time + rand(1.8, 3.8);
+  living.nextBlinkAt = time + rand(2.2, 4.8);
 }
 
 function setBlinkDebugMode(mode) {
@@ -1013,7 +1022,7 @@ window.addEventListener('portrait:blink-debug', (event) => {
   const detail = blinkEvent.detail || {};
   if (detail.mode) setBlinkDebugMode(detail.mode);
   if (typeof detail.speed === 'number') {
-    living.blinkSpeed = THREE.MathUtils.clamp(detail.speed, 0.55, 1.8);
+    living.blinkSpeed = THREE.MathUtils.clamp(detail.speed, 0.55, 2.4);
   }
   if (detail.action === 'blink') {
     living.blinkDebugMode = 'animate';
