@@ -19,13 +19,13 @@ assert.match(source, /function applyNativeMouth\(rig, openness, smile, speechPul
 assert.match(source, /document\.body\.dataset\.facialMouthOpen = open\.toFixed\(3\)/, 'mouth openness should be exposed for visual state checks');
 assert.match(source, /document\.body\.dataset\.facialJawOpen = jawOpen\.toFixed\(3\)/, 'jaw openness should be exposed for visual state checks');
 assert.match(source, /const cornerUpL = -0\.000038 \* liftL/, 'mouth corners should stay soft rather than exposing only side teeth');
-assert.match(source, /const upperLift = -0\.00005 \* smileLift - 0\.000052 \* open/, 'upper lip should lift enough for a readable soft smile');
-assert.match(source, /const lowerDrop = 0\.000098 \* open/, 'center lower lip should drop enough for a visible central smile aperture');
-assert.match(source, /const sideSeal = 0\.000048 \* open/, 'side lips should seal the corners so teeth stay centered');
-assert.match(source, /lowerDrop \* 0\.32 - sideSeal/, 'side lower lips should stay sealed while the center opens');
-assert.match(source, /const mouthOpen = THREE\.MathUtils\.clamp\(0\.082 \+ expressiveMouth \* 0\.23/, 'menu expression should keep a reference-like soft open mouth without fangy teeth');
-assert.match(source, /const jawOpen = 0\.0065 \+ mouthOpen \* 0\.078/, 'jaw opening should stay soft enough for a relaxed DBH menu expression');
-assert.match(source, /Chloe_Teeth:[\s\S]*?roughness: 0\.8,[\s\S]*?envMapIntensity: 0\.05/, 'teeth should stay softly visible for the central open-mouth expression');
+assert.match(source, /const upperLift = -0\.00006 \* smileLift - 0\.00009 \* open/, 'upper lip should lift enough for a readable soft smile');
+assert.match(source, /const lowerDrop = 0\.00018 \* open/, 'center lower lip should drop enough for a visible central smile aperture');
+assert.match(source, /const sideSeal = 0\.000032 \* open/, 'side lips should seal the corners so teeth stay centered');
+assert.match(source, /lowerDrop \* 0\.5 - sideSeal/, 'side lower lips should follow the center enough to avoid a puppet V-mouth');
+assert.match(source, /const mouthOpen = THREE\.MathUtils\.clamp\(0\.145 \+ expressiveMouth \* 0\.28/, 'menu expression should keep a reference-like soft open mouth without fangy teeth');
+assert.match(source, /const jawOpen = 0\.01 \+ mouthOpen \* 0\.11/, 'jaw opening should stay soft enough for a relaxed DBH menu expression');
+assert.match(source, /Chloe_Teeth:[\s\S]*?roughness: 0\.8,[\s\S]*?envMapIntensity: 0\.075/, 'teeth should stay softly visible for the central open-mouth expression');
 assert.match(source, /const expressionAsym = Math\.sin\(t \* 0\.61\) \* 0\.022/, 'face should keep subtle expression asymmetry');
 assert.match(source, /document\.body\.dataset\.facialSmileAsym = smileAsym\.toFixed\(3\)/, 'smile asymmetry should be exposed for visual checks');
 assert.match(source, /function catchlightTexture\(\)/, 'eye catchlight texture should exist');
@@ -54,15 +54,16 @@ assert.match(source, /living\.eyeDriftX \* 1\.35/, 'idle gaze should be amplifie
 assert.match(source, /attentiveLookX \* -1\.75/, 'eye yaw should be strong enough to create eye-contact movement');
 assert.match(source, /living\.eyeDriftX = THREE\.MathUtils\.damp\(living\.eyeDriftX, living\.eyeTargetX, 1\.75, dt\)/, 'gaze drift should move calmly rather than twitching');
 assert.match(htmlSource, /<i class="torso-haze"><\/i>/, 'reference haze layer should exist in the cinematic backdrop');
-assert.match(styleSource, /\.torso-haze[\s\S]*?top: 66vh;[\s\S]*?opacity: 0\.58;/, 'torso haze should soften the dress area like the reference menu');
-assert.match(styleSource, /\.floor-mist[\s\S]*?height: 39vh;[\s\S]*?opacity: 0\.54;/, 'floor mist should keep the lower torso subdued');
+assert.match(styleSource, /\.torso-haze[\s\S]*?top: 66vh;[\s\S]*?opacity: 0\.52;/, 'torso haze should soften the dress area like the reference menu');
+assert.match(styleSource, /\.floor-mist[\s\S]*?height: 39vh;[\s\S]*?opacity: 0\.5;/, 'floor mist should keep the lower torso subdued');
 assert.match(styleSource, /\.menu::before[\s\S]*?height: 138px;[\s\S]*?rgba\(255,255,255,0\.36\)/, 'menu glow should veil the lower portrait behind the UI');
 assert.match(styleSource, /\.item[\s\S]*?height: 42px;[\s\S]*?font-size: clamp\(12px, 1\.02vw, 17px\)/, 'menu items should stay slim like the reference UI');
 assert.match(styleSource, /\.item::after[\s\S]*?rgba\(237,244,248,0\.38\)[\s\S]*?opacity: 0\.46;/, 'inactive menu panels should stay faint instead of heavy cards');
 assert.match(styleSource, /\.item::before[\s\S]*?#10233b 0%[\s\S]*?#47759c 100%/, 'selected menu bar should keep the dark Detroit-like blue ramp');
-assert.match(styleSource, /\.cinematic-backdrop[\s\S]*?opacity: 0\.82;[\s\S]*?ellipse 27% 42%/, 'cinematic backdrop panes should stay visible around the portrait like the reference');
-assert.match(styleSource, /\.horizon-glow[\s\S]*?top: 50vh;[\s\S]*?opacity: 0\.68;/, 'reference-like horizontal window glow should stay readable behind the menu');
+assert.match(styleSource, /\.cinematic-backdrop[\s\S]*?opacity: 0\.9;[\s\S]*?ellipse 30% 45%/, 'cinematic backdrop panes should stay visible around the portrait like the reference');
+assert.match(styleSource, /\.horizon-glow[\s\S]*?top: 50vh;[\s\S]*?opacity: 0\.76;/, 'reference-like horizontal window glow should stay readable behind the menu');
 assert.match(source, /\[100, 66, '#ffffff', 0\.9\]/, 'background should keep bright vertical panes like the Detroit reference');
+assert.match(source, /const hotColumns: Array<\[number, number, number\]>/, 'background should add thin hot window columns like the Detroit reference');
 assert.match(source, /ctx\.globalAlpha = 0\.84;[\s\S]*?ctx\.fillRect\(-60, 292, 1144, 52\)/, 'background should keep a strong horizontal light band behind the portrait');
 
 function numberFor(key) {
