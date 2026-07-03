@@ -575,17 +575,17 @@ function updateEyeBlinkVeils(rig, blinkClose) {
 }
 
 const BLINK_NATIVE = {
-  restClose: 0.16,
-  closeScale: 1.32,
-  closeBias: -0.08,
-  upperDrop: 0.00009,
-  coverDrop: 0.000074,
-  lowerRise: -0.000025,
-  orbitDrop: 0.000018,
-  upperFold: -0.04,
-  coverFold: -0.028,
-  lowerFold: 0.014,
-  closedEyeOpacity: 0.28,
+  restClose: 0.12,
+  closeScale: 1.48,
+  closeBias: -0.055,
+  upperDrop: 0.000104,
+  coverDrop: 0.000086,
+  lowerRise: -0.00003,
+  orbitDrop: 0.000022,
+  upperFold: -0.046,
+  coverFold: -0.033,
+  lowerFold: 0.018,
+  closedEyeOpacity: 0.14,
 };
 
 function smootherStep01(value) {
@@ -978,7 +978,7 @@ const living = {
   queuedBlinks: 0,
   queuedBlinkAt: -1,
   blinkDebugMode: 'animate',
-  blinkSpeed: 1.08,
+  blinkSpeed: 1.16,
 };
 
 const BLINK_POSES = {
@@ -988,9 +988,9 @@ const BLINK_POSES = {
 };
 
 const BLINK_PHASE_DURATION = {
-  closing: 0.09,
-  closed: 0.24,
-  opening: 0.2,
+  closing: 0.078,
+  closed: 0.34,
+  opening: 0.235,
 };
 
 function rand(min, max) {
@@ -1050,19 +1050,26 @@ window.addEventListener('portrait:gaze-debug', (event) => {
   const detail = gazeEvent.detail || {};
   if (typeof detail.x === 'number') {
     living.eyeTargetX = THREE.MathUtils.clamp(detail.x, -0.026, 0.026);
-    living.eyeDriftX = living.eyeTargetX;
+    if (detail.immediate === true) living.eyeDriftX = living.eyeTargetX;
   }
   if (typeof detail.y === 'number') {
     living.eyeTargetY = THREE.MathUtils.clamp(detail.y, -0.014, 0.014);
-    living.eyeDriftY = living.eyeTargetY;
+    if (detail.immediate === true) living.eyeDriftY = living.eyeTargetY;
   }
   living.nextSaccadeAt = performance.now() / 1000 + 99;
 });
 
-function updateBlinkState(time, dt) {
+function exposeBlinkState(amount = living.blinkAmount) {
   document.body.dataset.blinkPhase = living.blinkPhase;
-  document.body.dataset.blinkAmount = living.blinkAmount.toFixed(3);
-  if (living.blinkDebugMode !== 'animate') return BLINK_POSES[living.blinkDebugMode];
+  document.body.dataset.blinkAmount = amount.toFixed(3);
+  return amount;
+}
+
+function updateBlinkState(time, dt) {
+  if (living.blinkDebugMode !== 'animate') {
+    living.blinkAmount = BLINK_POSES[living.blinkDebugMode];
+    return exposeBlinkState(living.blinkAmount);
+  }
 
   if (living.blinkPhase === 'open') {
     living.blinkAmount = THREE.MathUtils.damp(living.blinkAmount, 0, 14, dt);
@@ -1072,7 +1079,7 @@ function updateBlinkState(time, dt) {
     } else if (time >= living.nextBlinkAt) {
       queueBlink(time, false);
     }
-    return living.blinkAmount;
+    return exposeBlinkState(living.blinkAmount);
   }
 
   living.blinkElapsed += dt;
@@ -1084,7 +1091,7 @@ function updateBlinkState(time, dt) {
       living.blinkElapsed = 0;
       living.blinkAmount = 1;
     }
-    return living.blinkAmount;
+    return exposeBlinkState(living.blinkAmount);
   }
 
   if (living.blinkPhase === 'closed') {
@@ -1093,7 +1100,7 @@ function updateBlinkState(time, dt) {
       living.blinkPhase = 'opening';
       living.blinkElapsed = 0;
     }
-    return living.blinkAmount;
+    return exposeBlinkState(living.blinkAmount);
   }
 
   const duration = BLINK_PHASE_DURATION.opening / living.blinkSpeed;
@@ -1103,7 +1110,7 @@ function updateBlinkState(time, dt) {
     living.blinkElapsed = 0;
     living.blinkAmount = 0;
   }
-  return living.blinkAmount;
+  return exposeBlinkState(living.blinkAmount);
 }
 
 function updateLivingMotion(time, dt) {
@@ -1112,16 +1119,16 @@ function updateLivingMotion(time, dt) {
   document.body.dataset.eyeDriftHold = blinkHold.toFixed(3);
 
   if (time >= living.nextSaccadeAt && blinkHold < 0.15) {
-    living.eyeTargetX = rand(-0.013, 0.013);
-    living.eyeTargetY = rand(-0.006, 0.007);
+    living.eyeTargetX = rand(-0.011, 0.011);
+    living.eyeTargetY = rand(-0.005, 0.006);
     living.browTarget = rand(-0.045, 0.055);
     living.mouthTarget = rand(-0.035, 0.045);
     living.nextSaccadeAt = time + rand(4.2, 7.2);
   }
 
   if (blinkHold < 0.2) {
-    living.eyeDriftX = THREE.MathUtils.damp(living.eyeDriftX, living.eyeTargetX, 1.75, dt);
-    living.eyeDriftY = THREE.MathUtils.damp(living.eyeDriftY, living.eyeTargetY, 1.75, dt);
+    living.eyeDriftX = THREE.MathUtils.damp(living.eyeDriftX, living.eyeTargetX, 1.12, dt);
+    living.eyeDriftY = THREE.MathUtils.damp(living.eyeDriftY, living.eyeTargetY, 1.12, dt);
   } else {
     living.eyeTargetX = THREE.MathUtils.damp(living.eyeTargetX, living.eyeDriftX, 5.2, dt);
     living.eyeTargetY = THREE.MathUtils.damp(living.eyeTargetY, living.eyeDriftY, 5.2, dt);
