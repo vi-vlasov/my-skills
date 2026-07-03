@@ -644,37 +644,37 @@ function applyEyeBlinkVisibility(eyeMats, close) {
 function applyNativeSmile(rig, smile, asymmetry = 0) {
   const liftL = THREE.MathUtils.clamp(smile + asymmetry, 0, 1);
   const liftR = THREE.MathUtils.clamp(smile - asymmetry, 0, 1);
-  const cornerUpL = -0.000038 * liftL;
-  const cornerUpR = -0.000038 * liftR;
-  const cornerOutL = 0.000008 * liftL;
-  const cornerOutR = -0.000008 * liftR;
-  const cheekLiftL = -0.000032 * liftL;
-  const cheekLiftR = -0.000032 * liftR;
+  const cornerUpL = -0.000048 * liftL;
+  const cornerUpR = -0.000048 * liftR;
+  const cornerOutL = 0.00001 * liftL;
+  const cornerOutR = -0.00001 * liftR;
+  const cheekLiftL = -0.000042 * liftL;
+  const cheekLiftR = -0.000042 * liftR;
 
-  setBonePositionDeltas(rig, rig.mouthCornersL, cornerUpL, 0.000006 * liftL, cornerOutL);
-  setBonePositionDeltas(rig, rig.mouthCornersR, cornerUpR, 0.000006 * liftR, cornerOutR);
-  setBonePositionDeltas(rig, rig.lipEdgesL, cornerUpL * 0.28, 0, cornerOutL * 0.26);
-  setBonePositionDeltas(rig, rig.lipEdgesR, cornerUpR * 0.28, 0, cornerOutR * 0.26);
-  setBonePositionDeltas(rig, rig.cheeksL, cheekLiftL, 0.000005 * liftL, 0.000006 * liftL);
-  setBonePositionDeltas(rig, rig.cheeksR, cheekLiftR, 0.000005 * liftR, -0.000006 * liftR);
+  setBonePositionDeltas(rig, rig.mouthCornersL, cornerUpL, 0.000009 * liftL, cornerOutL);
+  setBonePositionDeltas(rig, rig.mouthCornersR, cornerUpR, 0.000009 * liftR, cornerOutR);
+  setBonePositionDeltas(rig, rig.lipEdgesL, cornerUpL * 0.34, 0, cornerOutL * 0.32);
+  setBonePositionDeltas(rig, rig.lipEdgesR, cornerUpR * 0.34, 0, cornerOutR * 0.32);
+  setBonePositionDeltas(rig, rig.cheeksL, cheekLiftL, 0.000008 * liftL, 0.000008 * liftL);
+  setBonePositionDeltas(rig, rig.cheeksR, cheekLiftR, 0.000008 * liftR, -0.000008 * liftR);
 }
 
 function applyNativeMouth(rig, openness, smile, speechPulse = 0) {
   const open = THREE.MathUtils.clamp(openness, 0, 1);
   const smileLift = THREE.MathUtils.clamp(smile, 0, 1);
   const pulse = THREE.MathUtils.clamp(speechPulse, -1, 1);
-  const upperLift = -0.00006 * smileLift - 0.00009 * open + 0.000004 * pulse;
-  const lowerDrop = 0.00018 * open + 0.000004 * Math.max(0, pulse);
-  const lowerOut = 0.000005 * open;
-  const sideSeal = 0.000032 * open;
+  const upperLift = -0.000072 * smileLift - 0.000082 * open + 0.000004 * pulse;
+  const lowerDrop = 0.000145 * open + 0.000004 * Math.max(0, pulse);
+  const lowerOut = 0.000007 * open;
+  const sideSeal = 0.000041 * open;
 
   setBoneRotationDeltas(rig, rig.mouthRoot, open * 0.026, 0, 0);
   setBoneRotationDeltas(rig, rig.mandiblesL, open * 0.016, 0, -open * 0.004);
   setBoneRotationDeltas(rig, rig.mandiblesR, open * 0.016, 0, open * 0.004);
   setBonePositionDeltas(rig, rig.lipMidUpper, upperLift, 0.000002 * pulse, 0);
   setBonePositionDeltas(rig, rig.lipMidLower, lowerDrop, -0.000003 * pulse, 0);
-  setBonePositionDeltas(rig, rig.lipLowerL, lowerDrop * 0.5 - sideSeal, 0, lowerOut);
-  setBonePositionDeltas(rig, rig.lipLowerR, lowerDrop * 0.5 - sideSeal, 0, -lowerOut);
+  setBonePositionDeltas(rig, rig.lipLowerL, lowerDrop * 0.44 - sideSeal, 0, lowerOut);
+  setBonePositionDeltas(rig, rig.lipLowerR, lowerDrop * 0.44 - sideSeal, 0, -lowerOut);
   setBoneRotationDeltas(rig, rig.tongue, open * 0.006, 0, 0);
 
   document.body.dataset.facialMouthOpen = open.toFixed(3);
@@ -1250,8 +1250,8 @@ function animate() {
     const expressionAsym = Math.sin(t * 0.61) * 0.022 + Math.sin(t * 0.27 + 1.2) * 0.01 + living.eyeDriftX * 0.16;
     const browAsym = Math.sin(t * 0.92) * 0.0035 + expressionAsym * 0.18 + living.eyeDriftX * 0.006;
     const speechPulse = Math.sin(t * 1.35) * 0.45 + Math.sin(t * 0.58 + 1.7) * 0.22;
-    const smile = THREE.MathUtils.clamp(0.28 + expressiveMouth * 0.24 + Math.sin(t * 0.72) * 0.012, 0.16, 0.5);
-    const mouthOpen = THREE.MathUtils.clamp(0.145 + expressiveMouth * 0.28 + speechPulse * 0.008, 0.09, 0.42);
+    const smile = THREE.MathUtils.clamp(0.34 + expressiveMouth * 0.26 + Math.sin(t * 0.72) * 0.012, 0.2, 0.56);
+    const mouthOpen = THREE.MathUtils.clamp(0.15 + expressiveMouth * 0.26 + speechPulse * 0.006, 0.09, 0.4);
     const smileAsym = expressionAsym;
 
     setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * -0.08, motion.roll * 0.08);
