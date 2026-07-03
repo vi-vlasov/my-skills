@@ -26,7 +26,7 @@ renderer.toneMappingExposure = 0.93;
 // ---------------------------------------------------------------- scene
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xe8f6fc);
+scene.background = new THREE.Color(0xedf8fc);
 
 // studio wall: blurred bright panels, like the blown-out DBH backdrop
 function wallTexture() {
@@ -36,10 +36,10 @@ function wallTexture() {
   const ctx = c.getContext('2d');
 
   const base = ctx.createLinearGradient(0, 0, 0, 576);
-  base.addColorStop(0, '#fbfdff');
-  base.addColorStop(0.3, '#f3fbff');
-  base.addColorStop(0.62, '#dceff8');
-  base.addColorStop(1, '#bcdceb');
+  base.addColorStop(0, '#ffffff');
+  base.addColorStop(0.3, '#f7fcff');
+  base.addColorStop(0.62, '#e2f3fb');
+  base.addColorStop(1, '#c7e4f1');
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, 1024, 576);
 
@@ -51,67 +51,67 @@ function wallTexture() {
   ctx.fillRect(0, 0, 1024, 360);
 
   const paneWash = ctx.createLinearGradient(0, 0, 1024, 0);
-  paneWash.addColorStop(0, 'rgba(136,194,226,0.54)');
-  paneWash.addColorStop(0.16, 'rgba(225,244,252,0.18)');
-  paneWash.addColorStop(0.5, 'rgba(255,255,255,0.04)');
-  paneWash.addColorStop(0.84, 'rgba(202,232,247,0.3)');
-  paneWash.addColorStop(1, 'rgba(121,190,226,0.56)');
+  paneWash.addColorStop(0, 'rgba(132,197,229,0.42)');
+  paneWash.addColorStop(0.18, 'rgba(236,249,254,0.28)');
+  paneWash.addColorStop(0.5, 'rgba(255,255,255,0.12)');
+  paneWash.addColorStop(0.82, 'rgba(223,244,253,0.3)');
+  paneWash.addColorStop(1, 'rgba(128,198,231,0.44)');
   ctx.fillStyle = paneWash;
   ctx.fillRect(0, 0, 1024, 576);
 
-  // tall luminous panes: soft enough to sit behind the face, but structured like the DBH menu.
-  ctx.filter = 'blur(14px)';
-  const panels: Array<[number, number, string, number]> = [
-    [14, 46, '#9ed2ee', 1.0],
-    [100, 66, '#ffffff', 0.9],
-    [232, 76, '#bfe1f4', 0.86],
-    [402, 92, '#ffffff', 0.72],
-    [594, 100, '#c6e6f7', 0.82],
-    [784, 66, '#ffffff', 0.92],
-    [922, 58, '#92caea', 0.96],
+  // Broad luminous panes, not a picket fence: closer to the DBH overexposed window blocks.
+  ctx.filter = 'blur(22px)';
+  const broadWindowPanes: Array<[number, number, string, number]> = [
+    [-52, 128, '#f8fdff', 0.88],
+    [128, 142, '#d9f1fb', 0.58],
+    [330, 166, '#ffffff', 0.74],
+    [552, 178, '#e6f7fd', 0.64],
+    [794, 150, '#ffffff', 0.82],
+    [956, 102, '#ccebf8', 0.72],
   ];
-  for (const [x, w, color, a] of panels) {
+  for (const [x, w, color, a] of broadWindowPanes) {
     ctx.globalAlpha = a;
     ctx.fillStyle = color;
-    ctx.fillRect(x, -42, w, 680);
+    ctx.fillRect(x, -80, w, 736);
   }
 
-  ctx.filter = 'blur(8px)';
-  const hotColumns: Array<[number, number, number]> = [
-    [38, 18, 0.72],
-    [144, 26, 0.76],
-    [316, 22, 0.52],
-    [748, 26, 0.58],
-    [886, 22, 0.78],
-    [982, 18, 0.82],
+  ctx.filter = 'blur(11px)';
+  const windowPipes: Array<[number, number, number]> = [
+    [72, 10, 0.82],
+    [214, 8, 0.64],
+    [508, 7, 0.42],
+    [805, 10, 0.72],
+    [956, 9, 0.86],
   ];
-  for (const [x, w, a] of hotColumns) {
+  for (const [x, w, a] of windowPipes) {
     ctx.globalAlpha = a;
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(x, -48, w, 696);
+    ctx.fillRect(x, -64, w, 712);
   }
 
-  ctx.filter = 'blur(3px)';
-  ctx.globalAlpha = 0.78;
+  ctx.filter = 'blur(5px)';
+  ctx.globalAlpha = 0.32;
   ctx.fillStyle = '#f8fdff';
-  for (const x of [82, 190, 334, 516, 708, 878, 986]) {
-    ctx.fillRect(x, 0, 4, 576);
+  for (const x of [94, 286, 516, 744, 940]) {
+    ctx.fillRect(x, 0, 3, 576);
   }
-  ctx.globalAlpha = 0.34;
+  ctx.globalAlpha = 0.18;
   ctx.fillStyle = '#9ccbe5';
-  for (const x of [74, 204, 348, 696, 866]) {
+  for (const x of [252, 764]) {
     ctx.fillRect(x, 0, 2, 576);
   }
 
-  ctx.filter = 'blur(12px)';
-  ctx.globalAlpha = 0.84;
+  ctx.filter = 'blur(18px)';
+  ctx.globalAlpha = 0.94;
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(-60, 292, 1144, 52);
-  ctx.globalAlpha = 0.58;
-  ctx.fillStyle = '#b7d8eb';
-  ctx.fillRect(-40, 210, 1104, 12);
-  ctx.fillRect(-40, 372, 1104, 10);
-  ctx.fillRect(-40, 462, 1104, 12);
+  ctx.fillRect(-80, 276, 1184, 82);
+  ctx.globalAlpha = 0.42;
+  ctx.fillStyle = '#c7e5f4';
+  ctx.fillRect(-60, 222, 1144, 18);
+  ctx.fillRect(-60, 390, 1144, 16);
+  ctx.globalAlpha = 0.36;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(-80, 466, 1184, 24);
 
   const sideFog = ctx.createLinearGradient(0, 0, 1024, 0);
   sideFog.addColorStop(0, 'rgba(136,194,226,0.48)');

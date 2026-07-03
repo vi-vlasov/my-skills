@@ -33,8 +33,9 @@ html, body {
   z-index: 2;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 42% 58% at 50% 38%, rgba(255,255,255,0.14) 0%, rgba(245,251,255,0.055) 44%, rgba(255,255,255,0) 72%),
-    radial-gradient(ellipse 70% 44% at 50% 76%, rgba(204,229,243,0.16) 0%, rgba(255,255,255,0.04) 54%, rgba(255,255,255,0) 78%);
+    radial-gradient(ellipse 44% 58% at 50% 36%, rgba(255,255,255,0.16) 0%, rgba(245,251,255,0.06) 44%, rgba(255,255,255,0) 72%),
+    radial-gradient(ellipse 88% 34% at 50% 75%, rgba(255,255,255,0.18) 0%, rgba(219,239,249,0.11) 48%, rgba(255,255,255,0) 78%),
+    linear-gradient(90deg, rgba(112,184,223,0.12), rgba(255,255,255,0.04) 18%, rgba(255,255,255,0.05) 82%, rgba(106,180,221,0.14));
   -webkit-backdrop-filter: blur(0.42px) saturate(1.04) contrast(0.985);
   backdrop-filter: blur(0.42px) saturate(1.04) contrast(0.985);
   mix-blend-mode: screen;
@@ -62,33 +63,33 @@ html, body {
 .cinematic-backdrop .pane {
   top: -8vh;
   height: 118vh;
-  width: clamp(54px, 7.4vw, 118px);
-  border-radius: 36px;
+  width: clamp(76px, 10.5vw, 168px);
+  border-radius: 54px;
   background:
     linear-gradient(180deg, rgba(255,255,255,0.86), rgba(181,222,244,0.34) 44%, rgba(250,253,255,0.52) 100%),
     linear-gradient(90deg, rgba(106,178,218,0), rgba(255,255,255,0.9) 48%, rgba(106,178,218,0));
-  box-shadow: 0 0 64px rgba(130, 194, 229, 0.34);
-  filter: blur(6px);
-  opacity: 0.62;
+  box-shadow: 0 0 88px rgba(130, 194, 229, 0.28);
+  filter: blur(9px);
+  opacity: 0.5;
 }
 
-.cinematic-backdrop .pane-a { left: -1.8vw; opacity: 0.76; }
-.cinematic-backdrop .pane-b { left: 13.8vw; width: clamp(58px, 8vw, 130px); opacity: 0.62; }
-.cinematic-backdrop .pane-c { left: 31vw; width: clamp(72px, 9.5vw, 150px); opacity: 0.36; }
-.cinematic-backdrop .pane-d { right: 27vw; width: clamp(68px, 9vw, 145px); opacity: 0.38; }
-.cinematic-backdrop .pane-e { right: 12.2vw; width: clamp(58px, 7.8vw, 124px); opacity: 0.62; }
-.cinematic-backdrop .pane-f { right: -1vw; width: clamp(54px, 7vw, 116px); opacity: 0.78; }
+.cinematic-backdrop .pane-a { left: -2.6vw; opacity: 0.7; }
+.cinematic-backdrop .pane-b { left: 14.6vw; width: clamp(84px, 11vw, 176px); opacity: 0.46; }
+.cinematic-backdrop .pane-c { left: 31vw; width: clamp(98px, 12.5vw, 198px); opacity: 0.26; }
+.cinematic-backdrop .pane-d { right: 27vw; width: clamp(96px, 12vw, 190px); opacity: 0.28; }
+.cinematic-backdrop .pane-e { right: 11.8vw; width: clamp(84px, 11vw, 176px); opacity: 0.48; }
+.cinematic-backdrop .pane-f { right: -1.8vw; width: clamp(76px, 10vw, 164px); opacity: 0.72; }
 
 .horizon-glow {
   left: -8vw;
   right: -8vw;
-  top: 50vh;
-  height: 15vh;
+  top: 49vh;
+  height: 21vh;
   background:
     radial-gradient(ellipse at 48% 50%, rgba(255,255,255,0.82) 0%, rgba(215,239,250,0.45) 42%, rgba(172,210,232,0) 74%),
     linear-gradient(90deg, rgba(134,195,226,0), rgba(255,255,255,0.9) 18%, rgba(255,255,255,0.88) 50%, rgba(232,247,255,0.74) 82%, rgba(134,195,226,0));
-  filter: blur(10px);
-  opacity: 0.76;
+  filter: blur(14px);
+  opacity: 0.84;
 }
 
 .lens-bloom {
@@ -106,14 +107,14 @@ html, body {
 .torso-haze {
   left: 18vw;
   right: 14vw;
-  top: 68vh;
-  height: 17vh;
+  top: 66vh;
+  height: 20vh;
   border-radius: 50%;
   background:
     radial-gradient(ellipse at 48% 40%, rgba(255,255,255,0.64) 0%, rgba(222,240,250,0.36) 42%, rgba(192,220,238,0) 74%),
     linear-gradient(90deg, rgba(190,220,238,0), rgba(238,248,253,0.48) 48%, rgba(190,220,238,0));
-  filter: blur(18px);
-  opacity: 0.42;
+  filter: blur(20px);
+  opacity: 0.46;
 }
 
 .floor-mist {

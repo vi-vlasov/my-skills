@@ -65,7 +65,7 @@ assert.match(styleSource, /\.camera-diffusion[\s\S]*?z-index: 2;[\s\S]*?backdrop
 assert.match(htmlSource, /<i class="torso-haze"><\/i>/, 'reference haze layer should exist in the cinematic backdrop');
 assert.match(htmlSource, /<i class="glass-band glass-band-a"><\/i>/, 'glass band layer should exist for the Detroit-like menu pane');
 assert.match(htmlSource, /<i class="menu-flare"><\/i>/, 'menu flare layer should exist for the selected-row lens bloom');
-assert.match(styleSource, /\.torso-haze[\s\S]*?top: 68vh;[\s\S]*?opacity: 0\.42;/, 'torso haze should soften the dress area without erasing the silhouette');
+assert.match(styleSource, /\.torso-haze[\s\S]*?top: 66vh;[\s\S]*?opacity: 0\.46;/, 'torso haze should soften the dress area without erasing the silhouette');
 assert.match(styleSource, /\.floor-mist[\s\S]*?height: 34vh;[\s\S]*?opacity: 0\.4;/, 'floor mist should keep the lower torso subdued without washing out the straps');
 assert.match(styleSource, /\.glass-band[\s\S]*?height: 1px;[\s\S]*?opacity: 0\.52;/, 'glass bands should add thin horizontal camera-glass lines like the reference');
 assert.match(styleSource, /\.menu-flare[\s\S]*?top: 79\.2vh;[\s\S]*?opacity: 0\.42;/, 'menu flare should add a subtle selected-row bloom without washing out the portrait');
@@ -76,10 +76,11 @@ assert.match(styleSource, /\.item[\s\S]*?height: 42px;[\s\S]*?font-size: clamp\(
 assert.match(styleSource, /\.item::after[\s\S]*?rgba\(237,244,248,0\.38\)[\s\S]*?opacity: 0\.46;/, 'inactive menu panels should stay faint instead of heavy cards');
 assert.match(styleSource, /\.item::before[\s\S]*?#10233b 0%[\s\S]*?#47759c 100%/, 'selected menu bar should keep the dark Detroit-like blue ramp');
 assert.match(styleSource, /\.cinematic-backdrop[\s\S]*?opacity: 0\.9;[\s\S]*?ellipse 30% 45%/, 'cinematic backdrop panes should stay visible around the portrait like the reference');
-assert.match(styleSource, /\.horizon-glow[\s\S]*?top: 50vh;[\s\S]*?opacity: 0\.76;/, 'reference-like horizontal window glow should stay readable behind the menu');
-assert.match(source, /\[100, 66, '#ffffff', 0\.9\]/, 'background should keep bright vertical panes like the Detroit reference');
-assert.match(source, /const hotColumns: Array<\[number, number, number\]>/, 'background should add thin hot window columns like the Detroit reference');
-assert.match(source, /ctx\.globalAlpha = 0\.84;[\s\S]*?ctx\.fillRect\(-60, 292, 1144, 52\)/, 'background should keep a strong horizontal light band behind the portrait');
+assert.match(styleSource, /\.horizon-glow[\s\S]*?top: 49vh;[\s\S]*?height: 21vh;[\s\S]*?opacity: 0\.84;/, 'reference-like horizontal window glow should stay readable behind the menu');
+assert.match(source, /const broadWindowPanes: Array<\[number, number, string, number\]>/, 'background should use broad overexposed window blocks like the Detroit reference');
+assert.match(source, /\[-52, 128, '#f8fdff', 0\.88\]/, 'background should keep a bright left window mass instead of narrow repeated stripes');
+assert.match(source, /const windowPipes: Array<\[number, number, number\]>/, 'background should keep only a few soft vertical light pipes like the Detroit reference');
+assert.match(source, /ctx\.globalAlpha = 0\.94;[\s\S]*?ctx\.fillRect\(-80, 276, 1184, 82\)/, 'background should keep a strong horizontal light band behind the portrait');
 
 function numberFor(key) {
   const match = nativeBlock[1].match(new RegExp(`${key}:\\s*(-?\\d+(?:\\.\\d+)?)`));
