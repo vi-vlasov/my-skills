@@ -57,16 +57,18 @@ assert.match(source, /function blinkVeilTexture\(\)/, 'blink veil texture should
 assert.match(source, /function updateEyeBlinkVeils\(rig, blinkClose\)/, 'blink veils should follow the native eye bones');
 assert.match(source, /setupEyeBlinkVeils\(\)/, 'Chloe setup should create blink veils');
 assert.match(source, /document\.body\.dataset\.eyeBlinkVeilOpacity/, 'blink veil opacity should be exposed for visual checks');
-assert.match(source, /sprite\.material\.opacity = close \* 0\.98/, 'closed eyelid veil should visibly cover the eye surface');
-assert.match(source, /sprite\.scale\.set\(0\.052, 0\.018 \+ close \* 0\.02, 1\)/, 'closed eyelid veil should stay fitted instead of becoming a large translucent oval');
+assert.match(source, /smoothstep\(THREE\.MathUtils\.clamp\(blinkClose, 0, 1\), 0\.38, 0\.96\)/, 'blink veil should not become opaque before the eyelids are mostly closed');
+assert.match(source, /sprite\.material\.opacity = close;/, 'closed eyelid veil should fully cover the eye surface instead of staying glassy');
+assert.match(source, /sprite\.scale\.set\(0\.057, 0\.016 \+ close \* 0\.012, 1\)/, 'closed eyelid veil should stay fitted instead of becoming a large translucent oval');
 assert.match(source, /function smootherStep01\(value\)/, 'blink states should use eased motion instead of jerky linear eye snaps');
-assert.match(source, /living\.blinkSpeed = THREE\.MathUtils\.clamp\(detail\.speed, 0\.55, 2\.4\)/, 'blink debug events should be able to force animation speed for testing');
+assert.match(source, /living\.blinkSpeed = THREE\.MathUtils\.clamp\(detail\.speed, 0\.35, 3\.2\)/, 'blink debug events should be able to force animation speed for testing');
+assert.match(source, /document\.body\.dataset\.blinkSpeed = living\.blinkSpeed\.toFixed\(2\)/, 'forced blink speed should be exposed for visual state checks');
 assert.match(source, /living\.eyeDriftX \* 1\.35/, 'idle gaze should be amplified enough to read on the portrait');
 assert.match(source, /attentiveLookX \* -1\.75/, 'eye yaw should be strong enough to create eye-contact movement');
 assert.match(source, /restClose: 0\.12/, 'open eyes should be open enough that the blink reads on the full portrait');
-assert.match(source, /closedEyeOpacity: 0\.14/, 'closed eyes should hide glassy iris reflections under the eyelid');
+assert.match(source, /closedEyeOpacity: 0\.06/, 'closed eyes should hide glassy iris reflections under the eyelid');
 assert.match(source, /if \(detail\.immediate === true\) living\.eyeDriftX = living\.eyeTargetX;/, 'gaze debug should avoid snapping the eyes unless an immediate pose is requested');
-assert.match(source, /living\.eyeDriftX = THREE\.MathUtils\.damp\(living\.eyeDriftX, living\.eyeTargetX, 1\.12, dt\)/, 'gaze drift should move calmly rather than twitching');
+assert.match(source, /living\.eyeDriftX = THREE\.MathUtils\.damp\(living\.eyeDriftX, living\.eyeTargetX, 0\.74, dt\)/, 'gaze drift should move calmly rather than twitching');
 assert.match(htmlSource, /<div class="camera-diffusion" aria-hidden="true"><\/div>/, 'camera diffusion layer should soften the CG render without affecting menu markup');
 assert.match(styleSource, /\.camera-diffusion[\s\S]*?z-index: 2;[\s\S]*?backdrop-filter: blur\(0\.42px\) saturate\(1\.04\) contrast\(0\.985\);[\s\S]*?opacity: 0\.62;/, 'camera diffusion should stay subtle and below the HUD/menu');
 assert.match(htmlSource, /<i class="torso-haze"><\/i>/, 'reference haze layer should exist in the cinematic backdrop');
@@ -152,18 +154,18 @@ assert.ok(nativeClose(0) >= 0.09 && nativeClose(0) <= 0.15, 'open state should k
 assert.ok(nativeClose(0.46) >= 0.62, 'half debug pose should visibly close the lids');
 assert.equal(nativeClose(1), 1, 'closed debug pose should reach full native close');
 assert.ok(
-  eyeOpacity(nativeClose(1)) <= 0.4,
+  eyeOpacity(nativeClose(1)) <= 0.25,
   'closed blink should fade the eye surface enough that the eyelid reads as closed'
 );
-assert.ok(blinkClosing >= 0.07 && blinkClosing <= 0.085, 'blink should snap closed quickly enough to read as intentional instead of twitchy');
-assert.ok(blinkClosed >= 0.32, 'closed blink state should be held long enough for screenshots and perception');
-assert.ok(blinkOpening >= 0.22 && blinkOpening <= 0.25, 'blink opening should be calm but not so slow that the eye looks like it is drifting');
-assert.ok(defaultBlinkSpeed >= 1.14 && defaultBlinkSpeed <= 1.2, 'default blink speed should be forceable without erasing the closed hold');
-assert.match(source, /Math\.random\(\) < 0\.04/, 'random double blinks should be rare enough to avoid nervous eye twitching');
-assert.match(source, /living\.nextBlinkAt = time \+ rand\(2\.2, 4\.8\)/, 'natural blink cadence should not fire so often that it reads as jitter');
+assert.ok(blinkClosing >= 0.09 && blinkClosing <= 0.105, 'blink should close visibly instead of reading as a twitch');
+assert.ok(blinkClosed >= 0.4, 'closed blink state should be held long enough for screenshots and perception');
+assert.ok(blinkOpening >= 0.27 && blinkOpening <= 0.3, 'blink opening should be calm but not so slow that the eye looks like it is drifting');
+assert.ok(defaultBlinkSpeed >= 0.92 && defaultBlinkSpeed <= 1.0, 'default blink speed should stay cinematic while remaining forceable');
+assert.match(source, /Math\.random\(\) < 0\.025/, 'random double blinks should be rare enough to avoid nervous eye twitching');
+assert.match(source, /living\.nextBlinkAt = time \+ rand\(3\.1, 6\.7\)/, 'natural blink cadence should not fire so often that it reads as jitter');
 assert.ok(eyeTargetMaxX - eyeTargetMinX >= 0.02, 'idle eye gaze should have visible horizontal range without snapping');
 assert.ok(eyeTargetMaxY - eyeTargetMinY >= 0.01, 'idle eye gaze should have visible vertical range without snapping');
-assert.ok(nextSaccadeMin >= 3, 'idle gaze retargets should not twitch too frequently');
-assert.ok(nextSaccadeMax >= 5, 'idle gaze should include calm held eye contact');
+assert.ok(nextSaccadeMin >= 6, 'idle gaze retargets should not twitch too frequently');
+assert.ok(nextSaccadeMax >= 10, 'idle gaze should include calm held eye contact');
 
 console.log('blink and facial regression checks passed');

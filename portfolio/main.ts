@@ -184,38 +184,38 @@ function blinkVeilTexture() {
   c.height = 128;
   const ctx = c.getContext('2d');
 
-  const lid = ctx.createRadialGradient(128, 64, 12, 128, 66, 112);
-  lid.addColorStop(0, 'rgba(194,150,139,0.98)');
-  lid.addColorStop(0.48, 'rgba(166,124,118,0.9)');
-  lid.addColorStop(0.82, 'rgba(104,78,84,0.5)');
+  const lid = ctx.createRadialGradient(128, 58, 10, 128, 62, 116);
+  lid.addColorStop(0, 'rgba(216,176,164,1)');
+  lid.addColorStop(0.44, 'rgba(190,145,136,0.96)');
+  lid.addColorStop(0.76, 'rgba(122,88,91,0.66)');
   lid.addColorStop(1, 'rgba(154,126,120,0)');
   ctx.fillStyle = lid;
   ctx.beginPath();
-  ctx.ellipse(128, 66, 106, 42, 0, 0, Math.PI * 2);
+  ctx.ellipse(128, 64, 112, 34, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  const crease = ctx.createLinearGradient(0, 34, 0, 88);
-  crease.addColorStop(0, 'rgba(62,50,54,0.26)');
-  crease.addColorStop(0.46, 'rgba(82,61,64,0.12)');
+  const crease = ctx.createLinearGradient(0, 26, 0, 84);
+  crease.addColorStop(0, 'rgba(62,50,54,0.34)');
+  crease.addColorStop(0.46, 'rgba(82,61,64,0.16)');
   crease.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = crease;
   ctx.beginPath();
-  ctx.ellipse(128, 56, 102, 22, 0, 0, Math.PI * 2);
+  ctx.ellipse(128, 52, 108, 18, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.strokeStyle = 'rgba(48,38,44,0.44)';
-  ctx.lineWidth = 4;
+  ctx.strokeStyle = 'rgba(42,32,39,0.64)';
+  ctx.lineWidth = 5;
   ctx.lineCap = 'round';
   ctx.beginPath();
-  ctx.moveTo(44, 82);
-  ctx.quadraticCurveTo(128, 98, 212, 82);
+  ctx.moveTo(42, 78);
+  ctx.quadraticCurveTo(128, 92, 214, 78);
   ctx.stroke();
 
-  ctx.strokeStyle = 'rgba(244,214,204,0.22)';
+  ctx.strokeStyle = 'rgba(248,221,212,0.24)';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(58, 73);
-  ctx.quadraticCurveTo(128, 86, 198, 73);
+  ctx.moveTo(58, 68);
+  ctx.quadraticCurveTo(128, 79, 198, 68);
   ctx.stroke();
 
   const tex = new THREE.CanvasTexture(c);
@@ -548,8 +548,8 @@ function updateEyeCatchlights(rig, blinkClose, smile) {
 
 function updateEyeBlinkVeil(sprite, eyeBone, blinkClose, side) {
   if (!sprite || !eyeBone) return;
-  const close = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.18, 0.86);
-  sprite.material.opacity = close * 0.98;
+  const close = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.38, 0.96);
+  sprite.material.opacity = close;
   sprite.visible = sprite.material.opacity > 0.02;
   if (!sprite.visible) return;
 
@@ -560,9 +560,9 @@ function updateEyeBlinkVeil(sprite, eyeBone, blinkClose, side) {
     .copy(eyeWorld)
     .addScaledVector(eyeToCamera, 0.026)
     .addScaledVector(cameraRight, side * 0.001)
-    .addScaledVector(cameraUp, -0.0054 - close * 0.001);
+    .addScaledVector(cameraUp, -0.0068 - close * 0.0005);
 
-  sprite.scale.set(0.052, 0.018 + close * 0.02, 1);
+  sprite.scale.set(0.057, 0.016 + close * 0.012, 1);
 }
 
 function updateEyeBlinkVeils(rig, blinkClose) {
@@ -585,7 +585,7 @@ const BLINK_NATIVE = {
   upperFold: -0.046,
   coverFold: -0.033,
   lowerFold: 0.018,
-  closedEyeOpacity: 0.14,
+  closedEyeOpacity: 0.06,
 };
 
 function smootherStep01(value) {
@@ -978,7 +978,7 @@ const living = {
   queuedBlinks: 0,
   queuedBlinkAt: -1,
   blinkDebugMode: 'animate',
-  blinkSpeed: 1.16,
+  blinkSpeed: 0.96,
 };
 
 const BLINK_POSES = {
@@ -988,9 +988,9 @@ const BLINK_POSES = {
 };
 
 const BLINK_PHASE_DURATION = {
-  closing: 0.078,
-  closed: 0.34,
-  opening: 0.235,
+  closing: 0.096,
+  closed: 0.42,
+  opening: 0.285,
 };
 
 function rand(min, max) {
@@ -1012,11 +1012,11 @@ function queueBlink(time, forceDouble = false) {
   } else {
     living.queuedBlinks += 1;
   }
-  if (forceDouble || Math.random() < 0.04) {
+  if (forceDouble || Math.random() < 0.025) {
     living.queuedBlinks += 1;
-    living.queuedBlinkAt = time + rand(0.34, 0.48);
+    living.queuedBlinkAt = time + rand(0.42, 0.58);
   }
-  living.nextBlinkAt = time + rand(2.2, 4.8);
+  living.nextBlinkAt = time + rand(3.1, 6.7);
 }
 
 function setBlinkDebugMode(mode) {
@@ -1037,7 +1037,8 @@ window.addEventListener('portrait:blink-debug', (event) => {
   const detail = blinkEvent.detail || {};
   if (detail.mode) setBlinkDebugMode(detail.mode);
   if (typeof detail.speed === 'number') {
-    living.blinkSpeed = THREE.MathUtils.clamp(detail.speed, 0.55, 2.4);
+    living.blinkSpeed = THREE.MathUtils.clamp(detail.speed, 0.35, 3.2);
+    document.body.dataset.blinkSpeed = living.blinkSpeed.toFixed(2);
   }
   if (detail.action === 'blink') {
     living.blinkDebugMode = 'animate';
@@ -1062,6 +1063,7 @@ window.addEventListener('portrait:gaze-debug', (event) => {
 function exposeBlinkState(amount = living.blinkAmount) {
   document.body.dataset.blinkPhase = living.blinkPhase;
   document.body.dataset.blinkAmount = amount.toFixed(3);
+  document.body.dataset.blinkSpeed = living.blinkSpeed.toFixed(2);
   return amount;
 }
 
@@ -1123,12 +1125,12 @@ function updateLivingMotion(time, dt) {
     living.eyeTargetY = rand(-0.005, 0.006);
     living.browTarget = rand(-0.045, 0.055);
     living.mouthTarget = rand(-0.035, 0.045);
-    living.nextSaccadeAt = time + rand(4.2, 7.2);
+    living.nextSaccadeAt = time + rand(6.4, 10.8);
   }
 
   if (blinkHold < 0.2) {
-    living.eyeDriftX = THREE.MathUtils.damp(living.eyeDriftX, living.eyeTargetX, 1.12, dt);
-    living.eyeDriftY = THREE.MathUtils.damp(living.eyeDriftY, living.eyeTargetY, 1.12, dt);
+    living.eyeDriftX = THREE.MathUtils.damp(living.eyeDriftX, living.eyeTargetX, 0.74, dt);
+    living.eyeDriftY = THREE.MathUtils.damp(living.eyeDriftY, living.eyeTargetY, 0.74, dt);
   } else {
     living.eyeTargetX = THREE.MathUtils.damp(living.eyeTargetX, living.eyeDriftX, 5.2, dt);
     living.eyeTargetY = THREE.MathUtils.damp(living.eyeTargetY, living.eyeDriftY, 5.2, dt);
