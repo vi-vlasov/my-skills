@@ -26,7 +26,7 @@ renderer.toneMappingExposure = 0.98;
 // ---------------------------------------------------------------- scene
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xe8f2f8);
+scene.background = new THREE.Color(0xeaf5fb);
 
 // studio wall: blurred bright panels, like the blown-out DBH backdrop
 function wallTexture() {
@@ -36,57 +36,74 @@ function wallTexture() {
   const ctx = c.getContext('2d');
 
   const base = ctx.createLinearGradient(0, 0, 0, 576);
-  base.addColorStop(0, '#fdfefe');
-  base.addColorStop(0.44, '#eef5fa');
-  base.addColorStop(1, '#d7e6f1');
+  base.addColorStop(0, '#ffffff');
+  base.addColorStop(0.34, '#f5fbff');
+  base.addColorStop(0.68, '#dcecf6');
+  base.addColorStop(1, '#c8deec');
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, 1024, 576);
 
-  const topGlow = ctx.createRadialGradient(512, 92, 50, 512, 92, 420);
-  topGlow.addColorStop(0, 'rgba(255,255,255,0.92)');
-  topGlow.addColorStop(0.4, 'rgba(255,255,255,0.4)');
+  const topGlow = ctx.createRadialGradient(508, 98, 44, 508, 98, 460);
+  topGlow.addColorStop(0, 'rgba(255,255,255,0.98)');
+  topGlow.addColorStop(0.42, 'rgba(255,255,255,0.5)');
   topGlow.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = topGlow;
-  ctx.fillRect(0, 0, 1024, 320);
+  ctx.fillRect(0, 0, 1024, 360);
+
+  const paneWash = ctx.createLinearGradient(0, 0, 1024, 0);
+  paneWash.addColorStop(0, 'rgba(180,215,235,0.42)');
+  paneWash.addColorStop(0.16, 'rgba(255,255,255,0.22)');
+  paneWash.addColorStop(0.5, 'rgba(255,255,255,0.08)');
+  paneWash.addColorStop(0.84, 'rgba(205,230,244,0.24)');
+  paneWash.addColorStop(1, 'rgba(155,202,228,0.44)');
+  ctx.fillStyle = paneWash;
+  ctx.fillRect(0, 0, 1024, 576);
 
   // tall luminous columns, closer to the Detroit main menu backdrop
-  ctx.filter = 'blur(20px)';
+  ctx.filter = 'blur(18px)';
   const panels: Array<[number, number, string, number]> = [
-    [36, 92, '#d7ebf7', 0.82],
-    [172, 70, '#ffffff', 0.9],
-    [308, 102, '#deeff9', 0.8],
-    [468, 118, '#ffffff', 0.98],
-    [670, 92, '#dcebfa', 0.8],
-    [836, 104, '#ffffff', 0.9],
+    [34, 64, '#bfe1f4', 0.78],
+    [106, 110, '#ffffff', 0.84],
+    [260, 94, '#d3ebf8', 0.76],
+    [404, 132, '#ffffff', 0.94],
+    [602, 120, '#d1e9f8', 0.78],
+    [784, 82, '#ffffff', 0.82],
+    [910, 76, '#aed8ef', 0.62],
   ];
   for (const [x, w, color, a] of panels) {
     ctx.globalAlpha = a;
     ctx.fillStyle = color;
-    ctx.fillRect(x, -34, w, 660);
+    ctx.fillRect(x, -42, w, 680);
   }
 
-  ctx.globalAlpha = 0.16;
-  ctx.fillStyle = '#b5d2e5';
-  ctx.fillRect(-40, 348, 1104, 14);
-  ctx.fillRect(-40, 470, 1104, 12);
+  ctx.filter = 'blur(4px)';
+  ctx.globalAlpha = 0.38;
+  ctx.fillStyle = '#e7f6ff';
+  for (const x of [118, 236, 378, 552, 734, 884]) {
+    ctx.fillRect(x, 0, 3, 576);
+  }
 
-  ctx.filter = 'blur(10px)';
-  ctx.globalAlpha = 0.32;
+  ctx.filter = 'blur(16px)';
+  ctx.globalAlpha = 0.5;
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(90, 336, 844, 22);
+  ctx.fillRect(-60, 310, 1144, 30);
+  ctx.globalAlpha = 0.24;
+  ctx.fillStyle = '#c5ddeb';
+  ctx.fillRect(-40, 380, 1104, 8);
+  ctx.fillRect(-40, 462, 1104, 10);
 
   const sideFog = ctx.createLinearGradient(0, 0, 1024, 0);
-  sideFog.addColorStop(0, 'rgba(206,227,240,0.36)');
-  sideFog.addColorStop(0.16, 'rgba(230,241,248,0.08)');
-  sideFog.addColorStop(0.84, 'rgba(230,241,248,0.06)');
-  sideFog.addColorStop(1, 'rgba(214,231,242,0.24)');
+  sideFog.addColorStop(0, 'rgba(190,219,236,0.42)');
+  sideFog.addColorStop(0.18, 'rgba(240,249,253,0.08)');
+  sideFog.addColorStop(0.78, 'rgba(240,249,253,0.04)');
+  sideFog.addColorStop(1, 'rgba(170,211,235,0.35)');
   ctx.fillStyle = sideFog;
   ctx.fillRect(0, 0, 1024, 576);
 
   const lowerFog = ctx.createLinearGradient(0, 260, 0, 576);
   lowerFog.addColorStop(0, 'rgba(255,255,255,0)');
-  lowerFog.addColorStop(0.5, 'rgba(240,248,252,0.2)');
-  lowerFog.addColorStop(1, 'rgba(226,238,246,0.78)');
+  lowerFog.addColorStop(0.46, 'rgba(237,247,252,0.24)');
+  lowerFog.addColorStop(1, 'rgba(215,232,242,0.72)');
   ctx.fillStyle = lowerFog;
   ctx.fillRect(0, 250, 1024, 326);
 
@@ -133,7 +150,7 @@ const halo = new THREE.Mesh(
   })
 );
 halo.position.set(0.02, 1.9, -2.04);
-halo.material.opacity = 0.22;
+halo.material.opacity = 0.28;
 scene.add(halo);
 
 const lowerWash = new THREE.Mesh(
@@ -147,8 +164,21 @@ const lowerWash = new THREE.Mesh(
   })
 );
 lowerWash.position.set(0, 0.28, -1.96);
-lowerWash.material.opacity = 0.012;
+lowerWash.material.opacity = 0.025;
 scene.add(lowerWash);
+
+const menuGlow = new THREE.Mesh(
+  new THREE.PlaneGeometry(7.8, 0.22),
+  new THREE.MeshBasicMaterial({
+    color: new THREE.Color(1.0, 1.08, 1.16),
+    transparent: true,
+    opacity: 0.2,
+    toneMapped: false,
+    depthWrite: false,
+  })
+);
+menuGlow.position.set(0, 0.86, -2.0);
+scene.add(menuGlow);
 
 // hot glow strips that feed the bloom halo around the silhouette
 function glowStrip(x, w, intensity) {
@@ -164,14 +194,15 @@ function glowStrip(x, w, intensity) {
   m.position.set(x, 1.5, -2.1);
   scene.add(m);
 }
-glowStrip(-1.62, 0.38, 0.88);
-glowStrip(0.08, 0.56, 1.1);
-glowStrip(1.56, 0.42, 0.9);
+glowStrip(-1.72, 0.34, 1.18);
+glowStrip(-0.18, 0.28, 0.92);
+glowStrip(0.42, 0.42, 1.24);
+glowStrip(1.72, 0.34, 1.0);
 
 // image-based lighting
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-scene.environmentIntensity = 0.52;
+scene.environmentIntensity = 0.58;
 pmrem.dispose();
 
 // ---------------------------------------------------------------- camera
@@ -195,10 +226,10 @@ fill.position.set(-1.55, 1.88, 1.45);
 scene.add(fill);
 
 // back/rim lights — edge glow that melts into the background
-const rimL = new THREE.DirectionalLight(0xe9f7ff, 1.18);
+const rimL = new THREE.DirectionalLight(0xe9f7ff, 1.32);
 rimL.position.set(-1.8, 2.45, -1.15);
 scene.add(rimL);
-const rimR = new THREE.DirectionalLight(0xf7fdff, 1.02);
+const rimR = new THREE.DirectionalLight(0xf7fdff, 1.14);
 rimR.position.set(1.42, 2.35, -0.96);
 scene.add(rimR);
 
@@ -273,7 +304,13 @@ function buildRig(root) {
     spineMid: pick('Bip_Spine2', 'Bip_Spine1'),
     clavicles: pick('Bip_Clavicle_L', 'Bip_Clavicle_R'),
     jaw: filter((name) => name.startsWith('Bip_FaceJawJoint')),
+    mouthCornersL: filter((name) => /^Bip_FaceMouthCorner.*_L$/.test(name)),
+    mouthCornersR: filter((name) => /^Bip_FaceMouthCorner.*_R$/.test(name)),
+    lipEdgesL: filter((name) => /^Bip_FaceLip(Edge|Roll|Ridge).*_L$/.test(name)),
+    lipEdgesR: filter((name) => /^Bip_FaceLip(Edge|Roll|Ridge).*_R$/.test(name)),
     upperLip: filter((name) => name.startsWith('Bip_FaceUpperLipUp')),
+    cheeksL: filter((name) => /^Bip_Face(Cheek|NostrilCheek).*_L$/.test(name)),
+    cheeksR: filter((name) => /^Bip_Face(Cheek|NostrilCheek).*_R$/.test(name)),
     browsL: filter((name) => /^Bip_FaceBrow(Up|Lo).*_L$/.test(name)),
     browsR: filter((name) => /^Bip_FaceBrow(Up|Lo).*_R$/.test(name)),
     orbitsUpperL: filter((name) => /^Bip_FaceEyeOrbitUp\d{2}_L$/.test(name)),
@@ -345,6 +382,24 @@ function applyEyeBlinkVisibility(eyeMats, blink) {
   for (const mat of eyeMats) {
     mat.opacity = 1 - hide * 0.28;
   }
+}
+
+function applyNativeSmile(rig, smile, asymmetry = 0) {
+  const liftL = THREE.MathUtils.clamp(smile + asymmetry, 0, 1);
+  const liftR = THREE.MathUtils.clamp(smile - asymmetry, 0, 1);
+  const cornerUpL = -0.00004 * liftL;
+  const cornerUpR = -0.00004 * liftR;
+  const cornerOutL = 0.000018 * liftL;
+  const cornerOutR = -0.000018 * liftR;
+  const cheekLiftL = -0.000018 * liftL;
+  const cheekLiftR = -0.000018 * liftR;
+
+  setBonePositionDeltas(rig, rig.mouthCornersL, cornerUpL, 0.000006 * liftL, cornerOutL);
+  setBonePositionDeltas(rig, rig.mouthCornersR, cornerUpR, 0.000006 * liftR, cornerOutR);
+  setBonePositionDeltas(rig, rig.lipEdgesL, cornerUpL * 0.45, 0, cornerOutL * 0.36);
+  setBonePositionDeltas(rig, rig.lipEdgesR, cornerUpR * 0.45, 0, cornerOutR * 0.36);
+  setBonePositionDeltas(rig, rig.cheeksL, cheekLiftL, 0.000005 * liftL, 0.000006 * liftL);
+  setBonePositionDeltas(rig, rig.cheeksR, cheekLiftR, 0.000005 * liftR, -0.000006 * liftR);
 }
 
 // ---- primary character: Chloe (bundled with the portfolio) ----
@@ -587,15 +642,15 @@ const bodies = panel.querySelectorAll<HTMLElement>('.panel-body');
 let selected = 0;
 
 const MENU_POSES = {
-  about:    { lookX: 0.0,   lookY: 0.008, camX: 0.0,    camY: 0.002, bodyX: 0.0,    bodyY: 0.0,   mouth: 0.44, brow: 0.24, led: 1.0,  squint: 0.015, roll: 0.0 },
-  projects: { lookX: -0.012,lookY: 0.006, camX: -0.008, camY: 0.001, bodyX: -0.006, bodyY: -0.002,mouth: 0.24, brow: 0.12, led: 0.94, squint: 0.005, roll: -0.01 },
-  skills:   { lookX: 0.008, lookY: 0.012, camX: 0.004,  camY: 0.003, bodyX: 0.0,    bodyY: 0.004, mouth: 0.3,  brow: 0.18, led: 1.05, squint: 0.012, roll: 0.0 },
+  about:    { lookX: 0.0,   lookY: 0.008, camX: 0.0,    camY: 0.002, bodyX: 0.0,    bodyY: 0.0,   mouth: 0.62, brow: 0.24, led: 1.0,  squint: 0.015, roll: 0.0 },
+  projects: { lookX: -0.012,lookY: 0.006, camX: -0.008, camY: 0.001, bodyX: -0.006, bodyY: -0.002,mouth: 0.32, brow: 0.12, led: 0.94, squint: 0.005, roll: -0.01 },
+  skills:   { lookX: 0.008, lookY: 0.012, camX: 0.004,  camY: 0.003, bodyX: 0.0,    bodyY: 0.004, mouth: 0.42, brow: 0.18, led: 1.05, squint: 0.012, roll: 0.0 },
   exp:      { lookX: 0.014, lookY: 0.004, camX: 0.007,  camY: -0.002,bodyX: 0.006,  bodyY: -0.004,mouth: 0.18, brow: 0.1,  led: 0.9,  squint: 0.0,   roll: 0.008 },
-  contact:  { lookX: 0.016, lookY: 0.009, camX: 0.01,   camY: 0.001, bodyX: 0.008,  bodyY: 0.0,   mouth: 0.28, brow: 0.16, led: 1.0,  squint: 0.008, roll: 0.01 },
+  contact:  { lookX: 0.016, lookY: 0.009, camX: 0.01,   camY: 0.001, bodyX: 0.008,  bodyY: 0.0,   mouth: 0.36, brow: 0.16, led: 1.0,  squint: 0.008, roll: 0.01 },
 };
 
 const PANEL_POSES = {
-  about:    { lookX: -0.01, lookY: 0.01,  camX: -0.006, camY: 0.006, bodyX: 0.014, bodyY: 0.004, mouth: 0.3,  brow: 0.15, led: 0.78, squint: 0.0,   roll: -0.008 },
+  about:    { lookX: -0.01, lookY: 0.01,  camX: -0.006, camY: 0.006, bodyX: 0.014, bodyY: 0.004, mouth: 0.42, brow: 0.15, led: 0.78, squint: 0.0,   roll: -0.008 },
   projects: { lookX: -0.02, lookY: 0.007, camX: -0.012, camY: 0.002, bodyX: 0.018, bodyY: 0.0,   mouth: 0.18, brow: 0.08, led: 0.72, squint: 0.0,   roll: -0.012 },
   skills:   { lookX: -0.004,lookY: 0.015, camX: -0.004, camY: 0.006, bodyX: 0.014, bodyY: 0.008, mouth: 0.22, brow: 0.12, led: 0.82, squint: 0.01,  roll: -0.006 },
   exp:      { lookX: 0.008, lookY: 0.005, camX: 0.0,    camY: 0.001, bodyX: 0.012, bodyY: -0.002,mouth: 0.16, brow: 0.07, led: 0.7,  squint: 0.0,   roll: 0.006 },
@@ -878,6 +933,8 @@ function animate() {
     const headYaw = motion.lookX * 0.42 + living.eyeDriftX * 0.05 + idleYaw;
     const shoulderBreath = Math.sin(t * 0.8) * 0.012;
     const browAsym = Math.sin(t * 0.92) * 0.002 + living.eyeDriftX * 0.006;
+    const smile = THREE.MathUtils.clamp(0.18 + expressiveMouth * 0.52 + Math.sin(t * 0.72) * 0.018, 0, 0.68);
+    const smileAsym = Math.sin(t * 0.61) * 0.018 + living.eyeDriftX * 0.18;
 
     setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * -0.08, motion.roll * 0.08);
     setBoneRotationDeltas(rig, rig.spineUpper, headPitch * -0.12, headYaw * -0.12, motion.roll * 0.14);
@@ -899,9 +956,10 @@ function animate() {
       living.eyeDriftX * 0.006
     );
 
-    const jawOpen = 0.014 + expressiveMouth * 0.018 + Math.sin(t * 1.45) * 0.0015;
+    const jawOpen = 0.01 + expressiveMouth * 0.045 + Math.sin(t * 1.45) * 0.0015;
     setBoneRotationDeltas(rig, rig.jaw, jawOpen, 0, 0);
-    setBoneRotationDeltas(rig, rig.upperLip, -expressiveMouth * 0.012 - Math.sin(t * 1.1) * 0.001, 0, 0);
+    setBoneRotationDeltas(rig, rig.upperLip, -expressiveMouth * 0.02 - Math.sin(t * 1.1) * 0.001, 0, 0);
+    applyNativeSmile(rig, smile, smileAsym);
 
     const browLift = 0.004 + expressiveBrow * 0.018;
     setBoneRotationDeltas(rig, rig.browsL, -browLift - browAsym, 0, -expressiveBrow * 0.003);
