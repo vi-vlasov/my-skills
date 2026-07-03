@@ -6,6 +6,8 @@ on:
       - claude/animated-3d-portfolio-ovsrbc
     paths:
       - "portfolio/**"
+      - "package.json"
+      - "package-lock.json"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -27,6 +29,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build portfolio
+        run: npm run build:portfolio
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

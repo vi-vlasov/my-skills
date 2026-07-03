@@ -9,12 +9,16 @@
   },
   "license": "MIT",
   "scripts": {
+    "build:portfolio": "tsc -p portfolio/tsconfig.json",
+    "check:portfolio": "tsc -p portfolio/tsconfig.json --noEmit",
     "changeset": "changeset",
     "version": "changeset version"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.7.0",
-    "@changesets/cli": "^2.30.0"
+    "@changesets/cli": "^2.30.0",
+    "three": "^0.185.1",
+    "typescript": "^6.0.3"
   },
   "packageManager": "npm@10.9.4"
 }

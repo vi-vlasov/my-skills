@@ -51,7 +51,7 @@ function wallTexture() {
 
   // tall luminous columns, closer to the Detroit main menu backdrop
   ctx.filter = 'blur(20px)';
-  const panels = [
+  const panels: Array<[number, number, string, number]> = [
     [36, 92, '#d7ebf7', 0.82],
     [172, 70, '#ffffff', 0.9],
     [308, 102, '#deeff9', 0.8],
@@ -581,9 +581,9 @@ window.addEventListener('resize', () => {
 
 // menu: hover/arrows select, click/Enter opens
 const menu = document.getElementById('menu');
-const items = [...menu.querySelectorAll('.item')];
-const panel = document.getElementById('panel');
-const bodies = panel.querySelectorAll('.panel-body');
+const items = [...menu.querySelectorAll<HTMLButtonElement>('.item')];
+const panel = document.getElementById('panel') as HTMLElement;
+const bodies = panel.querySelectorAll<HTMLElement>('.panel-body');
 let selected = 0;
 
 const MENU_POSES = {
@@ -691,7 +691,8 @@ function setBlinkDebugMode(mode) {
 }
 
 window.addEventListener('portrait:blink-debug', (event) => {
-  const detail = event.detail || {};
+  const blinkEvent = event as CustomEvent;
+  const detail = blinkEvent.detail || {};
   if (detail.mode) setBlinkDebugMode(detail.mode);
   if (detail.action === 'blink') {
     living.blinkDebugMode = 'animate';
