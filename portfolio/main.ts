@@ -21,7 +21,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.98;
+renderer.toneMappingExposure = 0.9;
 
 // ---------------------------------------------------------------- scene
 
@@ -202,7 +202,7 @@ glowStrip(1.72, 0.34, 1.0);
 // image-based lighting
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-scene.environmentIntensity = 0.58;
+scene.environmentIntensity = 0.5;
 pmrem.dispose();
 
 // ---------------------------------------------------------------- camera
@@ -216,12 +216,12 @@ camera.lookAt(FOCUS);
 // ---------------------------------------------------------------- lights
 
 // soft frontal key — the bright studio look
-const key = new THREE.DirectionalLight(0xffebd9, 1.72);
+const key = new THREE.DirectionalLight(0xffead9, 1.54);
 key.position.set(0.3, 2.85, 2.45);
 scene.add(key);
 
 // cool fill from the other side
-const fill = new THREE.DirectionalLight(0xd7ecfb, 0.74);
+const fill = new THREE.DirectionalLight(0xd7ecfb, 0.62);
 fill.position.set(-1.55, 1.88, 1.45);
 scene.add(fill);
 
@@ -233,7 +233,7 @@ const rimR = new THREE.DirectionalLight(0xf7fdff, 1.14);
 rimR.position.set(1.42, 2.35, -0.96);
 scene.add(rimR);
 
-const overhead = new THREE.DirectionalLight(0xf3fbff, 0.42);
+const overhead = new THREE.DirectionalLight(0xf3fbff, 0.34);
 overhead.position.set(0, 3.3, 0.85);
 scene.add(overhead);
 
@@ -463,11 +463,12 @@ function chloeMaterials() {
       map: tex(A + alb, true),
       normalMap: tex(A + nrm),
       roughnessMap: tex(A + rough),
-      roughness: 1.0,
-      specularIntensity: 0.45,
-      clearcoat: 0.12,
-      clearcoatRoughness: 0.5,
-      envMapIntensity: 0.7,
+      roughness: 0.86,
+      specularIntensity: 0.34,
+      clearcoat: 0.08,
+      clearcoatRoughness: 0.62,
+      envMapIntensity: 0.5,
+      color: new THREE.Color(1.06, 0.95, 0.9),
     });
   const cutout = (map, opts = {}) =>
     new THREE.MeshStandardMaterial({
@@ -487,12 +488,12 @@ function chloeMaterials() {
     Chloe_Eyes: new THREE.MeshPhysicalMaterial({
       map: tex(A + 'eye_alb.jpg', true),
       normalMap: tex(A + 'eye_nrm.jpg'),
-      roughness: 0.52,
-      clearcoat: 0.18,
-      clearcoatRoughness: 0.48,
-      envMapIntensity: 0.1,
-      specularIntensity: 0.16,
-      color: new THREE.Color(0.9, 0.92, 0.95),
+      roughness: 0.46,
+      clearcoat: 0.12,
+      clearcoatRoughness: 0.58,
+      envMapIntensity: 0.06,
+      specularIntensity: 0.12,
+      color: new THREE.Color(0.68, 0.76, 0.82),
       transparent: true,
       opacity: 1,
     }),
@@ -502,8 +503,9 @@ function chloeMaterials() {
     Chloe_Teeth: new THREE.MeshStandardMaterial({
       map: tex(A + 'teeth_alb.jpg', true),
       normalMap: tex(A + 'teeth_nrm.jpg'),
-      roughness: 0.28,
-      envMapIntensity: 0.6,
+      roughness: 0.36,
+      envMapIntensity: 0.42,
+      color: new THREE.Color(1.0, 0.96, 0.9),
     }),
     Chloe_Duct: new THREE.MeshStandardMaterial({ map: tex(A + 'duct_alb.jpg', true), roughness: 0.35 }),
     Chloe_tear: new THREE.MeshPhysicalMaterial({
