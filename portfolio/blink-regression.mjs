@@ -32,6 +32,9 @@ assert.match(source, /setBoneRotationDeltas\(rig, rig\.upperLip, -mouthOpen \* 0
 assert.match(source, /Chloe_Teeth:[\s\S]*?roughness: 0\.8,[\s\S]*?envMapIntensity: 0\.075,[\s\S]*?color: new THREE\.Color\(0\.78, 0\.75, 0\.7\)/, 'teeth should stay softly visible for the central open-mouth expression');
 assert.match(source, /about:\s*\{[\s\S]*?roll: -0\.006 \}/, 'main portrait pose should keep a subtle reference-like head roll instead of looking passport-flat');
 assert.match(source, /headGroup\.rotation\.z = motion\.roll \* 0\.52/, 'head roll should be visible enough to soften the portrait pose');
+assert.match(source, /new THREE\.PerspectiveCamera\(23\.8,/, 'camera should stay tightly framed like the DBH reference portrait');
+assert.match(source, /const FOCUS = new THREE\.Vector3\(0, 1\.512, 0\)/, 'portrait focus should keep the eyes and mouth in a reference-like vertical composition');
+assert.match(source, /const CAM_Z = 0\.665/, 'camera distance should keep the face large enough for a main-menu close-up');
 assert.match(source, /const expressionAsym = Math\.sin\(t \* 0\.61\) \* 0\.026/, 'face should keep subtle expression asymmetry');
 assert.match(source, /const smileAsym = expressionAsym \* 1\.16/, 'smile asymmetry should be visible enough to avoid a mirrored mask expression');
 assert.match(source, /document\.body\.dataset\.facialSmileAsym = smileAsym\.toFixed\(3\)/, 'smile asymmetry should be exposed for visual checks');
@@ -73,7 +76,7 @@ assert.match(styleSource, /\.glass-band[\s\S]*?height: 1px;[\s\S]*?opacity: 0\.5
 assert.match(styleSource, /\.menu-flare[\s\S]*?top: 79\.2vh;[\s\S]*?opacity: 0\.42;/, 'menu flare should add a subtle selected-row bloom without washing out the portrait');
 assert.match(source, /Chloe_DressMain:[\s\S]*?roughness: 0\.93,[\s\S]*?envMapIntensity: 0\.085,[\s\S]*?color: new THREE\.Color\(0\.76, 0\.82, 0\.9\)/, 'main dress material should stay matte enough to reveal torso structure through the haze');
 assert.match(source, /Chloe_DressDark:[\s\S]*?roughness: 0\.9,[\s\S]*?envMapIntensity: 0\.075,[\s\S]*?color: new THREE\.Color\(0\.58, 0\.66, 0\.78\)/, 'dark dress straps should stay visible like the reference silhouette');
-assert.match(styleSource, /\.menu::before[\s\S]*?height: 138px;[\s\S]*?rgba\(255,255,255,0\.36\)/, 'menu glow should veil the lower portrait behind the UI');
+assert.match(styleSource, /\.menu::before[\s\S]*?top: -42px;[\s\S]*?height: 164px;[\s\S]*?rgba\(255,255,255,0\.42\)/, 'menu glow should veil the lower portrait behind the UI');
 assert.match(styleSource, /\.item[\s\S]*?height: 42px;[\s\S]*?font-size: clamp\(12px, 1\.02vw, 17px\)/, 'menu items should stay slim like the reference UI');
 assert.match(styleSource, /\.item::after[\s\S]*?rgba\(237,244,248,0\.38\)[\s\S]*?opacity: 0\.46;/, 'inactive menu panels should stay faint instead of heavy cards');
 assert.match(styleSource, /\.item::before[\s\S]*?#10233b 0%[\s\S]*?#47759c 100%/, 'selected menu bar should keep the dark Detroit-like blue ramp');

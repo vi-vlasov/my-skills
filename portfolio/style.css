@@ -257,11 +257,11 @@ body::after {
   content: "";
   position: absolute;
   left: 4vw; right: 4vw;
-  top: -28px;
-  height: 138px;
+  top: -42px;
+  height: 164px;
   border-radius: 28px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.36), rgba(226,239,247,0.22) 45%, rgba(226,239,247,0) 100%);
-  filter: blur(20px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.42), rgba(226,239,247,0.28) 48%, rgba(226,239,247,0) 100%);
+  filter: blur(23px);
   z-index: -1;
 }
 

@@ -299,9 +299,9 @@ pmrem.dispose();
 
 // ---------------------------------------------------------------- camera
 
-const camera = new THREE.PerspectiveCamera(24.6, window.innerWidth / window.innerHeight, 0.05, 30);
-const FOCUS = new THREE.Vector3(0, 1.5, 0); // close-up portrait framing, DBH main-menu style
-const CAM_Z = 0.69;
+const camera = new THREE.PerspectiveCamera(23.8, window.innerWidth / window.innerHeight, 0.05, 30);
+const FOCUS = new THREE.Vector3(0, 1.512, 0); // close-up portrait framing, DBH main-menu style
+const CAM_Z = 0.665;
 camera.position.set(0.004, FOCUS.y + 0.005, CAM_Z);
 camera.lookAt(FOCUS);
 
