@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VI.VLASOV — PORTFOLIO</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%234ac3ee'/></svg>">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.min.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+
+<!-- 3D scene -->
+<canvas id="scene"></canvas>
+<div class="camera-diffusion" aria-hidden="true"></div>
+
+<!-- cinematic post layer: soft camera haze and overexposed studio panes -->
+<div class="cinematic-backdrop" aria-hidden="true">
+  <i class="pane pane-a"></i>
+  <i class="pane pane-b"></i>
+  <i class="pane pane-c"></i>
+  <i class="pane pane-d"></i>
+  <i class="pane pane-e"></i>
+  <i class="pane pane-f"></i>
+  <i class="horizon-glow"></i>
+  <i class="lens-bloom"></i>
+  <i class="torso-haze"></i>
+  <i class="floor-mist"></i>
+  <i class="glass-band glass-band-a"></i>
+  <i class="glass-band glass-band-b"></i>
+  <i class="menu-flare"></i>
+</div>
+
+<!-- top corners -->
+<div class="brand">VI.VLASOV<span>PORTFOLIO</span></div>
+<div class="spinner" aria-hidden="true"></div>
+
+<!-- faint HUD telemetry scattered around the menu row, like the DBH main menu -->
+<div class="telemetry" aria-hidden="true">
+  <span style="left:13%;  top:70.5%">08</span>
+  <span style="left:24%;  top:72.8%">D BKN / 6.1</span>
+  <span style="left:42.5%;top:72.8%">D BKN</span>
+  <span style="left:60%;  top:72.8%">08 / 3.4</span>
+  <span style="left:84%;  top:72.8%">GM</span>
+  <span style="left:24%;  top:84.6%">60.8</span>
+  <span style="left:43%;  top:84.6%">35.4</span>
+  <span style="left:60%;  top:84.6%" id="tele-clock">--:--</span>
+  <span style="left:82%;  top:84.6%">80.1</span>
+  <span style="left:13.5%;top:87.4%">78.0</span>
+  <span style="left:5%;   top:55%"  class="sq"></span>
+  <span style="left:94%;  top:60%"  class="sq"></span>
+  <span style="left:6%;   top:93%">VK300 #313 248 317 - 51</span>
+  <span style="left:79%;  top:93%">SYSTEM NOMINAL · PBR / ACES</span>
+</div>
+
+<!-- bottom horizontal menu (DBH style) -->
+<nav class="menu" id="menu">
+  <button class="item selected" data-panel="about">
+    <i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i>
+    <span class="chev"></span><span class="label">Обо мне</span>
+  </button>
+  <button class="item" data-panel="projects">
+    <i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i>
+    <span class="chev"></span><span class="label">Проекты</span>
+  </button>
+  <button class="item" data-panel="skills">
+    <i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i>
+    <span class="chev"></span><span class="label">Навыки</span>
+  </button>
+  <button class="item" data-panel="exp">
+    <i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i>
+    <span class="chev"></span><span class="label">Опыт</span>
+  </button>
+  <button class="item" data-panel="contact">
+    <i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i>
+    <span class="chev"></span><span class="label">Контакты</span>
+  </button>
+</nav>
+
+<!-- content panel -->
+<section class="panel" id="panel" hidden>
+  <i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i>
+  <button class="panel-back" id="panel-back">&#9664;&nbsp;&nbsp;Назад</button>
+
+  <div class="panel-body" id="panel-about" hidden>
+    <h2>Обо мне</h2>
+    <p class="tag">SOFTWARE ENGINEER · МОДЕЛЬ VK-2026</p>
+    <p>Привет! Я разработчик, который любит выразительные интерфейсы,
+    3D-графику в вебе и аккуратный код. Эта страница — оммаж главному
+    меню Detroit: Become Human: физически корректный рендеринг,
+    HDR-освещение и лицевая анимация прямо в браузере.</p>
+    <p>Замените этот текст своей историей — файл <code>portfolio/index.html</code>.</p>
+  </div>
+
+  <div class="panel-body" id="panel-projects" hidden>
+    <h2>Проекты</h2>
+    <p class="tag">ИЗБРАННЫЕ РАБОТЫ</p>
+    <article class="card">
+      <h3>Проект №1</h3>
+      <p>Краткое описание проекта: чем он полезен, что внутри, ссылка на репозиторий.</p>
+      <span class="meta">WEBGL · THREE.JS</span>
+    </article>
+    <article class="card">
+      <h3>Проект №2</h3>
+      <p>Краткое описание проекта: стек, роль, результат.</p>
+      <span class="meta">TYPESCRIPT · NODE</span>
+    </article>
+    <article class="card">
+      <h3>Проект №3</h3>
+      <p>Краткое описание проекта: что было сложным и как решилось.</p>
+      <span class="meta">PYTHON · ML</span>
+    </article>
+  </div>
+
+  <div class="panel-body" id="panel-skills" hidden>
+    <h2>Навыки</h2>
+    <p class="tag">SOFTWARE MODULES · DIAGNOSTICS OK</p>
+    <div class="skill"><span>JavaScript / TypeScript</span><div class="bar"><i style="--v:92%"></i></div></div>
+    <div class="skill"><span>Three.js / WebGL</span><div class="bar"><i style="--v:85%"></i></div></div>
+    <div class="skill"><span>React / UI Engineering</span><div class="bar"><i style="--v:88%"></i></div></div>
+    <div class="skill"><span>Node.js / Backend</span><div class="bar"><i style="--v:80%"></i></div></div>
+    <div class="skill"><span>Python</span><div class="bar"><i style="--v:75%"></i></div></div>
+  </div>
+
+  <div class="panel-body" id="panel-exp" hidden>
+    <h2>Опыт</h2>
+    <p class="tag">ЖУРНАЛ ПАМЯТИ · ХРОНОЛОГИЯ</p>
+    <article class="card">
+      <h3>2024 — н.в. · Компания / роль</h3>
+      <p>Чем занимаетесь сейчас: продукт, зона ответственности, достижения.</p>
+      <span class="meta">CURRENT</span>
+    </article>
+    <article class="card">
+      <h3>2022 — 2024 · Компания / роль</h3>
+      <p>Предыдущее место: что построили, чему научились.</p>
+      <span class="meta">ARCHIVE</span>
+    </article>
+  </div>
+
+  <div class="panel-body" id="panel-contact" hidden>
+    <h2>Контакты</h2>
+    <p class="tag">УСТАНОВИТЬ СОЕДИНЕНИЕ</p>
+    <ul class="contacts">
+      <li><span>EMAIL</span><a href="mailto:vikubik452@gmail.com">vikubik452@gmail.com</a></li>
+      <li><span>GITHUB</span><a href="https://github.com/vi-vlasov" target="_blank" rel="noopener">github.com/vi-vlasov</a></li>
+      <li><span>TELEGRAM</span><a href="#">@your_handle</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- boot / loading screen -->
+<div class="boot" id="boot">
+  <div class="boot-inner">
+    <div class="boot-ring"></div>
+    <div class="boot-title">LOADING&nbsp;MODEL&nbsp;VK-2026</div>
+    <div class="boot-bar"><i id="boot-progress"></i></div>
+    <div class="boot-sub" id="boot-status">INITIALIZING…</div>
+  </div>
+</div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
