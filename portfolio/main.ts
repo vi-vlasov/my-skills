@@ -303,12 +303,20 @@ function buildRig(root) {
     spineUpper: pick('Bip_Spine4', 'Bip_Spine3'),
     spineMid: pick('Bip_Spine2', 'Bip_Spine1'),
     clavicles: pick('Bip_Clavicle_L', 'Bip_Clavicle_R'),
+    mouthRoot: pick('Bip_FaceMouth'),
     jaw: filter((name) => name.startsWith('Bip_FaceJawJoint')),
+    mandiblesL: filter((name) => /^Bip_FaceMandible.*_L$/.test(name)),
+    mandiblesR: filter((name) => /^Bip_FaceMandible.*_R$/.test(name)),
     mouthCornersL: filter((name) => /^Bip_FaceMouthCorner.*_L$/.test(name)),
     mouthCornersR: filter((name) => /^Bip_FaceMouthCorner.*_R$/.test(name)),
+    lipMidUpper: pick('Bip_FaceLipMiUpOut', 'Bip_FaceLipMiUpIn'),
+    lipMidLower: pick('Bip_FaceLipMiLoOut', 'Bip_FaceLipMiLoIn'),
+    lipLowerL: filter((name) => /^Bip_FaceLip(BumpLo|Ridge).*_L$/.test(name)),
+    lipLowerR: filter((name) => /^Bip_FaceLip(BumpLo|Ridge).*_R$/.test(name)),
     lipEdgesL: filter((name) => /^Bip_FaceLip(Edge|Roll|Ridge).*_L$/.test(name)),
     lipEdgesR: filter((name) => /^Bip_FaceLip(Edge|Roll|Ridge).*_R$/.test(name)),
     upperLip: filter((name) => name.startsWith('Bip_FaceUpperLipUp')),
+    tongue: filter((name) => /^Bip_FaceTongue/.test(name)),
     cheeksL: filter((name) => /^Bip_Face(Cheek|NostrilCheek).*_L$/.test(name)),
     cheeksR: filter((name) => /^Bip_Face(Cheek|NostrilCheek).*_R$/.test(name)),
     browsL: filter((name) => /^Bip_FaceBrow(Up|Lo).*_L$/.test(name)),
@@ -409,12 +417,12 @@ function applyEyeBlinkVisibility(eyeMats, close) {
 function applyNativeSmile(rig, smile, asymmetry = 0) {
   const liftL = THREE.MathUtils.clamp(smile + asymmetry, 0, 1);
   const liftR = THREE.MathUtils.clamp(smile - asymmetry, 0, 1);
-  const cornerUpL = -0.00004 * liftL;
-  const cornerUpR = -0.00004 * liftR;
-  const cornerOutL = 0.000018 * liftL;
-  const cornerOutR = -0.000018 * liftR;
-  const cheekLiftL = -0.000018 * liftL;
-  const cheekLiftR = -0.000018 * liftR;
+  const cornerUpL = -0.000052 * liftL;
+  const cornerUpR = -0.000052 * liftR;
+  const cornerOutL = 0.000023 * liftL;
+  const cornerOutR = -0.000023 * liftR;
+  const cheekLiftL = -0.000026 * liftL;
+  const cheekLiftR = -0.000026 * liftR;
 
   setBonePositionDeltas(rig, rig.mouthCornersL, cornerUpL, 0.000006 * liftL, cornerOutL);
   setBonePositionDeltas(rig, rig.mouthCornersR, cornerUpR, 0.000006 * liftR, cornerOutR);
@@ -422,6 +430,27 @@ function applyNativeSmile(rig, smile, asymmetry = 0) {
   setBonePositionDeltas(rig, rig.lipEdgesR, cornerUpR * 0.45, 0, cornerOutR * 0.36);
   setBonePositionDeltas(rig, rig.cheeksL, cheekLiftL, 0.000005 * liftL, 0.000006 * liftL);
   setBonePositionDeltas(rig, rig.cheeksR, cheekLiftR, 0.000005 * liftR, -0.000006 * liftR);
+}
+
+function applyNativeMouth(rig, openness, smile, speechPulse = 0) {
+  const open = THREE.MathUtils.clamp(openness, 0, 1);
+  const smileLift = THREE.MathUtils.clamp(smile, 0, 1);
+  const pulse = THREE.MathUtils.clamp(speechPulse, -1, 1);
+  const upperLift = -0.000035 * smileLift - 0.000014 * open + 0.000004 * pulse;
+  const lowerDrop = 0.00004 * open + 0.000007 * Math.max(0, pulse);
+  const lowerOut = 0.000006 * open;
+
+  setBoneRotationDeltas(rig, rig.mouthRoot, open * 0.014, 0, 0);
+  setBoneRotationDeltas(rig, rig.mandiblesL, open * 0.008, 0, -open * 0.004);
+  setBoneRotationDeltas(rig, rig.mandiblesR, open * 0.008, 0, open * 0.004);
+  setBonePositionDeltas(rig, rig.lipMidUpper, upperLift, 0.000002 * pulse, 0);
+  setBonePositionDeltas(rig, rig.lipMidLower, lowerDrop, -0.000002 * pulse, 0);
+  setBonePositionDeltas(rig, rig.lipLowerL, lowerDrop * 0.56, 0, lowerOut);
+  setBonePositionDeltas(rig, rig.lipLowerR, lowerDrop * 0.56, 0, -lowerOut);
+  setBoneRotationDeltas(rig, rig.tongue, open * 0.004, 0, 0);
+
+  document.body.dataset.facialMouthOpen = open.toFixed(3);
+  document.body.dataset.facialSmile = smileLift.toFixed(3);
 }
 
 // ---- primary character: Chloe (bundled with the portfolio) ----
@@ -556,6 +585,11 @@ function setupChloe(gltf) {
   document.body.dataset.lidsUpperR = String(headGroup.userData.rig.lidsUpperR.length);
   document.body.dataset.lidsLowerL = String(headGroup.userData.rig.lidsLowerL.length);
   document.body.dataset.lidsLowerR = String(headGroup.userData.rig.lidsLowerR.length);
+  document.body.dataset.mouthRoot = String(headGroup.userData.rig.mouthRoot.length);
+  document.body.dataset.lipMidUpper = String(headGroup.userData.rig.lipMidUpper.length);
+  document.body.dataset.lipMidLower = String(headGroup.userData.rig.lipMidLower.length);
+  document.body.dataset.mandiblesL = String(headGroup.userData.rig.mandiblesL.length);
+  document.body.dataset.mandiblesR = String(headGroup.userData.rig.mandiblesR.length);
   headGroup.add(model);
   return { headY: 1.49 }; // vertical focus: face/upper chest band
 }
@@ -964,8 +998,10 @@ function animate() {
     const headYaw = motion.lookX * 0.42 + living.eyeDriftX * 0.05 + idleYaw;
     const shoulderBreath = Math.sin(t * 0.8) * 0.012;
     const browAsym = Math.sin(t * 0.92) * 0.002 + living.eyeDriftX * 0.006;
-    const smile = THREE.MathUtils.clamp(0.18 + expressiveMouth * 0.52 + Math.sin(t * 0.72) * 0.018, 0, 0.68);
-    const smileAsym = Math.sin(t * 0.61) * 0.018 + living.eyeDriftX * 0.18;
+    const speechPulse = Math.sin(t * 1.35) * 0.45 + Math.sin(t * 0.58 + 1.7) * 0.22;
+    const smile = THREE.MathUtils.clamp(0.26 + expressiveMouth * 0.44 + Math.sin(t * 0.72) * 0.018, 0.12, 0.72);
+    const mouthOpen = THREE.MathUtils.clamp(0.16 + expressiveMouth * 0.46 + speechPulse * 0.018, 0.08, 0.62);
+    const smileAsym = Math.sin(t * 0.61) * 0.015 + living.eyeDriftX * 0.14;
 
     setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * -0.08, motion.roll * 0.08);
     setBoneRotationDeltas(rig, rig.spineUpper, headPitch * -0.12, headYaw * -0.12, motion.roll * 0.14);
@@ -987,10 +1023,12 @@ function animate() {
       living.eyeDriftX * 0.006
     );
 
-    const jawOpen = 0.01 + expressiveMouth * 0.045 + Math.sin(t * 1.45) * 0.0015;
+    const jawOpen = 0.008 + mouthOpen * 0.056 + Math.sin(t * 1.45) * 0.001;
     setBoneRotationDeltas(rig, rig.jaw, jawOpen, 0, 0);
-    setBoneRotationDeltas(rig, rig.upperLip, -expressiveMouth * 0.02 - Math.sin(t * 1.1) * 0.001, 0, 0);
+    setBoneRotationDeltas(rig, rig.upperLip, -mouthOpen * 0.018 - Math.sin(t * 1.1) * 0.001, 0, 0);
     applyNativeSmile(rig, smile, smileAsym);
+    applyNativeMouth(rig, mouthOpen, smile, speechPulse);
+    document.body.dataset.facialJawOpen = jawOpen.toFixed(3);
 
     const browLift = 0.004 + expressiveBrow * 0.018;
     setBoneRotationDeltas(rig, rig.browsL, -browLift - browAsym, 0, -expressiveBrow * 0.003);
