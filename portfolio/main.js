@@ -21,12 +21,12 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 0.98;
 
 // ---------------------------------------------------------------- scene
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xecf6fb);
+scene.background = new THREE.Color(0xe8f2f8);
 
 // studio wall: blurred bright panels, like the blown-out DBH backdrop
 function wallTexture() {
@@ -36,49 +36,57 @@ function wallTexture() {
   const ctx = c.getContext('2d');
 
   const base = ctx.createLinearGradient(0, 0, 0, 576);
-  base.addColorStop(0, '#fafdff');
-  base.addColorStop(0.5, '#edf5fb');
-  base.addColorStop(1, '#d8e9f4');
+  base.addColorStop(0, '#fdfefe');
+  base.addColorStop(0.44, '#eef5fa');
+  base.addColorStop(1, '#d7e6f1');
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, 1024, 576);
 
-  const topGlow = ctx.createRadialGradient(512, 86, 40, 512, 86, 380);
-  topGlow.addColorStop(0, 'rgba(255,255,255,0.95)');
-  topGlow.addColorStop(0.45, 'rgba(255,255,255,0.38)');
+  const topGlow = ctx.createRadialGradient(512, 92, 50, 512, 92, 420);
+  topGlow.addColorStop(0, 'rgba(255,255,255,0.92)');
+  topGlow.addColorStop(0.4, 'rgba(255,255,255,0.4)');
   topGlow.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = topGlow;
   ctx.fillRect(0, 0, 1024, 320);
 
-  // soft vertical light panels
-  ctx.filter = 'blur(24px)';
+  // tall luminous columns, closer to the Detroit main menu backdrop
+  ctx.filter = 'blur(20px)';
   const panels = [
-    [30, 120, '#e6f5ff', 0.78],
-    [175, 90, '#ffffff', 0.92],
-    [322, 120, '#d9f0ff', 0.84],
-    [470, 160, '#ffffff', 1.0],
-    [690, 110, '#dbf2ff', 0.88],
-    [840, 134, '#ffffff', 0.94],
+    [36, 92, '#d7ebf7', 0.82],
+    [172, 70, '#ffffff', 0.9],
+    [308, 102, '#deeff9', 0.8],
+    [468, 118, '#ffffff', 0.98],
+    [670, 92, '#dcebfa', 0.8],
+    [836, 104, '#ffffff', 0.9],
   ];
   for (const [x, w, color, a] of panels) {
     ctx.globalAlpha = a;
     ctx.fillStyle = color;
-    ctx.fillRect(x, -40, w, 660);
+    ctx.fillRect(x, -34, w, 660);
   }
 
-  ctx.globalAlpha = 0.18;
-  ctx.fillStyle = '#b3d5ea';
-  ctx.fillRect(-40, 322, 1104, 26);
-  ctx.fillRect(-40, 448, 1104, 22);
+  ctx.globalAlpha = 0.16;
+  ctx.fillStyle = '#b5d2e5';
+  ctx.fillRect(-40, 348, 1104, 14);
+  ctx.fillRect(-40, 470, 1104, 12);
 
-  ctx.filter = 'blur(12px)';
-  ctx.globalAlpha = 0.42;
+  ctx.filter = 'blur(10px)';
+  ctx.globalAlpha = 0.32;
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(90, 306, 844, 40);
+  ctx.fillRect(90, 336, 844, 22);
+
+  const sideFog = ctx.createLinearGradient(0, 0, 1024, 0);
+  sideFog.addColorStop(0, 'rgba(206,227,240,0.36)');
+  sideFog.addColorStop(0.16, 'rgba(230,241,248,0.08)');
+  sideFog.addColorStop(0.84, 'rgba(230,241,248,0.06)');
+  sideFog.addColorStop(1, 'rgba(214,231,242,0.24)');
+  ctx.fillStyle = sideFog;
+  ctx.fillRect(0, 0, 1024, 576);
 
   const lowerFog = ctx.createLinearGradient(0, 260, 0, 576);
   lowerFog.addColorStop(0, 'rgba(255,255,255,0)');
-  lowerFog.addColorStop(0.42, 'rgba(240,248,252,0.28)');
-  lowerFog.addColorStop(1, 'rgba(230,241,247,0.86)');
+  lowerFog.addColorStop(0.5, 'rgba(240,248,252,0.2)');
+  lowerFog.addColorStop(1, 'rgba(226,238,246,0.78)');
   ctx.fillStyle = lowerFog;
   ctx.fillRect(0, 250, 1024, 326);
 
@@ -124,8 +132,8 @@ const halo = new THREE.Mesh(
     depthWrite: false,
   })
 );
-halo.position.set(0.05, 1.92, -2.04);
-halo.material.opacity = 0.32;
+halo.position.set(0.02, 1.9, -2.04);
+halo.material.opacity = 0.22;
 scene.add(halo);
 
 const lowerWash = new THREE.Mesh(
@@ -139,7 +147,7 @@ const lowerWash = new THREE.Mesh(
   })
 );
 lowerWash.position.set(0, 0.28, -1.96);
-lowerWash.material.opacity = 0.05;
+lowerWash.material.opacity = 0.012;
 scene.add(lowerWash);
 
 // hot glow strips that feed the bloom halo around the silhouette
@@ -156,45 +164,45 @@ function glowStrip(x, w, intensity) {
   m.position.set(x, 1.5, -2.1);
   scene.add(m);
 }
-glowStrip(-1.62, 0.46, 1.15);
-glowStrip(0.08, 0.68, 1.55);
-glowStrip(1.56, 0.52, 1.2);
+glowStrip(-1.62, 0.38, 0.88);
+glowStrip(0.08, 0.56, 1.1);
+glowStrip(1.56, 0.42, 0.9);
 
 // image-based lighting
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-scene.environmentIntensity = 0.74;
+scene.environmentIntensity = 0.52;
 pmrem.dispose();
 
 // ---------------------------------------------------------------- camera
 
 const camera = new THREE.PerspectiveCamera(28.5, window.innerWidth / window.innerHeight, 0.05, 30);
 const FOCUS = new THREE.Vector3(0, 1.57, 0); // face / upper-chest band
-const CAM_Z = 0.9;
-camera.position.set(0.012, FOCUS.y + 0.008, CAM_Z);
+const CAM_Z = 0.87;
+camera.position.set(0.004, FOCUS.y + 0.005, CAM_Z);
 camera.lookAt(FOCUS);
 
 // ---------------------------------------------------------------- lights
 
 // soft frontal key — the bright studio look
-const key = new THREE.DirectionalLight(0xffebd9, 1.86);
+const key = new THREE.DirectionalLight(0xffebd9, 1.72);
 key.position.set(0.3, 2.85, 2.45);
 scene.add(key);
 
 // cool fill from the other side
-const fill = new THREE.DirectionalLight(0xd7ecfb, 0.82);
+const fill = new THREE.DirectionalLight(0xd7ecfb, 0.74);
 fill.position.set(-1.55, 1.88, 1.45);
 scene.add(fill);
 
 // back/rim lights — edge glow that melts into the background
-const rimL = new THREE.DirectionalLight(0xe9f7ff, 1.5);
+const rimL = new THREE.DirectionalLight(0xe9f7ff, 1.18);
 rimL.position.set(-1.8, 2.45, -1.15);
 scene.add(rimL);
-const rimR = new THREE.DirectionalLight(0xf7fdff, 1.22);
+const rimR = new THREE.DirectionalLight(0xf7fdff, 1.02);
 rimR.position.set(1.42, 2.35, -0.96);
 scene.add(rimR);
 
-const overhead = new THREE.DirectionalLight(0xf3fbff, 0.58);
+const overhead = new THREE.DirectionalLight(0xf3fbff, 0.42);
 overhead.position.set(0, 3.3, 0.85);
 scene.add(overhead);
 
@@ -203,8 +211,6 @@ scene.add(overhead);
 const bootEl = document.getElementById('boot');
 const bootBar = document.getElementById('boot-progress');
 const bootStatus = document.getElementById('boot-status');
-const blinkLidLeft = document.getElementById('blink-lid-left');
-const blinkLidRight = document.getElementById('blink-lid-right');
 
 // the whole head group turns toward the pointer (androids watch you)
 const headGroup = new THREE.Group();
@@ -251,10 +257,14 @@ function buildRig(root) {
   const names = [...bones.keys()];
   const pick = (...list) => list.map((name) => bones.get(name)).filter(Boolean);
   const filter = (fn) => names.filter(fn).map((name) => bones.get(name));
+  const lowerLids = filter((name) => /^Bip_FaceEyelidLo/.test(name));
+  const isLowerLidL = (bone) => /_L$/.test(bone.name) || (bone.name.includes('Base') && bone.position.z > 0);
+  const isLowerLidR = (bone) => /_R(\.\d+)?$/.test(bone.name) && !isLowerLidL(bone);
 
   return {
     bones,
     baseRotations: new Map([...bones.values()].map((bone) => [bone, bone.rotation.clone()])),
+    basePositions: new Map([...bones.values()].map((bone) => [bone, bone.position.clone()])),
     neck: bones.get('Bip_Neck'),
     head: bones.get('Bip_Head'),
     eyeL: bones.get('Bip_Eye_L'),
@@ -266,10 +276,14 @@ function buildRig(root) {
     upperLip: filter((name) => name.startsWith('Bip_FaceUpperLipUp')),
     browsL: filter((name) => /^Bip_FaceBrow(Up|Lo).*_L$/.test(name)),
     browsR: filter((name) => /^Bip_FaceBrow(Up|Lo).*_R$/.test(name)),
-    lidsUpperL: filter((name) => /^Bip_Face(EyeCover|Eyelid)\d{2}_L$/.test(name)),
-    lidsUpperR: filter((name) => /^Bip_Face(EyeCover|Eyelid)\d{2}_R$/.test(name)),
-    lidsLowerL: filter((name) => /^Bip_FaceEyelidLo\d{2}.*_L$/.test(name)),
-    lidsLowerR: filter((name) => /^Bip_FaceEyelidLo\d{2}.*_R$/.test(name)),
+    orbitsUpperL: filter((name) => /^Bip_FaceEyeOrbitUp\d{2}_L$/.test(name)),
+    orbitsUpperR: filter((name) => /^Bip_FaceEyeOrbitUp\d{2}_R$/.test(name)),
+    eyeCoversL: filter((name) => /^Bip_FaceEyeCover\d{2}_L$/.test(name)),
+    eyeCoversR: filter((name) => /^Bip_FaceEyeCover\d{2}_R$/.test(name)),
+    lidsUpperL: filter((name) => /^Bip_FaceEyelid\d{2}_L$/.test(name)),
+    lidsUpperR: filter((name) => /^Bip_FaceEyelid\d{2}_R$/.test(name)),
+    lidsLowerL: lowerLids.filter(isLowerLidL),
+    lidsLowerR: lowerLids.filter(isLowerLidR),
   };
 }
 
@@ -282,6 +296,55 @@ function setBoneRotationDelta(rig, bone, x = 0, y = 0, z = 0) {
 
 function setBoneRotationDeltas(rig, bones, x = 0, y = 0, z = 0) {
   for (const bone of bones) setBoneRotationDelta(rig, bone, x, y, z);
+}
+
+function setBonePositionDelta(rig, bone, x = 0, y = 0, z = 0) {
+  if (!bone) return;
+  const base = rig.basePositions.get(bone);
+  if (!base) return;
+  bone.position.set(base.x + x, base.y + y, base.z + z);
+}
+
+function setBonePositionDeltas(rig, bones, x = 0, y = 0, z = 0) {
+  for (const bone of bones) setBonePositionDelta(rig, bone, x, y, z);
+}
+
+function applyNativeBlink(rig, blink, squint, lookY) {
+  const close = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blink * 0.72, 0, 1), 0, 1);
+  const gazeSquint = THREE.MathUtils.clamp(squint + Math.max(0, lookY) * 0.08, 0, 0.08);
+  const upperDrop = 0.000078 * close + 0.000016 * gazeSquint;
+  const coverDrop = 0.000058 * close + 0.000012 * gazeSquint;
+  const lowerRise = -0.000021 * close - 0.000006 * gazeSquint;
+  const orbitDrop = 0.000017 * close + 0.000004 * gazeSquint;
+  const upperFold = -0.044 * close - 0.006 * gazeSquint;
+  const coverFold = -0.026 * close - 0.004 * gazeSquint;
+  const lowerFold = 0.014 * close + 0.004 * gazeSquint;
+
+  setBonePositionDeltas(rig, rig.orbitsUpperL, orbitDrop, 0, 0);
+  setBonePositionDeltas(rig, rig.orbitsUpperR, orbitDrop, 0, 0);
+  setBonePositionDeltas(rig, rig.eyeCoversL, coverDrop, 0, 0);
+  setBonePositionDeltas(rig, rig.eyeCoversR, coverDrop, 0, 0);
+  setBonePositionDeltas(rig, rig.lidsUpperL, upperDrop, 0, 0);
+  setBonePositionDeltas(rig, rig.lidsUpperR, upperDrop, 0, 0);
+  setBonePositionDeltas(rig, rig.lidsLowerL, lowerRise, 0, 0);
+  setBonePositionDeltas(rig, rig.lidsLowerR, lowerRise, 0, 0);
+
+  setBoneRotationDeltas(rig, rig.orbitsUpperL, coverFold * 0.35, 0, 0);
+  setBoneRotationDeltas(rig, rig.orbitsUpperR, coverFold * 0.35, 0, 0);
+  setBoneRotationDeltas(rig, rig.eyeCoversL, coverFold, 0, close * 0.035);
+  setBoneRotationDeltas(rig, rig.eyeCoversR, coverFold, 0, -close * 0.035);
+  setBoneRotationDeltas(rig, rig.lidsUpperL, upperFold, 0, close * 0.055);
+  setBoneRotationDeltas(rig, rig.lidsUpperR, upperFold, 0, -close * 0.055);
+  setBoneRotationDeltas(rig, rig.lidsLowerL, lowerFold, 0, -close * 0.018);
+  setBoneRotationDeltas(rig, rig.lidsLowerR, lowerFold, 0, close * 0.018);
+}
+
+function applyEyeBlinkVisibility(eyeMats, blink) {
+  if (!eyeMats) return;
+  const hide = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blink, 0, 1), 0.48, 1);
+  for (const mat of eyeMats) {
+    mat.opacity = 1 - hide * 0.28;
+  }
 }
 
 // ---- primary character: Chloe (bundled with the portfolio) ----
@@ -318,10 +381,14 @@ function chloeMaterials() {
     Chloe_Eyes: new THREE.MeshPhysicalMaterial({
       map: tex(A + 'eye_alb.jpg', true),
       normalMap: tex(A + 'eye_nrm.jpg'),
-      roughness: 0.2,
-      clearcoat: 0.92,
-      clearcoatRoughness: 0.12,
-      envMapIntensity: 0.82,
+      roughness: 0.52,
+      clearcoat: 0.18,
+      clearcoatRoughness: 0.48,
+      envMapIntensity: 0.1,
+      specularIntensity: 0.16,
+      color: new THREE.Color(0.9, 0.92, 0.95),
+      transparent: true,
+      opacity: 1,
     }),
     Chloe_Hair: cutout('hair.png'),
     Chloe_Lashes: cutout('lashes.png', { roughness: 0.5 }),
@@ -343,20 +410,24 @@ function chloeMaterials() {
     Chloe_DressMain: new THREE.MeshStandardMaterial({
       map: tex(A + 'dress_alb.jpg', true),
       normalMap: tex(A + 'dress_nrm.jpg'),
-      roughness: 0.75,
-      envMapIntensity: 0.6,
+      roughness: 0.88,
+      envMapIntensity: 0.14,
+      color: new THREE.Color(0.86, 0.89, 0.95),
     }),
     Chloe_DressDark: new THREE.MeshStandardMaterial({
       map: tex(A + 'dress_alb.jpg', true),
-      roughness: 0.7,
-      envMapIntensity: 0.6,
+      roughness: 0.82,
+      envMapIntensity: 0.18,
+      color: new THREE.Color(0.84, 0.88, 0.94),
     }),
     Chloe_DressTrans: new THREE.MeshStandardMaterial({
       map: tex(A + 'white_alb.jpg', true),
       transparent: true,
-      opacity: 0.75,
+      opacity: 0.24,
       side: THREE.DoubleSide,
-      roughness: 0.6,
+      roughness: 0.92,
+      envMapIntensity: 0.04,
+      color: new THREE.Color(0.8, 0.86, 0.93),
     }),
     // the temple LED: the in-game mesh, plain HDR cyan so bloom picks it up
     Chloe_Circle: new THREE.MeshBasicMaterial({
@@ -377,13 +448,14 @@ function setupChloe(gltf) {
     // the FBX rip carries black vertex colors that would multiply the maps
     if (obj.geometry.getAttribute('color')) obj.geometry.deleteAttribute('color');
     const name = obj.name;
-    if (name === 'Chloe_Shoes' || name === 'Chloe_CircleShadow') {
+    if (name === 'Chloe_Shoes' || name === 'Chloe_CircleShadow' || name === 'Chloe_tear') {
       obj.visible = false;
       return;
     }
     if (name.startsWith('Chloe_Duct')) obj.material = mats.Chloe_Duct;
     else if (mats[name]) obj.material = mats[name];
     obj.material.vertexColors = false;
+    if (name === 'Chloe_Eyes') headGroup.userData.eyeMats = [obj.material];
     if (name === 'Chloe_Circle') headGroup.userData.ledMats = [obj.material];
   });
 
@@ -399,6 +471,14 @@ function setupChloe(gltf) {
   model.position.y -= 0.07;
 
   headGroup.userData.rig = buildRig(model);
+  document.body.dataset.orbitsUpperL = String(headGroup.userData.rig.orbitsUpperL.length);
+  document.body.dataset.orbitsUpperR = String(headGroup.userData.rig.orbitsUpperR.length);
+  document.body.dataset.eyeCoversL = String(headGroup.userData.rig.eyeCoversL.length);
+  document.body.dataset.eyeCoversR = String(headGroup.userData.rig.eyeCoversR.length);
+  document.body.dataset.lidsUpperL = String(headGroup.userData.rig.lidsUpperL.length);
+  document.body.dataset.lidsUpperR = String(headGroup.userData.rig.lidsUpperR.length);
+  document.body.dataset.lidsLowerL = String(headGroup.userData.rig.lidsLowerL.length);
+  document.body.dataset.lidsLowerR = String(headGroup.userData.rig.lidsLowerR.length);
   headGroup.add(model);
   return { headY: 1.49 }; // vertical focus: face/upper chest band
 }
@@ -477,9 +557,9 @@ const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(
   new THREE.Vector2(window.innerWidth, window.innerHeight),
-  0.48, // strength — halo bleeding over the silhouette edges
-  0.82, // radius
-  0.93 // threshold — only the hot strips and LED bloom
+  0.34, // strength — halo bleeding over the silhouette edges
+  0.74, // radius
+  0.96 // threshold — only the hot strips and LED bloom
 );
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
@@ -507,19 +587,19 @@ const bodies = panel.querySelectorAll('.panel-body');
 let selected = 0;
 
 const MENU_POSES = {
-  about:    { lookX: 0.01, lookY: 0.03, camX: 0.0,  camY: 0.006, bodyX: 0.0,   bodyY: 0.0,   mouth: 0.86, brow: 0.4, led: 1.0, squint: 0.08, roll: 0.0 },
-  projects: { lookX: -0.16, lookY: 0.015, camX: -0.02, camY: 0.003, bodyX: -0.02, bodyY: -0.005, mouth: 0.34, brow: 0.18, led: 0.92, squint: 0.02, roll: -0.03 },
-  skills:   { lookX: 0.035, lookY: 0.045, camX: 0.01, camY: 0.008, bodyX: 0.0,   bodyY: 0.01,  mouth: 0.46, brow: 0.3, led: 1.12, squint: 0.1,  roll: 0.0 },
-  exp:      { lookX: 0.12, lookY: 0.01,  camX: 0.018, camY: -0.004, bodyX: 0.018, bodyY: -0.01, mouth: 0.28, brow: 0.14, led: 0.88, squint: 0.02, roll: 0.03 },
-  contact:  { lookX: 0.18, lookY: 0.028, camX: 0.028, camY: 0.002, bodyX: 0.03,  bodyY: 0.0,   mouth: 0.62, brow: 0.34, led: 1.06, squint: 0.04, roll: 0.02 },
+  about:    { lookX: 0.0,   lookY: 0.008, camX: 0.0,    camY: 0.002, bodyX: 0.0,    bodyY: 0.0,   mouth: 0.44, brow: 0.24, led: 1.0,  squint: 0.015, roll: 0.0 },
+  projects: { lookX: -0.012,lookY: 0.006, camX: -0.008, camY: 0.001, bodyX: -0.006, bodyY: -0.002,mouth: 0.24, brow: 0.12, led: 0.94, squint: 0.005, roll: -0.01 },
+  skills:   { lookX: 0.008, lookY: 0.012, camX: 0.004,  camY: 0.003, bodyX: 0.0,    bodyY: 0.004, mouth: 0.3,  brow: 0.18, led: 1.05, squint: 0.012, roll: 0.0 },
+  exp:      { lookX: 0.014, lookY: 0.004, camX: 0.007,  camY: -0.002,bodyX: 0.006,  bodyY: -0.004,mouth: 0.18, brow: 0.1,  led: 0.9,  squint: 0.0,   roll: 0.008 },
+  contact:  { lookX: 0.016, lookY: 0.009, camX: 0.01,   camY: 0.001, bodyX: 0.008,  bodyY: 0.0,   mouth: 0.28, brow: 0.16, led: 1.0,  squint: 0.008, roll: 0.01 },
 };
 
 const PANEL_POSES = {
-  about:    { lookX: -0.05, lookY: 0.02,  camX: -0.012, camY: 0.012, bodyX: 0.07, bodyY: 0.008, mouth: 0.62, brow: 0.24, led: 0.76, squint: 0.0,  roll: -0.02 },
-  projects: { lookX: -0.15, lookY: 0.015, camX: -0.025, camY: 0.004, bodyX: 0.08, bodyY: 0.0,   mouth: 0.26, brow: 0.1,  led: 0.7,  squint: 0.0,  roll: -0.04 },
-  skills:   { lookX: -0.03, lookY: 0.04,  camX: -0.01,  camY: 0.012, bodyX: 0.06, bodyY: 0.015, mouth: 0.34, brow: 0.2,  led: 0.8,  squint: 0.03, roll: -0.015 },
-  exp:      { lookX: 0.05,  lookY: 0.01,  camX: 0.0,    camY: 0.002, bodyX: 0.05, bodyY: -0.004, mouth: 0.22, brow: 0.08, led: 0.68, squint: 0.0,  roll: 0.015 },
-  contact:  { lookX: 0.1,   lookY: 0.028, camX: 0.012,  camY: 0.012, bodyX: 0.04, bodyY: 0.004, mouth: 0.42, brow: 0.18, led: 0.74, squint: 0.01, roll: 0.02 },
+  about:    { lookX: -0.01, lookY: 0.01,  camX: -0.006, camY: 0.006, bodyX: 0.014, bodyY: 0.004, mouth: 0.3,  brow: 0.15, led: 0.78, squint: 0.0,   roll: -0.008 },
+  projects: { lookX: -0.02, lookY: 0.007, camX: -0.012, camY: 0.002, bodyX: 0.018, bodyY: 0.0,   mouth: 0.18, brow: 0.08, led: 0.72, squint: 0.0,   roll: -0.012 },
+  skills:   { lookX: -0.004,lookY: 0.015, camX: -0.004, camY: 0.006, bodyX: 0.014, bodyY: 0.008, mouth: 0.22, brow: 0.12, led: 0.82, squint: 0.01,  roll: -0.006 },
+  exp:      { lookX: 0.008, lookY: 0.005, camX: 0.0,    camY: 0.001, bodyX: 0.012, bodyY: -0.002,mouth: 0.16, brow: 0.07, led: 0.7,  squint: 0.0,   roll: 0.006 },
+  contact:  { lookX: 0.012, lookY: 0.012, camX: 0.004,  camY: 0.006, bodyX: 0.01,  bodyY: 0.003, mouth: 0.24, brow: 0.12, led: 0.78, squint: 0.004, roll: 0.008 },
 };
 
 const motion = {
@@ -536,6 +616,8 @@ const motion = {
   led: 1,
   squint: 0,
   roll: 0,
+  viewerX: 0,
+  viewerY: 0,
 };
 
 const living = {
@@ -547,11 +629,26 @@ const living = {
   mouthDrift: 0,
   browTarget: 0,
   mouthTarget: 0,
-  nextSaccadeAt: 0.7,
-  nextBlinkAt: 1.6,
-  blinkStartedAt: -10,
-  blinkEchoAt: -10,
-  blinkDuration: 0.18,
+  nextSaccadeAt: 0.9,
+  nextBlinkAt: 1.8,
+  blinkPhase: 'open',
+  blinkElapsed: 0,
+  blinkAmount: 0,
+  queuedBlinks: 0,
+  queuedBlinkAt: -1,
+  blinkDebugMode: 'animate',
+};
+
+const BLINK_POSES = {
+  open: 0,
+  half: 0.46,
+  closed: 1,
+};
+
+const BLINK_PHASE_DURATION = {
+  closing: 0.09,
+  closed: 0.11,
+  opening: 0.14,
 };
 
 function rand(min, max) {
@@ -562,98 +659,108 @@ function getCurrentPose() {
   return motion.panelOpen ? PANEL_POSES[motion.active] : MENU_POSES[motion.active];
 }
 
-function getUiFocusPoint() {
-  const target = motion.panelOpen
-    ? panel.querySelector('.panel-body:not([hidden])') || panel
-    : items[selected];
-  if (!target) return { x: 0, y: 0 };
-
-  const rect = target.getBoundingClientRect();
-  const x = ((rect.left + rect.width * 0.5) / window.innerWidth - 0.5) * 2;
-  const y = ((rect.top + rect.height * 0.34) / window.innerHeight - 0.5) * 2;
-  return {
-    x: THREE.MathUtils.clamp(x, -1, 1),
-    y: THREE.MathUtils.clamp(y, -1, 1),
-  };
+function startBlink() {
+  living.blinkPhase = 'closing';
+  living.blinkElapsed = 0;
 }
 
-function blinkWave(time, interval, width, offset = 0) {
-  const phase = (time + offset) % interval;
-  if (phase > width) return 0;
-  const t = phase / width;
-  return Math.sin(t * Math.PI);
+function queueBlink(time, forceDouble = false) {
+  if (living.blinkPhase === 'open') {
+    startBlink();
+  } else {
+    living.queuedBlinks += 1;
+  }
+  if (forceDouble || Math.random() < 0.16) {
+    living.queuedBlinks += 1;
+    living.queuedBlinkAt = time + rand(0.08, 0.16);
+  }
+  living.nextBlinkAt = time + rand(2.6, 4.8);
 }
 
-function pulseWave(time, startAt, duration) {
-  if (time <= startAt || time >= startAt + duration) return 0;
-  return Math.sin(((time - startAt) / duration) * Math.PI);
+function setBlinkDebugMode(mode) {
+  if (!['animate', 'open', 'half', 'closed'].includes(mode)) return;
+  living.blinkDebugMode = mode;
+  document.body.dataset.blinkMode = mode;
+  if (mode !== 'animate') {
+    living.blinkPhase = 'open';
+    living.blinkElapsed = 0;
+    living.blinkAmount = BLINK_POSES[mode];
+    living.queuedBlinks = 0;
+    living.queuedBlinkAt = -1;
+  }
+}
+
+window.addEventListener('portrait:blink-debug', (event) => {
+  const detail = event.detail || {};
+  if (detail.mode) setBlinkDebugMode(detail.mode);
+  if (detail.action === 'blink') {
+    living.blinkDebugMode = 'animate';
+    queueBlink(performance.now() / 1000, !!detail.double);
+  }
+});
+
+function updateBlinkState(time, dt) {
+  document.body.dataset.blinkPhase = living.blinkPhase;
+  document.body.dataset.blinkAmount = living.blinkAmount.toFixed(3);
+  if (living.blinkDebugMode !== 'animate') return BLINK_POSES[living.blinkDebugMode];
+
+  if (living.blinkPhase === 'open') {
+    living.blinkAmount = THREE.MathUtils.damp(living.blinkAmount, 0, 14, dt);
+    if (living.queuedBlinks > 0 && time >= living.queuedBlinkAt) {
+      living.queuedBlinks -= 1;
+      startBlink();
+    } else if (time >= living.nextBlinkAt) {
+      queueBlink(time, false);
+    }
+    return living.blinkAmount;
+  }
+
+  living.blinkElapsed += dt;
+  if (living.blinkPhase === 'closing') {
+    const duration = BLINK_PHASE_DURATION.closing;
+    living.blinkAmount = THREE.MathUtils.clamp(living.blinkElapsed / duration, 0, 1);
+    if (living.blinkElapsed >= duration) {
+      living.blinkPhase = 'closed';
+      living.blinkElapsed = 0;
+      living.blinkAmount = 1;
+    }
+    return living.blinkAmount;
+  }
+
+  if (living.blinkPhase === 'closed') {
+    living.blinkAmount = 1;
+    if (living.blinkElapsed >= BLINK_PHASE_DURATION.closed) {
+      living.blinkPhase = 'opening';
+      living.blinkElapsed = 0;
+    }
+    return living.blinkAmount;
+  }
+
+  const duration = BLINK_PHASE_DURATION.opening;
+  living.blinkAmount = 1 - THREE.MathUtils.clamp(living.blinkElapsed / duration, 0, 1);
+  if (living.blinkElapsed >= duration) {
+    living.blinkPhase = 'open';
+    living.blinkElapsed = 0;
+    living.blinkAmount = 0;
+  }
+  return living.blinkAmount;
 }
 
 function updateLivingMotion(time, dt) {
   if (time >= living.nextSaccadeAt) {
-    living.eyeTargetX = rand(-0.045, 0.045);
-    living.eyeTargetY = rand(-0.022, 0.022);
-    living.browTarget = rand(-0.08, 0.1);
-    living.mouthTarget = rand(-0.06, 0.08);
-    living.nextSaccadeAt = time + rand(1.2, 3.1);
+    living.eyeTargetX = rand(-0.008, 0.008);
+    living.eyeTargetY = rand(-0.004, 0.004);
+    living.browTarget = rand(-0.045, 0.055);
+    living.mouthTarget = rand(-0.035, 0.045);
+    living.nextSaccadeAt = time + rand(2.2, 4.4);
   }
 
-  if (time >= living.nextBlinkAt) {
-    living.blinkStartedAt = time;
-    living.blinkDuration = rand(0.16, 0.24);
-    living.blinkEchoAt = Math.random() < 0.22
-      ? time + living.blinkDuration + rand(0.08, 0.16)
-      : -10;
-    living.nextBlinkAt = time + rand(2.8, 5.4);
-  }
-
-  living.eyeDriftX = THREE.MathUtils.damp(living.eyeDriftX, living.eyeTargetX, 9.5, dt);
-  living.eyeDriftY = THREE.MathUtils.damp(living.eyeDriftY, living.eyeTargetY, 9.5, dt);
+  living.eyeDriftX = THREE.MathUtils.damp(living.eyeDriftX, living.eyeTargetX, 5.2, dt);
+  living.eyeDriftY = THREE.MathUtils.damp(living.eyeDriftY, living.eyeTargetY, 5.2, dt);
   living.browDrift = THREE.MathUtils.damp(living.browDrift, living.browTarget, 4.2, dt);
   living.mouthDrift = THREE.MathUtils.damp(living.mouthDrift, living.mouthTarget, 3.8, dt);
-
-  const scheduledBlink = Math.max(
-    pulseWave(time, living.blinkStartedAt, living.blinkDuration),
-    pulseWave(time, living.blinkEchoAt, living.blinkDuration * 0.88)
-  );
-  const idleBlink = Math.max(
-    blinkWave(time, 7.4, 0.1, 2.1) * 0.55,
-    blinkWave(time, 11.2, 0.08, 6.5) * 0.42
-  );
-
-  return Math.max(scheduledBlink, idleBlink);
+  return updateBlinkState(time, dt);
 }
-
-function updateBlinkOverlay(blinkAmount) {
-  if (blinkAmount <= 0.01) {
-    blinkLidLeft.style.opacity = '0';
-    blinkLidRight.style.opacity = '0';
-    return;
-  }
-
-  const viewportW = window.innerWidth;
-  const viewportH = window.innerHeight;
-  const faceCenterX = viewportW * 0.468 + motion.lookX * 86 + motion.bodyX * 160;
-  const faceCenterY = viewportH * 0.545 + motion.lookY * 42 + motion.bodyY * 110;
-  const spread = viewportW * 0.062;
-  const lidWidth = THREE.MathUtils.clamp(viewportW * 0.058, 44, 74);
-  const lidHeight = lidWidth * (0.08 + blinkAmount * 0.58);
-  const lidOpacity = Math.min(0.96, blinkAmount * 2.4);
-
-  for (const [el, direction] of [
-    [blinkLidLeft, -1],
-    [blinkLidRight, 1],
-  ]) {
-    el.style.width = `${lidWidth}px`;
-    el.style.height = `${lidHeight}px`;
-    el.style.left = `${faceCenterX + spread * direction}px`;
-    el.style.top = `${faceCenterY - lidWidth * 0.14}px`;
-    el.style.opacity = lidOpacity.toFixed(3);
-    el.style.borderRadius = `999px 999px ${16 + blinkAmount * 18}px ${16 + blinkAmount * 18}px`;
-    el.style.transform = `translate(-50%, -100%) rotate(${direction * blinkAmount * 4}deg)`;
-  }
-}
-
 function select(i) {
   selected = (i + items.length) % items.length;
   motion.active = items[selected].dataset.panel;
@@ -681,6 +788,20 @@ items.forEach((el, n) => {
 });
 document.getElementById('panel-back').addEventListener('click', closePanel);
 window.addEventListener('keydown', (e) => {
+  if (e.altKey) {
+    if (e.code === 'Digit0') setBlinkDebugMode('animate');
+    else if (e.code === 'Digit1') setBlinkDebugMode('open');
+    else if (e.code === 'Digit2') setBlinkDebugMode('half');
+    else if (e.code === 'Digit3') setBlinkDebugMode('closed');
+    else if (e.code === 'KeyB') {
+      living.blinkDebugMode = 'animate';
+      queueBlink(performance.now() / 1000, e.shiftKey);
+    } else {
+      return;
+    }
+    e.preventDefault();
+    return;
+  }
   if (!panel.hidden) {
     if (e.key === 'Escape') closePanel();
     return;
@@ -712,16 +833,19 @@ function animate() {
   if (mixer) mixer.update(dt);
 
   const pose = getCurrentPose();
-  const uiFocus = getUiFocusPoint();
+  const interfaceBiasX = motion.panelOpen ? -0.015 : 0.0;
+  const interfaceBiasY = motion.panelOpen ? 0.004 : 0.0;
+  motion.viewerX = THREE.MathUtils.damp(motion.viewerX, mouse.x, 3.6, dt);
+  motion.viewerY = THREE.MathUtils.damp(motion.viewerY, mouse.y, 3.6, dt);
   motion.lookX = THREE.MathUtils.damp(
     motion.lookX,
-    pose.lookX + uiFocus.x * 0.24 + mouse.x * 0.06,
+    pose.lookX + interfaceBiasX + motion.viewerX * 0.11,
     4.5,
     dt
   );
   motion.lookY = THREE.MathUtils.damp(
     motion.lookY,
-    pose.lookY + uiFocus.y * 0.16 - mouse.y * 0.03,
+    pose.lookY + interfaceBiasY - motion.viewerY * 0.06,
     4.5,
     dt
   );
@@ -745,54 +869,45 @@ function animate() {
 
   const rig = headGroup.userData.rig;
   if (rig) {
-    const attentiveLookX = motion.lookX + living.eyeDriftX * 0.55;
-    const attentiveLookY = motion.lookY + living.eyeDriftY * 0.7;
+    const attentiveLookX = motion.lookX + living.eyeDriftX * 0.28;
+    const attentiveLookY = motion.lookY + living.eyeDriftY * 0.34;
     const expressiveMouth = motion.mouth + living.mouthDrift;
     const expressiveBrow = motion.brow + living.browDrift;
-    const headPitch = motion.lookY * 0.9 + living.eyeDriftY * 0.14 + idlePitch;
-    const headYaw = motion.lookX * 0.78 + living.eyeDriftX * 0.1 + idleYaw;
-    const shoulderBreath = Math.sin(t * 0.8) * 0.015;
-    const browAsym = Math.sin(t * 0.92) * 0.003 + living.eyeDriftX * 0.01;
+    const headPitch = motion.lookY * 0.66 + living.eyeDriftY * 0.08 + idlePitch;
+    const headYaw = motion.lookX * 0.42 + living.eyeDriftX * 0.05 + idleYaw;
+    const shoulderBreath = Math.sin(t * 0.8) * 0.012;
+    const browAsym = Math.sin(t * 0.92) * 0.002 + living.eyeDriftX * 0.006;
 
     setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * -0.08, motion.roll * 0.08);
     setBoneRotationDeltas(rig, rig.spineUpper, headPitch * -0.12, headYaw * -0.12, motion.roll * 0.14);
     setBoneRotationDeltas(rig, rig.clavicles, shoulderBreath, 0, 0);
-    setBoneRotationDelta(rig, rig.neck, headPitch * -0.24, headYaw * -0.32, motion.roll * 0.18);
-    setBoneRotationDelta(rig, rig.head, headPitch * -0.72, headYaw * -0.72, motion.roll + Math.sin(t * 0.67) * 0.012);
+    setBoneRotationDelta(rig, rig.neck, headPitch * -0.2, headYaw * -0.2, motion.roll * 0.14);
+    setBoneRotationDelta(rig, rig.head, headPitch * -0.52, headYaw * -0.42, motion.roll + Math.sin(t * 0.67) * 0.008);
     setBoneRotationDelta(
       rig,
       rig.eyeL,
-      -attentiveLookY * 0.24 + blink * 0.042,
-      attentiveLookX * -0.42,
-      -living.eyeDriftX * 0.018
+      -attentiveLookY * 0.2,
+      attentiveLookX * -0.52,
+      -living.eyeDriftX * 0.006
     );
     setBoneRotationDelta(
       rig,
       rig.eyeR,
-      -attentiveLookY * 0.24 + blink * 0.042,
-      attentiveLookX * -0.42,
-      living.eyeDriftX * 0.018
+      -attentiveLookY * 0.2,
+      attentiveLookX * -0.52,
+      living.eyeDriftX * 0.006
     );
 
-    const jawOpen = 0.02 + expressiveMouth * 0.03 + Math.sin(t * 1.45) * 0.0035;
+    const jawOpen = 0.014 + expressiveMouth * 0.018 + Math.sin(t * 1.45) * 0.0015;
     setBoneRotationDeltas(rig, rig.jaw, jawOpen, 0, 0);
-    setBoneRotationDeltas(rig, rig.upperLip, -expressiveMouth * 0.023 - Math.sin(t * 1.1) * 0.002, 0, 0);
+    setBoneRotationDeltas(rig, rig.upperLip, -expressiveMouth * 0.012 - Math.sin(t * 1.1) * 0.001, 0, 0);
 
-    const browLift = 0.005 + expressiveBrow * 0.03;
-    setBoneRotationDeltas(rig, rig.browsL, -browLift - browAsym, 0, -expressiveBrow * 0.006);
-    setBoneRotationDeltas(rig, rig.browsR, -browLift + browAsym, 0, expressiveBrow * 0.006);
+    const browLift = 0.004 + expressiveBrow * 0.018;
+    setBoneRotationDeltas(rig, rig.browsL, -browLift - browAsym, 0, -expressiveBrow * 0.003);
+    setBoneRotationDeltas(rig, rig.browsR, -browLift + browAsym, 0, expressiveBrow * 0.003);
 
-    const upperLid = blink * 0.065 + motion.squint * 0.018 + Math.max(0, attentiveLookY) * 0.01;
-    const lowerLid = blink * 0.026 + motion.squint * 0.01 + Math.max(0, -attentiveLookY) * 0.004;
-    setBoneRotationDeltas(rig, rig.lidsUpperL, upperLid, 0, 0);
-    setBoneRotationDeltas(rig, rig.lidsUpperR, upperLid, 0, 0);
-    setBoneRotationDeltas(rig, rig.lidsLowerL, -lowerLid, 0, 0);
-    setBoneRotationDeltas(rig, rig.lidsLowerR, -lowerLid, 0, 0);
-
-    updateBlinkOverlay(blink * 0.95 + motion.squint * 0.14);
-  } else {
-    blinkLidLeft.style.opacity = '0';
-    blinkLidRight.style.opacity = '0';
+    applyNativeBlink(rig, blink, motion.squint, attentiveLookY);
+    applyEyeBlinkVisibility(headGroup.userData.eyeMats, blink);
   }
 
   // LED pulse
@@ -803,8 +918,8 @@ function animate() {
   }
 
   // slight camera breathing + UI-driven framing
-  camera.position.x = 0.015 + motion.camX + Math.sin(t * 0.34) * 0.008 + mouse.x * 0.008;
-  camera.position.y = FOCUS.y + 0.01 + motion.camY + Math.sin(t * 0.46) * 0.004 - mouse.y * 0.004;
+  camera.position.x = 0.004 + motion.camX + Math.sin(t * 0.34) * 0.006 + motion.viewerX * 0.01;
+  camera.position.y = FOCUS.y + 0.008 + motion.camY + Math.sin(t * 0.46) * 0.003 - motion.viewerY * 0.006;
   camera.lookAt(FOCUS);
 
   composer.render();
