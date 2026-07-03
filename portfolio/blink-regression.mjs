@@ -29,7 +29,13 @@ assert.match(source, /const smile = THREE\.MathUtils\.clamp\(0\.46 \+ expressive
 assert.match(source, /const mouthOpen = THREE\.MathUtils\.clamp\(0\.17 \+ expressiveMouth \* 0\.2/, 'menu expression should keep a reference-like soft open mouth without fangy teeth');
 assert.match(source, /const jawOpen = 0\.01 \+ mouthOpen \* 0\.13/, 'jaw opening should stay soft but visible for a relaxed DBH speaking expression');
 assert.match(source, /setBoneRotationDeltas\(rig, rig\.upperLip, -mouthOpen \* 0\.045/, 'upper lip should reveal a horizontal speaking-smile line without a puppet V');
-assert.match(source, /Chloe_Teeth:[\s\S]*?roughness: 0\.78,[\s\S]*?envMapIntensity: 0\.082,[\s\S]*?color: new THREE\.Color\(0\.8, 0\.77, 0\.72\)/, 'teeth should stay softly visible for the central open-mouth expression without fang-like highlights');
+assert.match(source, /Chloe_Teeth:[\s\S]*?roughness: 0\.82,[\s\S]*?envMapIntensity: 0\.052,[\s\S]*?color: new THREE\.Color\(0\.72, 0\.7, 0\.66\)/, 'teeth should stay softly visible for the central open-mouth expression without fang-like highlights');
+assert.match(source, /function mouthLineTexture\(\)/, 'mouth line texture should exist to soften side teeth into a central DBH-like dental line');
+assert.match(source, /function setupMouthLine\(\)/, 'mouth line sprite should be set up with the Chloe rig');
+assert.match(source, /function updateMouthLine\(rig, open, smile\)/, 'mouth line should follow the native mouth bone instead of being a fixed screen overlay');
+assert.match(source, /setupMouthLine\(\)/, 'Chloe setup should create the mouth line softener');
+assert.match(source, /document\.body\.dataset\.mouthLineOpacity = sprite\.material\.opacity\.toFixed\(3\)/, 'mouth line opacity should be exposed for visual checks');
+assert.match(source, /sprite\.material\.opacity = THREE\.MathUtils\.clamp\(0\.08 \+ openness \* 0\.42 \+ smileLift \* 0\.035, 0, 0\.24\)/, 'mouth line should stay subtle while hiding fang-like side teeth');
 assert.match(source, /about:\s*\{[\s\S]*?roll: -0\.006 \}/, 'main portrait pose should keep a subtle reference-like head roll instead of looking passport-flat');
 assert.match(source, /headGroup\.rotation\.z = motion\.roll \* 0\.52/, 'head roll should be visible enough to soften the portrait pose');
 assert.match(source, /new THREE\.PerspectiveCamera\(23\.8,/, 'camera should stay tightly framed like the DBH reference portrait');

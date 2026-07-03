@@ -223,6 +223,53 @@ function blinkVeilTexture() {
   return tex;
 }
 
+function mouthLineTexture() {
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 96;
+  const ctx = c.getContext('2d');
+
+  const sideShade = ctx.createLinearGradient(0, 0, 256, 0);
+  sideShade.addColorStop(0, 'rgba(46,30,32,0)');
+  sideShade.addColorStop(0.16, 'rgba(42,27,30,0.42)');
+  sideShade.addColorStop(0.36, 'rgba(42,27,30,0.14)');
+  sideShade.addColorStop(0.5, 'rgba(28,22,24,0.1)');
+  sideShade.addColorStop(0.64, 'rgba(42,27,30,0.14)');
+  sideShade.addColorStop(0.84, 'rgba(42,27,30,0.42)');
+  sideShade.addColorStop(1, 'rgba(46,30,32,0)');
+  ctx.fillStyle = sideShade;
+  ctx.beginPath();
+  ctx.ellipse(128, 50, 118, 24, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  const line = ctx.createLinearGradient(0, 0, 256, 0);
+  line.addColorStop(0, 'rgba(20,15,16,0)');
+  line.addColorStop(0.24, 'rgba(20,15,16,0.62)');
+  line.addColorStop(0.5, 'rgba(20,15,16,0.34)');
+  line.addColorStop(0.76, 'rgba(20,15,16,0.62)');
+  line.addColorStop(1, 'rgba(20,15,16,0)');
+  ctx.strokeStyle = line;
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(42, 48);
+  ctx.quadraticCurveTo(128, 43, 214, 48);
+  ctx.stroke();
+
+  const softLipReflection = ctx.createLinearGradient(0, 0, 0, 96);
+  softLipReflection.addColorStop(0, 'rgba(255,205,190,0)');
+  softLipReflection.addColorStop(0.56, 'rgba(255,205,190,0.1)');
+  softLipReflection.addColorStop(1, 'rgba(255,205,190,0)');
+  ctx.fillStyle = softLipReflection;
+  ctx.beginPath();
+  ctx.ellipse(128, 54, 84, 12, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
 const wall = new THREE.Mesh(
   new THREE.PlaneGeometry(7.2, 4.05),
   new THREE.MeshBasicMaterial({ map: wallTexture() })
@@ -452,8 +499,11 @@ function setBonePositionDeltas(rig, bones, x = 0, y = 0, z = 0) {
 
 const eyeCatchlightMap = catchlightTexture();
 const eyeBlinkVeilMap = blinkVeilTexture();
+const mouthLineMap = mouthLineTexture();
 const eyeWorld = new THREE.Vector3();
+const mouthWorld = new THREE.Vector3();
 const eyeToCamera = new THREE.Vector3();
+const mouthToCamera = new THREE.Vector3();
 const cameraRight = new THREE.Vector3();
 const cameraUp = new THREE.Vector3();
 const cameraForward = new THREE.Vector3();
@@ -493,6 +543,23 @@ function createEyeBlinkVeil(name) {
   return sprite;
 }
 
+function createMouthLine(name) {
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: mouthLineMap,
+    transparent: true,
+    opacity: 0,
+    depthWrite: false,
+    depthTest: false,
+    toneMapped: false,
+  }));
+  sprite.name = name;
+  sprite.renderOrder = 12;
+  sprite.scale.set(0.088, 0.026, 1);
+  sprite.visible = false;
+  scene.add(sprite);
+  return sprite;
+}
+
 function setupEyeCatchlights() {
   const prev = headGroup.userData.eyeCatchlights;
   if (prev) {
@@ -515,6 +582,13 @@ function setupEyeBlinkVeils() {
     right: createEyeBlinkVeil('Chloe_EyeBlinkVeil_R'),
   };
   document.body.dataset.eyeBlinkVeils = '2';
+}
+
+function setupMouthLine() {
+  const prev = headGroup.userData.mouthLine;
+  if (prev) scene.remove(prev);
+  headGroup.userData.mouthLine = createMouthLine('Chloe_MouthLine');
+  document.body.dataset.mouthLine = '1';
 }
 
 function updateEyeCatchlight(sprite, eyeBone, blinkClose, side, smile) {
@@ -544,6 +618,29 @@ function updateEyeCatchlights(rig, blinkClose, smile) {
   updateEyeCatchlight(catchlights.left, rig.eyeL, blinkClose, -1, smile);
   updateEyeCatchlight(catchlights.right, rig.eyeR, blinkClose, 1, smile);
   document.body.dataset.eyeCatchlightOpacity = catchlights.left.material.opacity.toFixed(3);
+}
+
+function updateMouthLine(rig, open, smile) {
+  const sprite = headGroup.userData.mouthLine;
+  const mouthBone = rig.mouthRoot?.[0];
+  if (!sprite || !mouthBone) return;
+
+  const openness = THREE.MathUtils.clamp(open, 0, 1);
+  const smileLift = THREE.MathUtils.clamp(smile, 0, 1);
+  sprite.material.opacity = THREE.MathUtils.clamp(0.08 + openness * 0.42 + smileLift * 0.035, 0, 0.24);
+  sprite.visible = sprite.material.opacity > 0.02;
+  if (!sprite.visible) return;
+
+  camera.matrixWorld.extractBasis(cameraRight, cameraUp, cameraForward);
+  mouthBone.getWorldPosition(mouthWorld);
+  mouthToCamera.copy(camera.position).sub(mouthWorld).normalize();
+  sprite.position
+    .copy(mouthWorld)
+    .addScaledVector(mouthToCamera, 0.032)
+    .addScaledVector(cameraUp, -0.0042);
+
+  sprite.scale.set(0.074 + smileLift * 0.032, 0.012 + openness * 0.034, 1);
+  document.body.dataset.mouthLineOpacity = sprite.material.opacity.toFixed(3);
 }
 
 function updateEyeBlinkVeil(sprite, eyeBone, blinkClose, side) {
@@ -729,9 +826,9 @@ function chloeMaterials() {
     Chloe_Teeth: new THREE.MeshStandardMaterial({
       map: tex(A + 'teeth_alb.jpg', true),
       normalMap: tex(A + 'teeth_nrm.jpg'),
-      roughness: 0.78,
-      envMapIntensity: 0.082,
-      color: new THREE.Color(0.8, 0.77, 0.72),
+      roughness: 0.82,
+      envMapIntensity: 0.052,
+      color: new THREE.Color(0.72, 0.7, 0.66),
     }),
     Chloe_Duct: new THREE.MeshStandardMaterial({ map: tex(A + 'duct_alb.jpg', true), roughness: 0.35 }),
     Chloe_tear: new THREE.MeshPhysicalMaterial({
@@ -807,6 +904,7 @@ function setupChloe(gltf) {
   headGroup.userData.rig = buildRig(model);
   setupEyeCatchlights();
   setupEyeBlinkVeils();
+  setupMouthLine();
   document.body.dataset.orbitsUpperL = String(headGroup.userData.rig.orbitsUpperL.length);
   document.body.dataset.orbitsUpperR = String(headGroup.userData.rig.orbitsUpperR.length);
   document.body.dataset.eyeCoversL = String(headGroup.userData.rig.eyeCoversL.length);
@@ -1290,6 +1388,7 @@ function animate() {
     setBoneRotationDeltas(rig, rig.upperLip, -mouthOpen * 0.045 - Math.sin(t * 1.1) * 0.0008, 0, 0);
     applyNativeSmile(rig, smile, smileAsym);
     applyNativeMouth(rig, mouthOpen, smile, speechPulse);
+    updateMouthLine(rig, mouthOpen, smile);
     document.body.dataset.facialJawOpen = jawOpen.toFixed(3);
     document.body.dataset.facialSmileAsym = smileAsym.toFixed(3);
 
