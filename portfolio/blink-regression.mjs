@@ -43,10 +43,11 @@ assert.match(source, /function updateEyeCatchlights\(rig, blinkClose, smile\)/, 
 assert.match(source, /setupEyeCatchlights\(\)/, 'Chloe setup should create eye catchlights');
 assert.match(source, /document\.body\.dataset\.eyeCatchlightOpacity/, 'eye catchlight opacity should be exposed for visual checks');
 assert.match(source, /smoothstep\(THREE\.MathUtils\.clamp\(blinkClose, 0, 1\), 0\.24, 0\.56\)/, 'eye catchlights should fade before the half-blink pose so closing eyes do not look glassy');
-assert.match(source, /sprite\.material\.opacity = openFade \* \(0\.24 \+ smile \* 0\.08\)/, 'eye catchlights should stay readable but controlled instead of glassy');
-assert.match(source, /const scale = 0\.0088 \+ smile \* 0\.0018/, 'eye catchlights should remain small enough to avoid fake overlay eyes');
-assert.match(source, /Chloe_Eyes:[\s\S]*?roughness: 0\.9,[\s\S]*?envMapIntensity: 0\.006/, 'eye material should stay matte enough to avoid glassy reflections');
-assert.match(source, /color: new THREE\.Color\(0\.43, 0\.52, 0\.58\)/, 'iris color should stay lighter and reference-like without adding glass');
+assert.match(source, /sprite\.material\.opacity = openFade \* \(0\.16 \+ smile \* 0\.045\)/, 'eye catchlights should stay readable but controlled instead of glassy');
+assert.match(source, /\.addScaledVector\(cameraUp, 0\.0036\)/, 'eye catchlights should sit on the iris instead of floating on the upper lid');
+assert.match(source, /const scale = 0\.0068 \+ smile \* 0\.001/, 'eye catchlights should remain small enough to avoid fake overlay eyes');
+assert.match(source, /Chloe_Eyes:[\s\S]*?roughness: 0\.9,[\s\S]*?envMapIntensity: 0\.004/, 'eye material should stay matte enough to avoid glassy reflections');
+assert.match(source, /color: new THREE\.Color\(0\.49, 0\.58, 0\.64\)/, 'iris color should stay lighter and reference-like without adding glass');
 assert.match(source, /renderer\.toneMappingExposure = 0\.93/, 'renderer exposure should keep the bright studio portrait look');
 assert.match(source, /scene\.environmentIntensity = 0\.46/, 'environment lighting should preserve face depth instead of flattening skin');
 assert.match(source, /const fill = new THREE\.DirectionalLight\(0xd8efff, 0\.78\)/, 'cool fill should leave enough cheek and nose depth');

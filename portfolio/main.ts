@@ -158,17 +158,17 @@ function catchlightTexture() {
   c.width = 96;
   c.height = 96;
   const ctx = c.getContext('2d');
-  const g = ctx.createRadialGradient(40, 34, 1, 40, 34, 38);
-  g.addColorStop(0, 'rgba(255,255,255,0.96)');
-  g.addColorStop(0.24, 'rgba(238,250,255,0.72)');
-  g.addColorStop(0.52, 'rgba(166,220,255,0.18)');
+  const g = ctx.createRadialGradient(42, 38, 1, 42, 38, 30);
+  g.addColorStop(0, 'rgba(255,255,255,0.82)');
+  g.addColorStop(0.28, 'rgba(238,250,255,0.48)');
+  g.addColorStop(0.58, 'rgba(166,220,255,0.1)');
   g.addColorStop(1, 'rgba(166,220,255,0)');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, 96, 96);
 
-  const pin = ctx.createRadialGradient(56, 52, 0, 56, 52, 14);
-  pin.addColorStop(0, 'rgba(255,255,255,0.62)');
-  pin.addColorStop(0.34, 'rgba(255,255,255,0.24)');
+  const pin = ctx.createRadialGradient(57, 54, 0, 57, 54, 10);
+  pin.addColorStop(0, 'rgba(255,255,255,0.38)');
+  pin.addColorStop(0.34, 'rgba(255,255,255,0.14)');
   pin.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = pin;
   ctx.fillRect(0, 0, 96, 96);
@@ -520,7 +520,7 @@ function setupEyeBlinkVeils() {
 function updateEyeCatchlight(sprite, eyeBone, blinkClose, side, smile) {
   if (!sprite || !eyeBone) return;
   const openFade = 1 - THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.24, 0.56);
-  sprite.material.opacity = openFade * (0.24 + smile * 0.08);
+  sprite.material.opacity = openFade * (0.16 + smile * 0.045);
   sprite.visible = sprite.material.opacity > 0.02;
   if (!sprite.visible) return;
 
@@ -529,11 +529,11 @@ function updateEyeCatchlight(sprite, eyeBone, blinkClose, side, smile) {
   eyeToCamera.copy(camera.position).sub(eyeWorld).normalize();
   sprite.position
     .copy(eyeWorld)
-    .addScaledVector(eyeToCamera, 0.022)
-    .addScaledVector(cameraRight, -0.004 + side * 0.0015)
-    .addScaledVector(cameraUp, 0.0074);
+    .addScaledVector(eyeToCamera, 0.023)
+    .addScaledVector(cameraRight, -0.0032 + side * 0.0011)
+    .addScaledVector(cameraUp, 0.0036);
 
-  const scale = 0.0088 + smile * 0.0018;
+  const scale = 0.0068 + smile * 0.001;
   sprite.scale.set(scale, scale, scale);
 }
 
@@ -718,8 +718,8 @@ function chloeMaterials() {
       normalMap: tex(A + 'eye_nrm.jpg'),
       roughness: 0.9,
       metalness: 0,
-      envMapIntensity: 0.006,
-      color: new THREE.Color(0.43, 0.52, 0.58),
+      envMapIntensity: 0.004,
+      color: new THREE.Color(0.49, 0.58, 0.64),
       transparent: true,
       opacity: 1,
     }),
