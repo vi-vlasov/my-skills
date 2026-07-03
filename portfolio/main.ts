@@ -644,38 +644,38 @@ function applyEyeBlinkVisibility(eyeMats, close) {
 function applyNativeSmile(rig, smile, asymmetry = 0) {
   const liftL = THREE.MathUtils.clamp(smile + asymmetry, 0, 1);
   const liftR = THREE.MathUtils.clamp(smile - asymmetry, 0, 1);
-  const cornerUpL = -0.000048 * liftL;
-  const cornerUpR = -0.000048 * liftR;
-  const cornerOutL = 0.00001 * liftL;
-  const cornerOutR = -0.00001 * liftR;
-  const cheekLiftL = -0.000042 * liftL;
-  const cheekLiftR = -0.000042 * liftR;
+  const cornerUpL = -0.000058 * liftL;
+  const cornerUpR = -0.000058 * liftR;
+  const cornerOutL = 0.000011 * liftL;
+  const cornerOutR = -0.000011 * liftR;
+  const cheekLiftL = -0.000052 * liftL;
+  const cheekLiftR = -0.000052 * liftR;
 
-  setBonePositionDeltas(rig, rig.mouthCornersL, cornerUpL, 0.000009 * liftL, cornerOutL);
-  setBonePositionDeltas(rig, rig.mouthCornersR, cornerUpR, 0.000009 * liftR, cornerOutR);
-  setBonePositionDeltas(rig, rig.lipEdgesL, cornerUpL * 0.34, 0, cornerOutL * 0.32);
-  setBonePositionDeltas(rig, rig.lipEdgesR, cornerUpR * 0.34, 0, cornerOutR * 0.32);
-  setBonePositionDeltas(rig, rig.cheeksL, cheekLiftL, 0.000008 * liftL, 0.000008 * liftL);
-  setBonePositionDeltas(rig, rig.cheeksR, cheekLiftR, 0.000008 * liftR, -0.000008 * liftR);
+  setBonePositionDeltas(rig, rig.mouthCornersL, cornerUpL, 0.000012 * liftL, cornerOutL);
+  setBonePositionDeltas(rig, rig.mouthCornersR, cornerUpR, 0.000012 * liftR, cornerOutR);
+  setBonePositionDeltas(rig, rig.lipEdgesL, cornerUpL * 0.42, 0, cornerOutL * 0.34);
+  setBonePositionDeltas(rig, rig.lipEdgesR, cornerUpR * 0.42, 0, cornerOutR * 0.34);
+  setBonePositionDeltas(rig, rig.cheeksL, cheekLiftL, 0.00001 * liftL, 0.00001 * liftL);
+  setBonePositionDeltas(rig, rig.cheeksR, cheekLiftR, 0.00001 * liftR, -0.00001 * liftR);
 }
 
 function applyNativeMouth(rig, openness, smile, speechPulse = 0) {
   const open = THREE.MathUtils.clamp(openness, 0, 1);
   const smileLift = THREE.MathUtils.clamp(smile, 0, 1);
   const pulse = THREE.MathUtils.clamp(speechPulse, -1, 1);
-  const upperLift = -0.000072 * smileLift - 0.000082 * open + 0.000004 * pulse;
-  const lowerDrop = 0.000145 * open + 0.000004 * Math.max(0, pulse);
-  const lowerOut = 0.000007 * open;
-  const sideSeal = 0.000041 * open;
+  const upperLift = -0.00011 * smileLift - 0.000148 * open + 0.000006 * pulse;
+  const lowerDrop = 0.000112 * open + 0.000004 * Math.max(0, pulse);
+  const lowerOut = 0.0000085 * open;
+  const sideSeal = 0.000058 * open;
 
-  setBoneRotationDeltas(rig, rig.mouthRoot, open * 0.026, 0, 0);
-  setBoneRotationDeltas(rig, rig.mandiblesL, open * 0.016, 0, -open * 0.004);
-  setBoneRotationDeltas(rig, rig.mandiblesR, open * 0.016, 0, open * 0.004);
-  setBonePositionDeltas(rig, rig.lipMidUpper, upperLift, 0.000002 * pulse, 0);
-  setBonePositionDeltas(rig, rig.lipMidLower, lowerDrop, -0.000003 * pulse, 0);
-  setBonePositionDeltas(rig, rig.lipLowerL, lowerDrop * 0.44 - sideSeal, 0, lowerOut);
-  setBonePositionDeltas(rig, rig.lipLowerR, lowerDrop * 0.44 - sideSeal, 0, -lowerOut);
-  setBoneRotationDeltas(rig, rig.tongue, open * 0.006, 0, 0);
+  setBoneRotationDeltas(rig, rig.mouthRoot, open * 0.052, 0, 0);
+  setBoneRotationDeltas(rig, rig.mandiblesL, open * 0.031, 0, -open * 0.005);
+  setBoneRotationDeltas(rig, rig.mandiblesR, open * 0.031, 0, open * 0.005);
+  setBonePositionDeltas(rig, rig.lipMidUpper, upperLift, 0.000003 * pulse, 0);
+  setBonePositionDeltas(rig, rig.lipMidLower, lowerDrop, -0.000004 * pulse, 0);
+  setBonePositionDeltas(rig, rig.lipLowerL, lowerDrop * 0.46 - sideSeal, 0, lowerOut);
+  setBonePositionDeltas(rig, rig.lipLowerR, lowerDrop * 0.46 - sideSeal, 0, -lowerOut);
+  setBoneRotationDeltas(rig, rig.tongue, open * 0.007, 0, 0);
 
   document.body.dataset.facialMouthOpen = open.toFixed(3);
   document.body.dataset.facialSmile = smileLift.toFixed(3);
@@ -731,7 +731,7 @@ function chloeMaterials() {
       normalMap: tex(A + 'teeth_nrm.jpg'),
       roughness: 0.8,
       envMapIntensity: 0.075,
-      color: new THREE.Color(0.72, 0.68, 0.62),
+      color: new THREE.Color(0.78, 0.75, 0.7),
     }),
     Chloe_Duct: new THREE.MeshStandardMaterial({ map: tex(A + 'duct_alb.jpg', true), roughness: 0.35 }),
     Chloe_tear: new THREE.MeshPhysicalMaterial({
@@ -1257,8 +1257,8 @@ function animate() {
     const expressionAsym = Math.sin(t * 0.61) * 0.026 + Math.sin(t * 0.27 + 1.2) * 0.012 + living.eyeDriftX * 0.18;
     const browAsym = Math.sin(t * 0.92) * 0.0048 + expressionAsym * 0.24 + living.eyeDriftX * 0.008;
     const speechPulse = Math.sin(t * 1.35) * 0.45 + Math.sin(t * 0.58 + 1.7) * 0.22;
-    const smile = THREE.MathUtils.clamp(0.34 + expressiveMouth * 0.26 + Math.sin(t * 0.72) * 0.012, 0.2, 0.56);
-    const mouthOpen = THREE.MathUtils.clamp(0.15 + expressiveMouth * 0.26 + speechPulse * 0.006, 0.09, 0.4);
+    const smile = THREE.MathUtils.clamp(0.38 + expressiveMouth * 0.28 + Math.sin(t * 0.72) * 0.012, 0.24, 0.62);
+    const mouthOpen = THREE.MathUtils.clamp(0.18 + expressiveMouth * 0.3 + speechPulse * 0.009, 0.12, 0.46);
     const smileAsym = expressionAsym * 1.16;
 
     setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * -0.08, motion.roll * 0.08);
@@ -1283,9 +1283,9 @@ function animate() {
     document.body.dataset.attentiveLookX = attentiveLookX.toFixed(4);
     document.body.dataset.attentiveLookY = attentiveLookY.toFixed(4);
 
-    const jawOpen = 0.01 + mouthOpen * 0.11 + Math.sin(t * 1.45) * 0.0005;
+    const jawOpen = 0.014 + mouthOpen * 0.19 + Math.sin(t * 1.45) * 0.0005;
     setBoneRotationDeltas(rig, rig.jaw, jawOpen, 0, 0);
-    setBoneRotationDeltas(rig, rig.upperLip, -mouthOpen * 0.044 - Math.sin(t * 1.1) * 0.0012, 0, 0);
+    setBoneRotationDeltas(rig, rig.upperLip, -mouthOpen * 0.078 - Math.sin(t * 1.1) * 0.0012, 0, 0);
     applyNativeSmile(rig, smile, smileAsym);
     applyNativeMouth(rig, mouthOpen, smile, speechPulse);
     document.body.dataset.facialJawOpen = jawOpen.toFixed(3);
