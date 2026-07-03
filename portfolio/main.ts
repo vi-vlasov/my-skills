@@ -132,6 +132,67 @@ function haloTexture() {
   return tex;
 }
 
+function catchlightTexture() {
+  const c = document.createElement('canvas');
+  c.width = 96;
+  c.height = 96;
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(40, 34, 1, 40, 34, 38);
+  g.addColorStop(0, 'rgba(255,255,255,0.96)');
+  g.addColorStop(0.24, 'rgba(238,250,255,0.72)');
+  g.addColorStop(0.52, 'rgba(166,220,255,0.18)');
+  g.addColorStop(1, 'rgba(166,220,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 96, 96);
+
+  const pin = ctx.createRadialGradient(56, 52, 0, 56, 52, 14);
+  pin.addColorStop(0, 'rgba(255,255,255,0.62)');
+  pin.addColorStop(0.34, 'rgba(255,255,255,0.24)');
+  pin.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = pin;
+  ctx.fillRect(0, 0, 96, 96);
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+function blinkVeilTexture() {
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 128;
+  const ctx = c.getContext('2d');
+
+  const lid = ctx.createRadialGradient(128, 64, 12, 128, 66, 112);
+  lid.addColorStop(0, 'rgba(198,160,148,0.78)');
+  lid.addColorStop(0.48, 'rgba(174,136,128,0.58)');
+  lid.addColorStop(0.82, 'rgba(120,94,96,0.22)');
+  lid.addColorStop(1, 'rgba(154,126,120,0)');
+  ctx.fillStyle = lid;
+  ctx.beginPath();
+  ctx.ellipse(128, 66, 106, 42, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  const crease = ctx.createLinearGradient(0, 34, 0, 88);
+  crease.addColorStop(0, 'rgba(62,50,54,0.26)');
+  crease.addColorStop(0.46, 'rgba(82,61,64,0.12)');
+  crease.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = crease;
+  ctx.beginPath();
+  ctx.ellipse(128, 56, 102, 22, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = 'rgba(74,58,62,0.28)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.ellipse(128, 84, 88, 13, 0, 0, Math.PI);
+  ctx.stroke();
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
 const wall = new THREE.Mesh(
   new THREE.PlaneGeometry(7.2, 4.05),
   new THREE.MeshBasicMaterial({ map: wallTexture() })
@@ -354,17 +415,141 @@ function setBonePositionDeltas(rig, bones, x = 0, y = 0, z = 0) {
   for (const bone of bones) setBonePositionDelta(rig, bone, x, y, z);
 }
 
+const eyeCatchlightMap = catchlightTexture();
+const eyeBlinkVeilMap = blinkVeilTexture();
+const eyeWorld = new THREE.Vector3();
+const eyeToCamera = new THREE.Vector3();
+const cameraRight = new THREE.Vector3();
+const cameraUp = new THREE.Vector3();
+const cameraForward = new THREE.Vector3();
+
+function createEyeCatchlight(name) {
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: eyeCatchlightMap,
+    color: new THREE.Color(0.92, 0.98, 1.08),
+    transparent: true,
+    opacity: 0.54,
+    depthWrite: false,
+    depthTest: true,
+    blending: THREE.AdditiveBlending,
+    toneMapped: false,
+  }));
+  sprite.name = name;
+  sprite.scale.setScalar(0.017);
+  sprite.visible = false;
+  scene.add(sprite);
+  return sprite;
+}
+
+function createEyeBlinkVeil(name) {
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: eyeBlinkVeilMap,
+    transparent: true,
+    opacity: 0,
+    depthWrite: false,
+    depthTest: false,
+    toneMapped: false,
+  }));
+  sprite.name = name;
+  sprite.renderOrder = 14;
+  sprite.scale.set(0.055, 0.026, 1);
+  sprite.visible = false;
+  scene.add(sprite);
+  return sprite;
+}
+
+function setupEyeCatchlights() {
+  const prev = headGroup.userData.eyeCatchlights;
+  if (prev) {
+    scene.remove(prev.left, prev.right);
+  }
+  headGroup.userData.eyeCatchlights = {
+    left: createEyeCatchlight('Chloe_EyeCatchlight_L'),
+    right: createEyeCatchlight('Chloe_EyeCatchlight_R'),
+  };
+  document.body.dataset.eyeCatchlights = '2';
+}
+
+function setupEyeBlinkVeils() {
+  const prev = headGroup.userData.eyeBlinkVeils;
+  if (prev) {
+    scene.remove(prev.left, prev.right);
+  }
+  headGroup.userData.eyeBlinkVeils = {
+    left: createEyeBlinkVeil('Chloe_EyeBlinkVeil_L'),
+    right: createEyeBlinkVeil('Chloe_EyeBlinkVeil_R'),
+  };
+  document.body.dataset.eyeBlinkVeils = '2';
+}
+
+function updateEyeCatchlight(sprite, eyeBone, blinkClose, side, smile) {
+  if (!sprite || !eyeBone) return;
+  const openFade = 1 - THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.46, 0.88);
+  sprite.material.opacity = openFade * (0.32 + smile * 0.2);
+  sprite.visible = sprite.material.opacity > 0.02;
+  if (!sprite.visible) return;
+
+  camera.matrixWorld.extractBasis(cameraRight, cameraUp, cameraForward);
+  eyeBone.getWorldPosition(eyeWorld);
+  eyeToCamera.copy(camera.position).sub(eyeWorld).normalize();
+  sprite.position
+    .copy(eyeWorld)
+    .addScaledVector(eyeToCamera, 0.022)
+    .addScaledVector(cameraRight, -0.004 + side * 0.0015)
+    .addScaledVector(cameraUp, 0.0065);
+
+  const scale = 0.0145 + smile * 0.0035;
+  sprite.scale.set(scale, scale, scale);
+}
+
+function updateEyeCatchlights(rig, blinkClose, smile) {
+  const catchlights = headGroup.userData.eyeCatchlights;
+  if (!catchlights) return;
+  headGroup.updateMatrixWorld(true);
+  updateEyeCatchlight(catchlights.left, rig.eyeL, blinkClose, -1, smile);
+  updateEyeCatchlight(catchlights.right, rig.eyeR, blinkClose, 1, smile);
+  document.body.dataset.eyeCatchlightOpacity = catchlights.left.material.opacity.toFixed(3);
+}
+
+function updateEyeBlinkVeil(sprite, eyeBone, blinkClose, side) {
+  if (!sprite || !eyeBone) return;
+  const close = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.18, 0.86);
+  sprite.material.opacity = close * 0.78;
+  sprite.visible = sprite.material.opacity > 0.02;
+  if (!sprite.visible) return;
+
+  camera.matrixWorld.extractBasis(cameraRight, cameraUp, cameraForward);
+  eyeBone.getWorldPosition(eyeWorld);
+  eyeToCamera.copy(camera.position).sub(eyeWorld).normalize();
+  sprite.position
+    .copy(eyeWorld)
+    .addScaledVector(eyeToCamera, 0.026)
+    .addScaledVector(cameraRight, side * 0.001)
+    .addScaledVector(cameraUp, -0.005 - close * 0.0012);
+
+  sprite.scale.set(0.052, 0.02 + close * 0.02, 1);
+}
+
+function updateEyeBlinkVeils(rig, blinkClose) {
+  const veils = headGroup.userData.eyeBlinkVeils;
+  if (!veils) return;
+  headGroup.updateMatrixWorld(true);
+  updateEyeBlinkVeil(veils.left, rig.eyeL, blinkClose, -1);
+  updateEyeBlinkVeil(veils.right, rig.eyeR, blinkClose, 1);
+  document.body.dataset.eyeBlinkVeilOpacity = veils.left.material.opacity.toFixed(3);
+}
+
 const BLINK_NATIVE = {
   closeScale: 1.32,
   closeBias: -0.08,
-  upperDrop: 0.00017,
-  coverDrop: 0.000135,
-  lowerRise: -0.000052,
-  orbitDrop: 0.000035,
-  upperFold: -0.095,
-  coverFold: -0.064,
-  lowerFold: 0.034,
-  closedEyeOpacity: 0.08,
+  upperDrop: 0.000085,
+  coverDrop: 0.00007,
+  lowerRise: -0.000025,
+  orbitDrop: 0.000018,
+  upperFold: -0.04,
+  coverFold: -0.028,
+  lowerFold: 0.014,
+  closedEyeOpacity: 0.82,
 };
 
 function getNativeBlinkClose(blink) {
@@ -577,6 +762,8 @@ function setupChloe(gltf) {
   model.position.y -= 0.07;
 
   headGroup.userData.rig = buildRig(model);
+  setupEyeCatchlights();
+  setupEyeBlinkVeils();
   document.body.dataset.orbitsUpperL = String(headGroup.userData.rig.orbitsUpperL.length);
   document.body.dataset.orbitsUpperR = String(headGroup.userData.rig.orbitsUpperR.length);
   document.body.dataset.eyeCoversL = String(headGroup.userData.rig.eyeCoversL.length);
@@ -757,9 +944,9 @@ const BLINK_POSES = {
 };
 
 const BLINK_PHASE_DURATION = {
-  closing: 0.06,
-  closed: 0.16,
-  opening: 0.12,
+  closing: 0.095,
+  closed: 0.22,
+  opening: 0.17,
 };
 
 function rand(min, max) {
@@ -783,9 +970,9 @@ function queueBlink(time, forceDouble = false) {
   }
   if (forceDouble || Math.random() < 0.12) {
     living.queuedBlinks += 1;
-    living.queuedBlinkAt = time + rand(0.18, 0.28);
+    living.queuedBlinkAt = time + rand(0.24, 0.36);
   }
-  living.nextBlinkAt = time + rand(1.9, 3.8);
+  living.nextBlinkAt = time + rand(1.55, 3.1);
 }
 
 function setBlinkDebugMode(mode) {
@@ -809,6 +996,20 @@ window.addEventListener('portrait:blink-debug', (event) => {
     living.blinkDebugMode = 'animate';
     queueBlink(performance.now() / 1000, !!detail.double);
   }
+});
+
+window.addEventListener('portrait:gaze-debug', (event) => {
+  const gazeEvent = event as CustomEvent;
+  const detail = gazeEvent.detail || {};
+  if (typeof detail.x === 'number') {
+    living.eyeTargetX = THREE.MathUtils.clamp(detail.x, -0.026, 0.026);
+    living.eyeDriftX = living.eyeTargetX;
+  }
+  if (typeof detail.y === 'number') {
+    living.eyeTargetY = THREE.MathUtils.clamp(detail.y, -0.014, 0.014);
+    living.eyeDriftY = living.eyeTargetY;
+  }
+  living.nextSaccadeAt = performance.now() / 1000 + 99;
 });
 
 function updateBlinkState(time, dt) {
@@ -864,20 +1065,22 @@ function updateLivingMotion(time, dt) {
   document.body.dataset.eyeDriftHold = blinkHold.toFixed(3);
 
   if (time >= living.nextSaccadeAt && blinkHold < 0.15) {
-    living.eyeTargetX = rand(-0.008, 0.008);
-    living.eyeTargetY = rand(-0.004, 0.004);
+    living.eyeTargetX = rand(-0.014, 0.014);
+    living.eyeTargetY = rand(-0.007, 0.007);
     living.browTarget = rand(-0.045, 0.055);
     living.mouthTarget = rand(-0.035, 0.045);
-    living.nextSaccadeAt = time + rand(2.2, 4.4);
+    living.nextSaccadeAt = time + rand(3.2, 5.8);
   }
 
   if (blinkHold < 0.2) {
-    living.eyeDriftX = THREE.MathUtils.damp(living.eyeDriftX, living.eyeTargetX, 5.2, dt);
-    living.eyeDriftY = THREE.MathUtils.damp(living.eyeDriftY, living.eyeTargetY, 5.2, dt);
+    living.eyeDriftX = THREE.MathUtils.damp(living.eyeDriftX, living.eyeTargetX, 2.9, dt);
+    living.eyeDriftY = THREE.MathUtils.damp(living.eyeDriftY, living.eyeTargetY, 2.9, dt);
   } else {
-    living.eyeTargetX = THREE.MathUtils.damp(living.eyeTargetX, living.eyeDriftX, 14, dt);
-    living.eyeTargetY = THREE.MathUtils.damp(living.eyeTargetY, living.eyeDriftY, 14, dt);
+    living.eyeTargetX = THREE.MathUtils.damp(living.eyeTargetX, living.eyeDriftX, 7.5, dt);
+    living.eyeTargetY = THREE.MathUtils.damp(living.eyeTargetY, living.eyeDriftY, 7.5, dt);
   }
+  document.body.dataset.eyeDriftX = living.eyeDriftX.toFixed(4);
+  document.body.dataset.eyeDriftY = living.eyeDriftY.toFixed(4);
   living.browDrift = THREE.MathUtils.damp(living.browDrift, living.browTarget, 4.2, dt);
   living.mouthDrift = THREE.MathUtils.damp(living.mouthDrift, living.mouthTarget, 3.8, dt);
   return blink;
@@ -956,17 +1159,17 @@ function animate() {
   const pose = getCurrentPose();
   const interfaceBiasX = motion.panelOpen ? -0.015 : 0.0;
   const interfaceBiasY = motion.panelOpen ? 0.004 : 0.0;
-  motion.viewerX = THREE.MathUtils.damp(motion.viewerX, mouse.x, 3.6, dt);
-  motion.viewerY = THREE.MathUtils.damp(motion.viewerY, mouse.y, 3.6, dt);
+  motion.viewerX = THREE.MathUtils.damp(motion.viewerX, mouse.x, 4.2, dt);
+  motion.viewerY = THREE.MathUtils.damp(motion.viewerY, mouse.y, 4.2, dt);
   motion.lookX = THREE.MathUtils.damp(
     motion.lookX,
-    pose.lookX + interfaceBiasX + motion.viewerX * 0.11,
+    pose.lookX + interfaceBiasX + motion.viewerX * 0.15,
     4.5,
     dt
   );
   motion.lookY = THREE.MathUtils.damp(
     motion.lookY,
-    pose.lookY + interfaceBiasY - motion.viewerY * 0.06,
+    pose.lookY + interfaceBiasY - motion.viewerY * 0.08,
     4.5,
     dt
   );
@@ -990,8 +1193,8 @@ function animate() {
 
   const rig = headGroup.userData.rig;
   if (rig) {
-    const attentiveLookX = motion.lookX + living.eyeDriftX * 0.28;
-    const attentiveLookY = motion.lookY + living.eyeDriftY * 0.34;
+    const attentiveLookX = motion.lookX + living.eyeDriftX * 1.35;
+    const attentiveLookY = motion.lookY + living.eyeDriftY * 1.1;
     const expressiveMouth = motion.mouth + living.mouthDrift;
     const expressiveBrow = motion.brow + living.browDrift;
     const headPitch = motion.lookY * 0.66 + living.eyeDriftY * 0.08 + idlePitch;
@@ -1011,17 +1214,19 @@ function animate() {
     setBoneRotationDelta(
       rig,
       rig.eyeL,
-      -attentiveLookY * 0.2,
-      attentiveLookX * -0.52,
-      -living.eyeDriftX * 0.006
+      -attentiveLookY * 0.55,
+      attentiveLookX * -1.65,
+      -living.eyeDriftX * 0.015
     );
     setBoneRotationDelta(
       rig,
       rig.eyeR,
-      -attentiveLookY * 0.2,
-      attentiveLookX * -0.52,
-      living.eyeDriftX * 0.006
+      -attentiveLookY * 0.55,
+      attentiveLookX * -1.65,
+      living.eyeDriftX * 0.015
     );
+    document.body.dataset.attentiveLookX = attentiveLookX.toFixed(4);
+    document.body.dataset.attentiveLookY = attentiveLookY.toFixed(4);
 
     const jawOpen = 0.006 + mouthOpen * 0.038 + Math.sin(t * 1.45) * 0.0008;
     setBoneRotationDeltas(rig, rig.jaw, jawOpen, 0, 0);
@@ -1036,6 +1241,8 @@ function animate() {
 
     const blinkClose = applyNativeBlink(rig, blink, motion.squint + smile * 0.09, attentiveLookY);
     applyEyeBlinkVisibility(headGroup.userData.eyeMats, blinkClose);
+    updateEyeBlinkVeils(rig, blinkClose);
+    updateEyeCatchlights(rig, blinkClose, smile);
   }
 
   // LED pulse
