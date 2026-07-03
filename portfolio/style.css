@@ -109,7 +109,7 @@ body::after {
 body::before {
   z-index: 1;
   background:
-    radial-gradient(60% 44% at 50% 28%, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.1) 42%, rgba(255,255,255,0) 76%),
+    radial-gradient(60% 44% at 50% 24%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.04) 42%, rgba(255,255,255,0) 76%),
     linear-gradient(90deg, rgba(187,220,242,0.16) 0%, rgba(255,255,255,0) 22%, rgba(255,255,255,0) 78%, rgba(176,216,241,0.18) 100%);
   mix-blend-mode: screen;
 }

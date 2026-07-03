@@ -485,15 +485,13 @@ function chloeMaterials() {
     Chloe_Head: skin('face_alb.jpg', 'face_nrm.jpg', 'face_rough.jpg'),
     Chloe_Body: skin('body_alb.jpg', 'body_nrm.jpg', 'body_rough.jpg'),
     Chloe_Arms: skin('arms_alb.jpg', 'arms_nrm.jpg', 'arms_rough.jpg'),
-    Chloe_Eyes: new THREE.MeshPhysicalMaterial({
+    Chloe_Eyes: new THREE.MeshStandardMaterial({
       map: tex(A + 'eye_alb.jpg', true),
       normalMap: tex(A + 'eye_nrm.jpg'),
-      roughness: 0.46,
-      clearcoat: 0.12,
-      clearcoatRoughness: 0.58,
-      envMapIntensity: 0.06,
-      specularIntensity: 0.12,
-      color: new THREE.Color(0.68, 0.76, 0.82),
+      roughness: 0.72,
+      metalness: 0,
+      envMapIntensity: 0.025,
+      color: new THREE.Color(0.48, 0.58, 0.64),
       transparent: true,
       opacity: 1,
     }),
@@ -1036,7 +1034,7 @@ function animate() {
     setBoneRotationDeltas(rig, rig.browsL, -browLift - browAsym, 0, -expressiveBrow * 0.003);
     setBoneRotationDeltas(rig, rig.browsR, -browLift + browAsym, 0, expressiveBrow * 0.003);
 
-    const blinkClose = applyNativeBlink(rig, blink, motion.squint + smile * 0.055, attentiveLookY);
+    const blinkClose = applyNativeBlink(rig, blink, motion.squint + smile * 0.09, attentiveLookY);
     applyEyeBlinkVisibility(headGroup.userData.eyeMats, blinkClose);
   }
 
