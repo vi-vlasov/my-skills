@@ -1205,11 +1205,12 @@ function animate() {
     const headPitch = motion.lookY * 0.66 + living.eyeDriftY * 0.08 + idlePitch;
     const headYaw = motion.lookX * 0.42 + living.eyeDriftX * 0.05 + idleYaw;
     const shoulderBreath = Math.sin(t * 0.8) * 0.012;
-    const browAsym = Math.sin(t * 0.92) * 0.002 + living.eyeDriftX * 0.006;
+    const expressionAsym = Math.sin(t * 0.61) * 0.022 + Math.sin(t * 0.27 + 1.2) * 0.01 + living.eyeDriftX * 0.16;
+    const browAsym = Math.sin(t * 0.92) * 0.0035 + expressionAsym * 0.18 + living.eyeDriftX * 0.006;
     const speechPulse = Math.sin(t * 1.35) * 0.45 + Math.sin(t * 0.58 + 1.7) * 0.22;
     const smile = THREE.MathUtils.clamp(0.34 + expressiveMouth * 0.34 + Math.sin(t * 0.72) * 0.014, 0.18, 0.66);
     const mouthOpen = THREE.MathUtils.clamp(0.1 + expressiveMouth * 0.34 + speechPulse * 0.012, 0.06, 0.48);
-    const smileAsym = Math.sin(t * 0.61) * 0.015 + living.eyeDriftX * 0.14;
+    const smileAsym = expressionAsym;
 
     setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * -0.08, motion.roll * 0.08);
     setBoneRotationDeltas(rig, rig.spineUpper, headPitch * -0.12, headYaw * -0.12, motion.roll * 0.14);
@@ -1239,6 +1240,7 @@ function animate() {
     applyNativeSmile(rig, smile, smileAsym);
     applyNativeMouth(rig, mouthOpen, smile, speechPulse);
     document.body.dataset.facialJawOpen = jawOpen.toFixed(3);
+    document.body.dataset.facialSmileAsym = smileAsym.toFixed(3);
 
     const browLift = 0.004 + expressiveBrow * 0.018;
     setBoneRotationDeltas(rig, rig.browsL, -browLift - browAsym, 0, -expressiveBrow * 0.003);

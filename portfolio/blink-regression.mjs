@@ -24,6 +24,8 @@ assert.match(source, /const lowerDrop = 0\.000078 \* open/, 'lower lip should dr
 assert.match(source, /const mouthOpen = THREE\.MathUtils\.clamp\(0\.1 \+ expressiveMouth \* 0\.34/, 'menu expression should keep the reference-like mouth opening visible');
 assert.match(source, /const jawOpen = 0\.008 \+ mouthOpen \* 0\.064/, 'jaw opening should be strong enough to show teeth in the portrait');
 assert.match(source, /Chloe_Teeth:[\s\S]*?roughness: 0\.68,[\s\S]*?envMapIntensity: 0\.12/, 'teeth should stay soft enough for the open-mouth expression');
+assert.match(source, /const expressionAsym = Math\.sin\(t \* 0\.61\) \* 0\.022/, 'face should keep subtle expression asymmetry');
+assert.match(source, /document\.body\.dataset\.facialSmileAsym = smileAsym\.toFixed\(3\)/, 'smile asymmetry should be exposed for visual checks');
 assert.match(source, /function catchlightTexture\(\)/, 'eye catchlight texture should exist');
 assert.match(source, /function updateEyeCatchlights\(rig, blinkClose, smile\)/, 'eye catchlights should follow the native eye bones');
 assert.match(source, /setupEyeCatchlights\(\)/, 'Chloe setup should create eye catchlights');
