@@ -639,18 +639,18 @@ function applyNativeMouth(rig, openness, smile, speechPulse = 0) {
   const open = THREE.MathUtils.clamp(openness, 0, 1);
   const smileLift = THREE.MathUtils.clamp(smile, 0, 1);
   const pulse = THREE.MathUtils.clamp(speechPulse, -1, 1);
-  const upperLift = -0.000044 * smileLift - 0.000028 * open + 0.000003 * pulse;
-  const lowerDrop = 0.000062 * open + 0.000003 * Math.max(0, pulse);
+  const upperLift = -0.00005 * smileLift - 0.000052 * open + 0.000003 * pulse;
+  const lowerDrop = 0.000098 * open + 0.000003 * Math.max(0, pulse);
   const lowerOut = 0.000004 * open;
-  const sideSeal = 0.000026 * open;
+  const sideSeal = 0.000048 * open;
 
   setBoneRotationDeltas(rig, rig.mouthRoot, open * 0.014, 0, 0);
   setBoneRotationDeltas(rig, rig.mandiblesL, open * 0.009, 0, -open * 0.004);
   setBoneRotationDeltas(rig, rig.mandiblesR, open * 0.009, 0, open * 0.004);
   setBonePositionDeltas(rig, rig.lipMidUpper, upperLift, 0.000002 * pulse, 0);
   setBonePositionDeltas(rig, rig.lipMidLower, lowerDrop, -0.000003 * pulse, 0);
-  setBonePositionDeltas(rig, rig.lipLowerL, lowerDrop * 0.48 - sideSeal, 0, lowerOut);
-  setBonePositionDeltas(rig, rig.lipLowerR, lowerDrop * 0.48 - sideSeal, 0, -lowerOut);
+  setBonePositionDeltas(rig, rig.lipLowerL, lowerDrop * 0.32 - sideSeal, 0, lowerOut);
+  setBonePositionDeltas(rig, rig.lipLowerR, lowerDrop * 0.32 - sideSeal, 0, -lowerOut);
   setBoneRotationDeltas(rig, rig.tongue, open * 0.006, 0, 0);
 
   document.body.dataset.facialMouthOpen = open.toFixed(3);
@@ -705,9 +705,9 @@ function chloeMaterials() {
     Chloe_Teeth: new THREE.MeshStandardMaterial({
       map: tex(A + 'teeth_alb.jpg', true),
       normalMap: tex(A + 'teeth_nrm.jpg'),
-      roughness: 0.82,
-      envMapIntensity: 0.04,
-      color: new THREE.Color(0.54, 0.51, 0.48),
+      roughness: 0.8,
+      envMapIntensity: 0.05,
+      color: new THREE.Color(0.62, 0.58, 0.54),
     }),
     Chloe_Duct: new THREE.MeshStandardMaterial({ map: tex(A + 'duct_alb.jpg', true), roughness: 0.35 }),
     Chloe_tear: new THREE.MeshPhysicalMaterial({
@@ -904,7 +904,7 @@ const bodies = panel.querySelectorAll<HTMLElement>('.panel-body');
 let selected = 0;
 
 const MENU_POSES = {
-  about:    { lookX: 0.0,   lookY: 0.008, camX: 0.0,    camY: 0.002, bodyX: 0.0,    bodyY: 0.0,   mouth: 0.42, brow: 0.24, led: 1.0,  squint: 0.015, roll: 0.0 },
+  about:    { lookX: 0.0,   lookY: 0.008, camX: 0.0,    camY: 0.002, bodyX: 0.0,    bodyY: 0.0,   mouth: 0.48, brow: 0.24, led: 1.0,  squint: 0.015, roll: 0.0 },
   projects: { lookX: -0.012,lookY: 0.006, camX: -0.008, camY: 0.001, bodyX: -0.006, bodyY: -0.002,mouth: 0.24, brow: 0.12, led: 0.94, squint: 0.005, roll: -0.01 },
   skills:   { lookX: 0.008, lookY: 0.012, camX: 0.004,  camY: 0.003, bodyX: 0.0,    bodyY: 0.004, mouth: 0.3,  brow: 0.18, led: 1.05, squint: 0.012, roll: 0.0 },
   exp:      { lookX: 0.014, lookY: 0.004, camX: 0.007,  camY: -0.002,bodyX: 0.006,  bodyY: -0.004,mouth: 0.18, brow: 0.1,  led: 0.9,  squint: 0.0,   roll: 0.008 },
@@ -1227,7 +1227,7 @@ function animate() {
     const browAsym = Math.sin(t * 0.92) * 0.0035 + expressionAsym * 0.18 + living.eyeDriftX * 0.006;
     const speechPulse = Math.sin(t * 1.35) * 0.45 + Math.sin(t * 0.58 + 1.7) * 0.22;
     const smile = THREE.MathUtils.clamp(0.28 + expressiveMouth * 0.24 + Math.sin(t * 0.72) * 0.012, 0.16, 0.5);
-    const mouthOpen = THREE.MathUtils.clamp(0.065 + expressiveMouth * 0.21 + speechPulse * 0.0045, 0.035, 0.25);
+    const mouthOpen = THREE.MathUtils.clamp(0.082 + expressiveMouth * 0.23 + speechPulse * 0.005, 0.04, 0.28);
     const smileAsym = expressionAsym;
 
     setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * -0.08, motion.roll * 0.08);
@@ -1252,7 +1252,7 @@ function animate() {
     document.body.dataset.attentiveLookX = attentiveLookX.toFixed(4);
     document.body.dataset.attentiveLookY = attentiveLookY.toFixed(4);
 
-    const jawOpen = 0.0045 + mouthOpen * 0.04 + Math.sin(t * 1.45) * 0.0005;
+    const jawOpen = 0.0065 + mouthOpen * 0.078 + Math.sin(t * 1.45) * 0.0005;
     setBoneRotationDeltas(rig, rig.jaw, jawOpen, 0, 0);
     setBoneRotationDeltas(rig, rig.upperLip, -mouthOpen * 0.028 - Math.sin(t * 1.1) * 0.0012, 0, 0);
     applyNativeSmile(rig, smile, smileAsym);

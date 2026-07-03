@@ -34,9 +34,9 @@ html, body {
   overflow: hidden;
   pointer-events: none;
   mix-blend-mode: normal;
-  opacity: 0.72;
-  -webkit-mask-image: radial-gradient(ellipse 31% 45% at 50% 48%, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.5) 66%, rgba(0,0,0,1) 100%);
-  mask-image: radial-gradient(ellipse 31% 45% at 50% 48%, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.5) 66%, rgba(0,0,0,1) 100%);
+  opacity: 0.82;
+  -webkit-mask-image: radial-gradient(ellipse 27% 42% at 50% 48%, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 42%, rgba(0,0,0,0.58) 62%, rgba(0,0,0,1) 100%);
+  mask-image: radial-gradient(ellipse 27% 42% at 50% 48%, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 42%, rgba(0,0,0,0.58) 62%, rgba(0,0,0,1) 100%);
 }
 
 .cinematic-backdrop i {
@@ -54,27 +54,27 @@ html, body {
     linear-gradient(180deg, rgba(255,255,255,0.74), rgba(171,216,240,0.28) 44%, rgba(244,251,255,0.42) 100%),
     linear-gradient(90deg, rgba(106,178,218,0), rgba(255,255,255,0.76) 48%, rgba(106,178,218,0));
   box-shadow: 0 0 54px rgba(130, 194, 229, 0.28);
-  filter: blur(10px);
-  opacity: 0.44;
+  filter: blur(8px);
+  opacity: 0.52;
 }
 
-.cinematic-backdrop .pane-a { left: -1.8vw; opacity: 0.64; }
-.cinematic-backdrop .pane-b { left: 13.8vw; width: clamp(58px, 8vw, 130px); opacity: 0.5; }
-.cinematic-backdrop .pane-c { left: 31vw; width: clamp(72px, 9.5vw, 150px); opacity: 0.28; }
-.cinematic-backdrop .pane-d { right: 27vw; width: clamp(68px, 9vw, 145px); opacity: 0.3; }
-.cinematic-backdrop .pane-e { right: 12.2vw; width: clamp(58px, 7.8vw, 124px); opacity: 0.5; }
-.cinematic-backdrop .pane-f { right: -1vw; width: clamp(54px, 7vw, 116px); opacity: 0.66; }
+.cinematic-backdrop .pane-a { left: -1.8vw; opacity: 0.76; }
+.cinematic-backdrop .pane-b { left: 13.8vw; width: clamp(58px, 8vw, 130px); opacity: 0.62; }
+.cinematic-backdrop .pane-c { left: 31vw; width: clamp(72px, 9.5vw, 150px); opacity: 0.36; }
+.cinematic-backdrop .pane-d { right: 27vw; width: clamp(68px, 9vw, 145px); opacity: 0.38; }
+.cinematic-backdrop .pane-e { right: 12.2vw; width: clamp(58px, 7.8vw, 124px); opacity: 0.62; }
+.cinematic-backdrop .pane-f { right: -1vw; width: clamp(54px, 7vw, 116px); opacity: 0.78; }
 
 .horizon-glow {
   left: -8vw;
   right: -8vw;
-  top: 51vh;
-  height: 12vh;
+  top: 50vh;
+  height: 13vh;
   background:
     radial-gradient(ellipse at 48% 50%, rgba(255,255,255,0.82) 0%, rgba(215,239,250,0.45) 42%, rgba(172,210,232,0) 74%),
     linear-gradient(90deg, rgba(134,195,226,0), rgba(255,255,255,0.9) 18%, rgba(255,255,255,0.88) 50%, rgba(232,247,255,0.74) 82%, rgba(134,195,226,0));
-  filter: blur(14px);
-  opacity: 0.54;
+  filter: blur(12px);
+  opacity: 0.68;
 }
 
 .lens-bloom {
