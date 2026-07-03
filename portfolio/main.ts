@@ -496,7 +496,7 @@ function setupEyeBlinkVeils() {
 function updateEyeCatchlight(sprite, eyeBone, blinkClose, side, smile) {
   if (!sprite || !eyeBone) return;
   const openFade = 1 - THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(blinkClose, 0, 1), 0.46, 0.88);
-  sprite.material.opacity = openFade * (0.2 + smile * 0.12);
+  sprite.material.opacity = openFade * (0.28 + smile * 0.1);
   sprite.visible = sprite.material.opacity > 0.02;
   if (!sprite.visible) return;
 
@@ -507,9 +507,9 @@ function updateEyeCatchlight(sprite, eyeBone, blinkClose, side, smile) {
     .copy(eyeWorld)
     .addScaledVector(eyeToCamera, 0.022)
     .addScaledVector(cameraRight, -0.004 + side * 0.0015)
-    .addScaledVector(cameraUp, 0.0065);
+    .addScaledVector(cameraUp, 0.0074);
 
-  const scale = 0.0105 + smile * 0.0025;
+  const scale = 0.0088 + smile * 0.0018;
   sprite.scale.set(scale, scale, scale);
 }
 
@@ -692,10 +692,10 @@ function chloeMaterials() {
     Chloe_Eyes: new THREE.MeshStandardMaterial({
       map: tex(A + 'eye_alb.jpg', true),
       normalMap: tex(A + 'eye_nrm.jpg'),
-      roughness: 0.86,
+      roughness: 0.9,
       metalness: 0,
-      envMapIntensity: 0.008,
-      color: new THREE.Color(0.34, 0.41, 0.46),
+      envMapIntensity: 0.006,
+      color: new THREE.Color(0.43, 0.52, 0.58),
       transparent: true,
       opacity: 1,
     }),
