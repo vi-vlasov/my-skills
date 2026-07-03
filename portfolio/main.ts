@@ -7,6 +7,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 // ---------------------------------------------------------------- renderer
@@ -231,7 +232,7 @@ pmrem.dispose();
 
 const camera = new THREE.PerspectiveCamera(23.8, window.innerWidth / window.innerHeight, 0.05, 30);
 const FOCUS = new THREE.Vector3(0, 1.512, 0); // close-up portrait framing, DBH main-menu style
-const CAM_Z = 0.78;
+const CAM_Z = 0.84;
 camera.position.set(0.004, FOCUS.y + 0.005, CAM_Z);
 camera.lookAt(FOCUS);
 
@@ -248,14 +249,14 @@ fill.position.set(-1.55, 1.88, 1.45);
 scene.add(fill);
 
 // back/rim lights — edge glow that melts into the background
-const rimL = new THREE.DirectionalLight(0xe9f7ff, 1.32);
+const rimL = new THREE.DirectionalLight(0xe9f7ff, 1.02);
 rimL.position.set(-1.8, 2.45, -1.15);
 scene.add(rimL);
-const rimR = new THREE.DirectionalLight(0xf7fdff, 1.14);
+const rimR = new THREE.DirectionalLight(0xf7fdff, 0.86);
 rimR.position.set(1.42, 2.35, -0.96);
 scene.add(rimR);
 
-const overhead = new THREE.DirectionalLight(0xf3fbff, 0.34);
+const overhead = new THREE.DirectionalLight(0xf3fbff, 0.28);
 overhead.position.set(0, 3.3, 0.85);
 scene.add(overhead);
 
@@ -293,6 +294,245 @@ function tex(url, srgb = false) {
   t.anisotropy = maxAniso;
   if (srgb) t.colorSpace = THREE.SRGBColorSpace;
   return t;
+}
+
+function createChloeEyeTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 2048;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return tex('assets/chloe/eye_alb.jpg', true);
+
+  const hash = (value) => {
+    const s = Math.sin(value * 127.1 + 311.7) * 43758.5453123;
+    return s - Math.floor(s);
+  };
+
+  const sclera = ctx.createLinearGradient(0, 0, 0, 520);
+  sclera.addColorStop(0, '#c7b9b1');
+  sclera.addColorStop(0.5, '#ddd8ce');
+  sclera.addColorStop(1, '#b9b8aa');
+  ctx.fillStyle = sclera;
+  ctx.fillRect(0, 0, canvas.width, 540);
+
+  ctx.globalAlpha = 0.18;
+  for (let i = 0; i < 90; i += 1) {
+    const x = hash(i) * canvas.width;
+    const y = 40 + hash(i + 11) * 430;
+    const len = 38 + hash(i + 23) * 160;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.bezierCurveTo(x + 16 * (hash(i + 3) - 0.5), y + len * 0.32, x + 40 * (hash(i + 5) - 0.5), y + len * 0.7, x + 20 * (hash(i + 7) - 0.5), y + len);
+    ctx.strokeStyle = hash(i + 13) > 0.42 ? '#8f332f' : '#6f5b4e';
+    ctx.lineWidth = 0.7 + hash(i + 17) * 1.7;
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  const irisTop = 500;
+  const irisHeight = canvas.height - irisTop;
+  const irisBase = ctx.createLinearGradient(0, irisTop, 0, canvas.height);
+  irisBase.addColorStop(0, '#b9beb1');
+  irisBase.addColorStop(0.12, '#7d928d');
+  irisBase.addColorStop(0.38, '#526e72');
+  irisBase.addColorStop(0.68, '#27383a');
+  irisBase.addColorStop(1, '#050707');
+  ctx.fillStyle = irisBase;
+  ctx.fillRect(0, irisTop, canvas.width, irisHeight);
+
+  const ring = ctx.createLinearGradient(0, irisTop, 0, canvas.height);
+  ring.addColorStop(0, 'rgba(8, 14, 16, 0.82)');
+  ring.addColorStop(0.09, 'rgba(215, 221, 195, 0.22)');
+  ring.addColorStop(0.42, 'rgba(24, 40, 43, 0)');
+  ring.addColorStop(0.72, 'rgba(4, 6, 7, 0.32)');
+  ring.addColorStop(1, 'rgba(0, 0, 0, 0.94)');
+  ctx.fillStyle = ring;
+  ctx.fillRect(0, irisTop, canvas.width, irisHeight);
+
+  ctx.globalCompositeOperation = 'screen';
+  for (let x = 0; x < canvas.width; x += 3) {
+    const n = hash(x);
+    const y0 = irisTop + 24 + hash(x + 19) * 70;
+    const y1 = canvas.height - 78 - hash(x + 29) * 120;
+    const hue = n > 0.78 ? '183, 196, 170' : n > 0.5 ? '118, 153, 148' : '77, 106, 112';
+    ctx.globalAlpha = 0.16 + hash(x + 5) * 0.42;
+    ctx.strokeStyle = `rgb(${hue})`;
+    ctx.lineWidth = 0.45 + hash(x + 9) * 1.7;
+    ctx.beginPath();
+    ctx.moveTo(x, y0);
+    ctx.bezierCurveTo(x + 8 * (hash(x + 2) - 0.5), y0 + 130, x + 18 * (hash(x + 4) - 0.5), y1 - 90, x + 4 * (hash(x + 6) - 0.5), y1);
+    ctx.stroke();
+  }
+
+  ctx.globalCompositeOperation = 'multiply';
+  for (let x = 0; x < canvas.width; x += 5) {
+    ctx.globalAlpha = 0.16 + hash(x + 41) * 0.34;
+    ctx.strokeStyle = '#071012';
+    ctx.lineWidth = 0.5 + hash(x + 43) * 2.2;
+    ctx.beginPath();
+    ctx.moveTo(x, irisTop + hash(x + 47) * 64);
+    ctx.lineTo(x + 10 * (hash(x + 53) - 0.5), canvas.height);
+    ctx.stroke();
+  }
+
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalAlpha = 1;
+  const pupil = ctx.createLinearGradient(0, 790, 0, canvas.height);
+  pupil.addColorStop(0, 'rgba(4, 8, 9, 0)');
+  pupil.addColorStop(0.52, 'rgba(2, 4, 5, 0.55)');
+  pupil.addColorStop(1, 'rgba(0, 0, 0, 1)');
+  ctx.fillStyle = pupil;
+  ctx.fillRect(0, 790, canvas.width, 234);
+
+  function paintAtlasEnhancement(strength = 1) {
+    ctx.globalCompositeOperation = 'screen';
+    for (let x = 0; x < canvas.width; x += 4) {
+      const n = hash(x + 101);
+      const y0 = irisTop + 12 + hash(x + 119) * 76;
+      const y1 = canvas.height - 68 - hash(x + 129) * 118;
+      const hue = n > 0.78 ? '173, 193, 198' : n > 0.5 ? '88, 129, 141' : '48, 78, 92';
+      ctx.globalAlpha = (0.12 + hash(x + 105) * 0.28) * strength;
+      ctx.strokeStyle = `rgb(${hue})`;
+      ctx.lineWidth = 0.5 + hash(x + 109) * 1.35;
+      ctx.beginPath();
+      ctx.moveTo(x, y0);
+      ctx.bezierCurveTo(x + 6 * (hash(x + 112) - 0.5), y0 + 115, x + 15 * (hash(x + 114) - 0.5), y1 - 80, x + 4 * (hash(x + 116) - 0.5), y1);
+      ctx.stroke();
+    }
+
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.globalAlpha = 0.72 * strength;
+    const pupilDepth = ctx.createLinearGradient(0, 585, 0, canvas.height);
+    pupilDepth.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    pupilDepth.addColorStop(0.42, 'rgba(3, 6, 7, 0.42)');
+    pupilDepth.addColorStop(1, 'rgba(0, 0, 0, 0.98)');
+    ctx.fillStyle = pupilDepth;
+    ctx.fillRect(0, 585, canvas.width, 439);
+
+    ctx.globalAlpha = 0.38 * strength;
+    ctx.fillStyle = '#10191b';
+    ctx.fillRect(0, irisTop + 8, canvas.width, 30);
+
+    ctx.globalAlpha = 0.88 * strength;
+    const pupilCore = ctx.createLinearGradient(0, irisTop + 78, 0, irisTop + 245);
+    pupilCore.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    pupilCore.addColorStop(0.28, 'rgba(0, 0, 0, 0.72)');
+    pupilCore.addColorStop(0.54, 'rgba(0, 0, 0, 0.98)');
+    pupilCore.addColorStop(0.82, 'rgba(0, 0, 0, 0.18)');
+    pupilCore.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = pupilCore;
+    ctx.fillRect(0, irisTop + 78, canvas.width, 245);
+
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 0.58 * strength;
+    const directPupil = ctx.createLinearGradient(0, 612, 0, 714);
+    directPupil.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    directPupil.addColorStop(0.34, 'rgba(2, 4, 5, 0.88)');
+    directPupil.addColorStop(0.62, 'rgba(0, 0, 0, 0.94)');
+    directPupil.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = directPupil;
+    ctx.fillRect(0, 612, canvas.width, 102);
+
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+  }
+
+  paintAtlasEnhancement(0.35);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.flipY = false;
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.anisotropy = maxAniso;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.generateMipmaps = true;
+  texture.needsUpdate = true;
+
+  const source = new Image();
+  source.onload = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.filter = 'contrast(1.56) saturate(1.08) brightness(0.94)';
+    ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+    ctx.filter = 'none';
+    const eyeUvDebug = new URLSearchParams(window.location.search).get('eyeuv');
+    if (eyeUvDebug) {
+      const debugColors = ['#ff0033', '#ff7a00', '#ffe600', '#7dff00', '#00ff66', '#00ffd5', '#008cff', '#3d00ff', '#a100ff', '#ff00c8', '#ffffff', '#000000', '#8a5c32', '#69a0a8', '#2c4f6f', '#c8d0d5'];
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+      if (eyeUvDebug === 'v') {
+        const stripeHeight = canvas.height / debugColors.length;
+        for (let i = 0; i < debugColors.length; i += 1) {
+          ctx.fillStyle = debugColors[i];
+          ctx.fillRect(0, i * stripeHeight, canvas.width, stripeHeight);
+        }
+      } else {
+        const stripeWidth = canvas.width / debugColors.length;
+        for (let i = 0; i < debugColors.length; i += 1) {
+          ctx.fillStyle = debugColors[i];
+          ctx.fillRect(i * stripeWidth, 0, stripeWidth, canvas.height);
+        }
+      }
+      texture.needsUpdate = true;
+      document.body.dataset.eyeTextureReady = 'uv-debug';
+      return;
+    }
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.globalAlpha = 0.24;
+    ctx.fillStyle = '#6f8a93';
+    ctx.fillRect(0, irisTop, canvas.width, canvas.height - irisTop);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    paintAtlasEnhancement(0.9);
+    texture.needsUpdate = true;
+    document.body.dataset.eyeTextureReady = 'enhanced';
+  };
+  source.src = 'assets/chloe/eye_alb.jpg';
+  texture.userData.sourceImage = source;
+
+  return texture;
+}
+
+function createChloeFaceTexture() {
+  const texture = tex('assets/chloe/face_alb.jpg', true);
+  const canvas = document.createElement('canvas');
+  canvas.width = 2048;
+  canvas.height = 2048;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return texture;
+
+  function paintSoftEllipse(cx, cy, rx, ry, color, alpha) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(rx, ry);
+    const soft = ctx.createRadialGradient(0, 0, 0.08, 0, 0, 1);
+    soft.addColorStop(0, color.replace(')', `, ${alpha})`).replace('rgb', 'rgba'));
+    soft.addColorStop(0.64, color.replace(')', `, ${alpha * 0.62})`).replace('rgb', 'rgba'));
+    soft.addColorStop(1, color.replace(')', ', 0)').replace('rgb', 'rgba'));
+    ctx.fillStyle = soft;
+    ctx.beginPath();
+    ctx.arc(0, 0, 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  const source = new Image();
+  source.onload = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.filter = 'saturate(0.96) contrast(1.015) brightness(1.01)';
+    ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+    ctx.filter = 'none';
+
+    ctx.globalCompositeOperation = 'source-over';
+    paintSoftEllipse(1024, 1162, 365, 96, 'rgb(188, 142, 126)', 0.2);
+    paintSoftEllipse(1024, 1252, 390, 108, 'rgb(194, 148, 134)', 0.17);
+    paintSoftEllipse(1024, 1214, 285, 42, 'rgb(126, 72, 70)', 0.08);
+
+    texture.image = canvas;
+    texture.needsUpdate = true;
+    document.body.dataset.faceTextureReady = 'calmed-lips';
+  };
+  source.src = 'assets/chloe/face_alb.jpg';
+  texture.userData.sourceImage = source;
+  return texture;
 }
 
 function modelReady() {
@@ -381,21 +621,37 @@ function setBonePositionDeltas(rig, bones, x = 0, y = 0, z = 0) {
 }
 
 const BLINK_NATIVE = {
-  restClose: 0.12,
-  maxClose: 0.82,
+  restClose: 0.18,
+  maxClose: 0.72,
+  rigCloseScale: 0.42,
   closeScale: 1.36,
   closeBias: -0.08,
-  upperDrop: 0.000118,
-  coverDrop: 0.000096,
-  lowerRise: -0.000034,
-  orbitDrop: 0.000026,
+  upperDrop: 0.000126,
+  coverDrop: 0.000104,
+  lowerRise: -0.00004,
+  orbitDrop: 0.000028,
   upperFold: -0.052,
   coverFold: -0.038,
   lowerFold: 0.021,
-  closedEyeOpacity: 0.2,
-  closedLashOpacity: 0.24,
+  closedEyeOpacity: 1,
+  closedLashOpacity: 1,
+  closedDuctOpacity: 1,
 };
-const closedEyeColor = new THREE.Color(0.58, 0.5, 0.46);
+
+const BLINK_RIG_OPEN = {
+  upper: 1.15,
+  cover: 0.48,
+  lower: 0.58,
+};
+
+const blinkRigDebug = {
+  scale: BLINK_NATIVE.rigCloseScale,
+  upper: 0.2,
+  cover: 2,
+  lower: 2,
+  fold: 0.24,
+  twist: 0,
+};
 
 function smootherStep01(value) {
   const x = THREE.MathUtils.clamp(value, 0, 1);
@@ -414,14 +670,20 @@ function getNativeBlinkClose(blink) {
 
 function applyNativeBlink(rig, blink, squint, lookY) {
   const close = getNativeBlinkClose(blink);
+  const rigClose = close * blinkRigDebug.scale;
+  const blinkPose = smootherStep01((close - BLINK_NATIVE.restClose) / (BLINK_NATIVE.maxClose - BLINK_NATIVE.restClose));
+  const rigUpper = THREE.MathUtils.lerp(BLINK_RIG_OPEN.upper, blinkRigDebug.upper, blinkPose);
+  const rigCover = THREE.MathUtils.lerp(BLINK_RIG_OPEN.cover, blinkRigDebug.cover, blinkPose);
+  const rigLower = THREE.MathUtils.lerp(BLINK_RIG_OPEN.lower, blinkRigDebug.lower, blinkPose);
+  const rigFold = blinkRigDebug.fold * blinkPose;
   const gazeSquint = THREE.MathUtils.clamp(squint + Math.max(0, lookY) * 0.08, 0, 0.08);
-  const upperDrop = BLINK_NATIVE.upperDrop * close + 0.000018 * gazeSquint;
-  const coverDrop = BLINK_NATIVE.coverDrop * close + 0.000014 * gazeSquint;
-  const lowerRise = BLINK_NATIVE.lowerRise * close - 0.000009 * gazeSquint;
-  const orbitDrop = BLINK_NATIVE.orbitDrop * close + 0.000006 * gazeSquint;
-  const upperFold = BLINK_NATIVE.upperFold * close - 0.008 * gazeSquint;
-  const coverFold = BLINK_NATIVE.coverFold * close - 0.006 * gazeSquint;
-  const lowerFold = BLINK_NATIVE.lowerFold * close + 0.006 * gazeSquint;
+  const upperDrop = BLINK_NATIVE.upperDrop * rigClose * rigUpper + 0.000018 * gazeSquint;
+  const coverDrop = BLINK_NATIVE.coverDrop * rigClose * rigCover + 0.000014 * gazeSquint;
+  const lowerRise = BLINK_NATIVE.lowerRise * rigClose * rigLower - 0.000009 * gazeSquint;
+  const orbitDrop = BLINK_NATIVE.orbitDrop * rigClose + 0.000006 * gazeSquint;
+  const upperFold = BLINK_NATIVE.upperFold * rigClose * rigFold - 0.008 * gazeSquint;
+  const coverFold = BLINK_NATIVE.coverFold * rigClose * rigFold - 0.006 * gazeSquint;
+  const lowerFold = BLINK_NATIVE.lowerFold * rigClose * rigFold + 0.006 * gazeSquint;
 
   setBonePositionDeltas(rig, rig.orbitsUpperL, orbitDrop, 0, 0);
   setBonePositionDeltas(rig, rig.orbitsUpperR, orbitDrop, 0, 0);
@@ -434,49 +696,78 @@ function applyNativeBlink(rig, blink, squint, lookY) {
 
   setBoneRotationDeltas(rig, rig.orbitsUpperL, coverFold * 0.35, 0, 0);
   setBoneRotationDeltas(rig, rig.orbitsUpperR, coverFold * 0.35, 0, 0);
-  setBoneRotationDeltas(rig, rig.eyeCoversL, coverFold, 0, close * 0.035);
-  setBoneRotationDeltas(rig, rig.eyeCoversR, coverFold, 0, -close * 0.035);
-  setBoneRotationDeltas(rig, rig.lidsUpperL, upperFold, 0, close * 0.055);
-  setBoneRotationDeltas(rig, rig.lidsUpperR, upperFold, 0, -close * 0.055);
-  setBoneRotationDeltas(rig, rig.lidsLowerL, lowerFold, 0, -close * 0.018);
-  setBoneRotationDeltas(rig, rig.lidsLowerR, lowerFold, 0, close * 0.018);
+  const twist = rigClose * blinkRigDebug.twist * blinkPose;
+  setBoneRotationDeltas(rig, rig.eyeCoversL, coverFold, 0, twist * 0.012);
+  setBoneRotationDeltas(rig, rig.eyeCoversR, coverFold, 0, -twist * 0.012);
+  setBoneRotationDeltas(rig, rig.lidsUpperL, upperFold, 0, twist * 0.018);
+  setBoneRotationDeltas(rig, rig.lidsUpperR, upperFold, 0, -twist * 0.018);
+  setBoneRotationDeltas(rig, rig.lidsLowerL, lowerFold, 0, -twist * 0.008);
+  setBoneRotationDeltas(rig, rig.lidsLowerR, lowerFold, 0, twist * 0.008);
 
   document.body.dataset.blinkNativeClose = close.toFixed(3);
+  document.body.dataset.blinkRigClose = rigClose.toFixed(3);
+  document.body.dataset.blinkRigBlend = blinkPose.toFixed(3);
+  document.body.dataset.blinkRigOpen = `${BLINK_RIG_OPEN.upper.toFixed(2)}/${BLINK_RIG_OPEN.cover.toFixed(2)}/${BLINK_RIG_OPEN.lower.toFixed(2)}`;
+  document.body.dataset.blinkRigTarget = `${blinkRigDebug.scale.toFixed(2)}/${blinkRigDebug.upper.toFixed(2)}/${blinkRigDebug.cover.toFixed(2)}/${blinkRigDebug.lower.toFixed(2)}/${blinkRigDebug.fold.toFixed(2)}/${blinkRigDebug.twist.toFixed(2)}`;
+  document.body.dataset.blinkRigTune = `${blinkRigDebug.scale.toFixed(2)}/${rigUpper.toFixed(2)}/${rigCover.toFixed(2)}/${rigLower.toFixed(2)}/${rigFold.toFixed(2)}/${twist.toFixed(2)}`;
   return close;
 }
 
 function applyEyeBlinkVisibility(eyeMats, close) {
   if (!eyeMats) return;
-  const hide = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(close, 0, 1), 0.18, BLINK_NATIVE.maxClose);
+  const blinkMix = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(close, 0, 1), 0.14, BLINK_NATIVE.maxClose);
   for (const mat of eyeMats) {
+    if (mat.userData.openBlinkOpacity == null) mat.userData.openBlinkOpacity = mat.opacity ?? 1;
     if (!mat.userData.openBlinkColor) mat.userData.openBlinkColor = mat.color.clone();
     if (mat.userData.openBlinkEnv == null) mat.userData.openBlinkEnv = mat.envMapIntensity ?? 0;
-    mat.opacity = 1 - hide * (1 - BLINK_NATIVE.closedEyeOpacity);
-    mat.color.copy(mat.userData.openBlinkColor).lerp(closedEyeColor, hide * 0.82);
-    mat.envMapIntensity = THREE.MathUtils.lerp(mat.userData.openBlinkEnv, 0, hide);
+    if (mat.userData.openBlinkDepthWrite == null) mat.userData.openBlinkDepthWrite = mat.depthWrite;
+    mat.opacity = THREE.MathUtils.lerp(mat.userData.openBlinkOpacity, BLINK_NATIVE.closedEyeOpacity, blinkMix);
+    mat.color.copy(mat.userData.openBlinkColor);
+    mat.envMapIntensity = mat.userData.openBlinkEnv;
+    mat.depthWrite = mat.userData.openBlinkDepthWrite;
   }
+  if (eyeMats[0]) eyeMats[0].needsUpdate = true;
   document.body.dataset.eyeOpacity = eyeMats[0]?.opacity?.toFixed?.(3) ?? '';
 }
 
 function applyLashBlinkVisibility(lashMats, close) {
   if (!lashMats) return;
-  const hide = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(close, 0, 1), 0.32, BLINK_NATIVE.maxClose);
+  const blinkMix = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(close, 0, 1), 0.16, BLINK_NATIVE.maxClose);
   for (const mat of lashMats) {
     if (mat.userData.openBlinkOpacity == null) mat.userData.openBlinkOpacity = mat.opacity ?? 1;
-    mat.opacity = THREE.MathUtils.lerp(mat.userData.openBlinkOpacity, BLINK_NATIVE.closedLashOpacity, hide);
+    if (mat.userData.openBlinkDepthWrite == null) mat.userData.openBlinkDepthWrite = mat.depthWrite;
+    mat.opacity = THREE.MathUtils.lerp(mat.userData.openBlinkOpacity, BLINK_NATIVE.closedLashOpacity, blinkMix);
+    mat.depthWrite = mat.userData.openBlinkDepthWrite;
   }
+  if (lashMats[0]) lashMats[0].needsUpdate = true;
   document.body.dataset.lashOpacity = lashMats[0]?.opacity?.toFixed?.(3) ?? '';
+}
+
+function applyDuctBlinkVisibility(ductMats, close) {
+  if (!ductMats) return;
+  const blinkMix = THREE.MathUtils.smoothstep(THREE.MathUtils.clamp(close, 0, 1), 0.16, BLINK_NATIVE.maxClose);
+  for (const mat of ductMats) {
+    if (mat.userData.openBlinkOpacity == null) mat.userData.openBlinkOpacity = mat.opacity ?? 1;
+    if (mat.userData.openBlinkEnv == null) mat.userData.openBlinkEnv = mat.envMapIntensity ?? 0;
+    if (mat.userData.openBlinkDepthWrite == null) mat.userData.openBlinkDepthWrite = mat.depthWrite;
+    mat.transparent = true;
+    mat.opacity = THREE.MathUtils.lerp(mat.userData.openBlinkOpacity, BLINK_NATIVE.closedDuctOpacity, blinkMix);
+    mat.envMapIntensity = mat.userData.openBlinkEnv;
+    mat.depthWrite = mat.userData.openBlinkDepthWrite;
+  }
+  if (ductMats[0]) ductMats[0].needsUpdate = true;
+  document.body.dataset.ductOpacity = ductMats[0]?.opacity?.toFixed?.(3) ?? '';
 }
 
 function applyNativeSmile(rig, smile, asymmetry = 0) {
   const liftL = THREE.MathUtils.clamp(smile + asymmetry, 0, 1);
   const liftR = THREE.MathUtils.clamp(smile - asymmetry, 0, 1);
-  const cornerUpL = -0.00004 * liftL;
-  const cornerUpR = -0.00004 * liftR;
-  const cornerOutL = 0.000018 * liftL;
-  const cornerOutR = -0.000018 * liftR;
-  const cheekLiftL = -0.000018 * liftL;
-  const cheekLiftR = -0.000018 * liftR;
+  const cornerUpL = -0.000026 * liftL;
+  const cornerUpR = -0.000026 * liftR;
+  const cornerOutL = 0.000009 * liftL;
+  const cornerOutR = -0.000009 * liftR;
+  const cheekLiftL = -0.000012 * liftL;
+  const cheekLiftR = -0.000012 * liftR;
 
   setBonePositionDeltas(rig, rig.mouthCornersL, cornerUpL, 0.000006 * liftL, cornerOutL);
   setBonePositionDeltas(rig, rig.mouthCornersR, cornerUpR, 0.000006 * liftR, cornerOutR);
@@ -491,17 +782,17 @@ function applyNativeSmile(rig, smile, asymmetry = 0) {
 
 function chloeMaterials() {
   const A = 'assets/chloe/';
-  const skin = (alb, nrm, rough) =>
+  const skin = (alb, nrm, rough, mapOverride = null) =>
     new THREE.MeshPhysicalMaterial({
-      map: tex(A + alb, true),
+      map: mapOverride || tex(A + alb, true),
       normalMap: tex(A + nrm),
       roughnessMap: tex(A + rough),
       roughness: 0.84,
-      specularIntensity: 0.18,
-      clearcoat: 0.05,
+      specularIntensity: 0.15,
+      clearcoat: 0.032,
       clearcoatRoughness: 0.76,
-      envMapIntensity: 0.31,
-      color: new THREE.Color(1.065, 1.0, 0.965),
+      envMapIntensity: 0.27,
+      color: new THREE.Color(1.045, 0.995, 0.965),
     });
   const cutout = (map, opts = {}) =>
     new THREE.MeshStandardMaterial({
@@ -515,26 +806,33 @@ function chloeMaterials() {
     });
 
   return {
-    Chloe_Head: skin('face_alb.jpg', 'face_nrm.jpg', 'face_rough.jpg'),
+    Chloe_Head: skin('face_alb.jpg', 'face_nrm.jpg', 'face_rough.jpg', createChloeFaceTexture()),
     Chloe_Body: skin('body_alb.jpg', 'body_nrm.jpg', 'body_rough.jpg'),
     Chloe_Arms: skin('arms_alb.jpg', 'arms_nrm.jpg', 'arms_rough.jpg'),
-    Chloe_Eyes: new THREE.MeshStandardMaterial({
-      map: tex(A + 'eye_alb.jpg', true),
-      normalMap: tex(A + 'eye_nrm.jpg'),
-      roughness: 0.9,
-      metalness: 0,
-      envMapIntensity: 0.004,
-      color: new THREE.Color(0.49, 0.58, 0.64),
+	    Chloe_Eyes: new THREE.MeshStandardMaterial({
+	      map: createChloeEyeTexture(),
+	      normalMap: tex(A + 'eye_nrm.jpg'),
+	      normalScale: new THREE.Vector2(0.12, 0.12),
+	      roughness: 0.82,
+	      metalness: 0,
+	      envMapIntensity: 0.008,
+      color: new THREE.Color(1, 1, 1),
       transparent: true,
       opacity: 1,
     }),
-    Chloe_Hair: cutout('hair.png', {
-      alphaTest: 0.28,
-      roughness: 0.84,
-      envMapIntensity: 0.18,
-      color: new THREE.Color(0.9, 0.82, 0.68),
+	    Chloe_Hair: cutout('hair.png', {
+	      alphaTest: 0.28,
+	      roughness: 0.84,
+	      envMapIntensity: 0.18,
+	      color: new THREE.Color(0.9, 0.82, 0.68),
+	    }),
+    Chloe_Lashes: cutout('lashes.png', {
+      alphaTest: 0.42,
+      roughness: 0.72,
+      envMapIntensity: 0.045,
+      color: new THREE.Color(0.28, 0.24, 0.22),
+      depthWrite: false,
     }),
-    Chloe_Lashes: cutout('lashes.png', { roughness: 0.5 }),
     Chloe_Brows: cutout('brows.png', { roughness: 0.58, envMapIntensity: 0.28, color: new THREE.Color(0.7, 0.57, 0.48) }),
     Chloe_Teeth: new THREE.MeshStandardMaterial({
       map: tex(A + 'teeth_alb.jpg', true),
@@ -543,7 +841,14 @@ function chloeMaterials() {
       envMapIntensity: 0.075,
       color: new THREE.Color(0.72, 0.68, 0.62),
     }),
-    Chloe_Duct: new THREE.MeshStandardMaterial({ map: tex(A + 'duct_alb.jpg', true), roughness: 0.35 }),
+    Chloe_Duct: new THREE.MeshStandardMaterial({
+      map: tex(A + 'duct_alb.jpg', true),
+      transparent: true,
+      roughness: 0.82,
+      metalness: 0,
+      envMapIntensity: 0.025,
+      color: new THREE.Color(0.7, 0.56, 0.52),
+    }),
     Chloe_tear: new THREE.MeshPhysicalMaterial({
       transparent: true,
       opacity: 0.3,
@@ -601,6 +906,7 @@ function setupChloe(gltf) {
     obj.material.vertexColors = false;
     if (name === 'Chloe_Eyes') headGroup.userData.eyeMats = [obj.material];
     if (name === 'Chloe_Lashes') headGroup.userData.lashMats = [obj.material];
+    if (name.startsWith('Chloe_Duct')) headGroup.userData.ductMats = [obj.material];
     if (name === 'Chloe_Circle') headGroup.userData.ledMats = [obj.material];
   });
 
@@ -703,6 +1009,70 @@ gltfLoader.load(
 
 // ---------------------------------------------------------------- post FX
 
+const SoftFXAAShader = {
+  name: 'ChloeSoftFXAA',
+  uniforms: {
+    tDiffuse: { value: null },
+    resolution: { value: new THREE.Vector2(1 / window.innerWidth, 1 / window.innerHeight) },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform sampler2D tDiffuse;
+    uniform vec2 resolution;
+    varying vec2 vUv;
+
+    float luma(vec3 color) {
+      return dot(color, vec3(0.299, 0.587, 0.114));
+    }
+
+    void main() {
+      vec3 rgbNW = texture2D(tDiffuse, vUv + vec2(-1.0, -1.0) * resolution).rgb;
+      vec3 rgbNE = texture2D(tDiffuse, vUv + vec2(1.0, -1.0) * resolution).rgb;
+      vec3 rgbSW = texture2D(tDiffuse, vUv + vec2(-1.0, 1.0) * resolution).rgb;
+      vec3 rgbSE = texture2D(tDiffuse, vUv + vec2(1.0, 1.0) * resolution).rgb;
+      vec4 texel = texture2D(tDiffuse, vUv);
+      vec3 rgbM = texel.rgb;
+
+      float lumaNW = luma(rgbNW);
+      float lumaNE = luma(rgbNE);
+      float lumaSW = luma(rgbSW);
+      float lumaSE = luma(rgbSE);
+      float lumaM = luma(rgbM);
+      float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
+      float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
+
+      vec2 dir = vec2(
+        -((lumaNW + lumaNE) - (lumaSW + lumaSE)),
+        ((lumaNW + lumaSW) - (lumaNE + lumaSE))
+      );
+
+      float dirReduce = max((lumaNW + lumaNE + lumaSW + lumaSE) * 0.03125, 0.0078125);
+      float rcpDirMin = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);
+      dir = min(vec2(8.0), max(vec2(-8.0), dir * rcpDirMin)) * resolution;
+
+      vec3 rgbA = 0.5 * (
+        texture2D(tDiffuse, vUv + dir * (1.0 / 3.0 - 0.5)).rgb +
+        texture2D(tDiffuse, vUv + dir * (2.0 / 3.0 - 0.5)).rgb
+      );
+      vec3 rgbB = rgbA * 0.5 + 0.25 * (
+        texture2D(tDiffuse, vUv + dir * -0.5).rgb +
+        texture2D(tDiffuse, vUv + dir * 0.5).rgb
+      );
+      float lumaB = luma(rgbB);
+      vec3 smoothed = (lumaB < lumaMin || lumaB > lumaMax) ? rgbA : rgbB;
+
+      gl_FragColor = vec4(mix(rgbM, smoothed, 0.78), texel.a);
+    }
+  `,
+};
+
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(
@@ -712,7 +1082,17 @@ const bloom = new UnrealBloomPass(
   0.96 // threshold — only the hot strips and LED bloom
 );
 composer.addPass(bloom);
+const fxaaPass = new ShaderPass(SoftFXAAShader);
+composer.addPass(fxaaPass);
 composer.addPass(new OutputPass());
+
+function syncFxaaResolution() {
+  const size = new THREE.Vector2();
+  renderer.getDrawingBufferSize(size);
+  fxaaPass.uniforms.resolution.value.set(1 / size.x, 1 / size.y);
+  document.body.dataset.fxaaResolution = `${Math.round(size.x)}x${Math.round(size.y)}`;
+}
+syncFxaaResolution();
 
 // ---------------------------------------------------------------- interaction
 
@@ -727,6 +1107,7 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
   composer.setSize(window.innerWidth, window.innerHeight);
+  syncFxaaResolution();
 });
 
 // menu: hover/arrows select, click/Enter opens
@@ -737,19 +1118,19 @@ const bodies = panel.querySelectorAll<HTMLElement>('.panel-body');
 let selected = 0;
 
 const MENU_POSES = {
-  about:    { lookX: 0.0,   lookY: 0.008, camX: 0.0,    camY: 0.002, bodyX: 0.0,    bodyY: 0.0,   mouth: 0.48, brow: 0.24, led: 1.0,  squint: 0.015, roll: -0.006 },
-  projects: { lookX: -0.012,lookY: 0.006, camX: -0.008, camY: 0.001, bodyX: -0.006, bodyY: -0.002,mouth: 0.24, brow: 0.12, led: 0.94, squint: 0.005, roll: -0.01 },
-  skills:   { lookX: 0.008, lookY: 0.012, camX: 0.004,  camY: 0.003, bodyX: 0.0,    bodyY: 0.004, mouth: 0.3,  brow: 0.18, led: 1.05, squint: 0.012, roll: 0.0 },
-  exp:      { lookX: 0.014, lookY: 0.004, camX: 0.007,  camY: -0.002,bodyX: 0.006,  bodyY: -0.004,mouth: 0.18, brow: 0.1,  led: 0.9,  squint: 0.0,   roll: 0.008 },
-  contact:  { lookX: 0.016, lookY: 0.009, camX: 0.01,   camY: 0.001, bodyX: 0.008,  bodyY: 0.0,   mouth: 0.26, brow: 0.16, led: 1.0,  squint: 0.008, roll: 0.01 },
+  about:    { lookX: 0.0,   lookY: 0.008, camX: 0.0,    camY: 0.002, bodyX: 0.0,    bodyY: 0.0,   mouth: 0.34, brow: 0.24, led: 1.0,  squint: 0.015, roll: -0.006 },
+  projects: { lookX: -0.012,lookY: 0.006, camX: -0.008, camY: 0.001, bodyX: -0.006, bodyY: -0.002,mouth: 0.18, brow: 0.12, led: 0.94, squint: 0.005, roll: -0.01 },
+  skills:   { lookX: 0.008, lookY: 0.012, camX: 0.004,  camY: 0.003, bodyX: 0.0,    bodyY: 0.004, mouth: 0.22, brow: 0.18, led: 1.05, squint: 0.012, roll: 0.0 },
+  exp:      { lookX: 0.014, lookY: 0.004, camX: 0.007,  camY: -0.002,bodyX: 0.006,  bodyY: -0.004,mouth: 0.13, brow: 0.1,  led: 0.9,  squint: 0.0,   roll: 0.008 },
+  contact:  { lookX: 0.016, lookY: 0.009, camX: 0.01,   camY: 0.001, bodyX: 0.008,  bodyY: 0.0,   mouth: 0.19, brow: 0.16, led: 1.0,  squint: 0.008, roll: 0.01 },
 };
 
 const PANEL_POSES = {
-  about:    { lookX: -0.01, lookY: 0.01,  camX: -0.006, camY: 0.006, bodyX: 0.014, bodyY: 0.004, mouth: 0.42, brow: 0.15, led: 0.78, squint: 0.0,   roll: -0.008 },
-  projects: { lookX: -0.02, lookY: 0.007, camX: -0.012, camY: 0.002, bodyX: 0.018, bodyY: 0.0,   mouth: 0.18, brow: 0.08, led: 0.72, squint: 0.0,   roll: -0.012 },
-  skills:   { lookX: -0.004,lookY: 0.015, camX: -0.004, camY: 0.006, bodyX: 0.014, bodyY: 0.008, mouth: 0.22, brow: 0.12, led: 0.82, squint: 0.01,  roll: -0.006 },
-  exp:      { lookX: 0.008, lookY: 0.005, camX: 0.0,    camY: 0.001, bodyX: 0.012, bodyY: -0.002,mouth: 0.16, brow: 0.07, led: 0.7,  squint: 0.0,   roll: 0.006 },
-  contact:  { lookX: 0.012, lookY: 0.012, camX: 0.004,  camY: 0.006, bodyX: 0.01,  bodyY: 0.003, mouth: 0.24, brow: 0.12, led: 0.78, squint: 0.004, roll: 0.008 },
+  about:    { lookX: -0.01, lookY: 0.01,  camX: -0.006, camY: 0.006, bodyX: 0.014, bodyY: 0.004, mouth: 0.3,  brow: 0.15, led: 0.78, squint: 0.0,   roll: -0.008 },
+  projects: { lookX: -0.02, lookY: 0.007, camX: -0.012, camY: 0.002, bodyX: 0.018, bodyY: 0.0,   mouth: 0.14, brow: 0.08, led: 0.72, squint: 0.0,   roll: -0.012 },
+  skills:   { lookX: -0.004,lookY: 0.015, camX: -0.004, camY: 0.006, bodyX: 0.014, bodyY: 0.008, mouth: 0.17, brow: 0.12, led: 0.82, squint: 0.01,  roll: -0.006 },
+  exp:      { lookX: 0.008, lookY: 0.005, camX: 0.0,    camY: 0.001, bodyX: 0.012, bodyY: -0.002,mouth: 0.12, brow: 0.07, led: 0.7,  squint: 0.0,   roll: 0.006 },
+  contact:  { lookX: 0.012, lookY: 0.012, camX: 0.004,  camY: 0.006, bodyX: 0.01,  bodyY: 0.003, mouth: 0.18, brow: 0.12, led: 0.78, squint: 0.004, roll: 0.008 },
 };
 
 const motion = {
@@ -787,7 +1168,7 @@ const living = {
   queuedBlinks: 0,
   queuedBlinkAt: -1,
   blinkDebugMode: 'animate',
-  blinkSpeed: 0.84,
+  blinkSpeed: 1.08,
 };
 
 const BLINK_POSES = {
@@ -797,9 +1178,9 @@ const BLINK_POSES = {
 };
 
 const BLINK_PHASE_DURATION = {
-  closing: 0.145,
-  closed: 0.34,
-  opening: 0.36,
+  closing: 0.075,
+  closed: 0.055,
+  opening: 0.11,
 };
 
 function rand(min, max) {
@@ -823,7 +1204,7 @@ function queueBlink(time, forceDouble = false) {
   }
   if (forceDouble || Math.random() < 0.025) {
     living.queuedBlinks += 1;
-    living.queuedBlinkAt = time + rand(0.42, 0.58);
+    living.queuedBlinkAt = time + rand(0.28, 0.38);
   }
   living.nextBlinkAt = time + rand(3.1, 6.7);
 }
@@ -841,24 +1222,34 @@ function setBlinkDebugMode(mode) {
   }
 }
 
-window.addEventListener('portrait:blink-debug', (event) => {
-  const blinkEvent = event as CustomEvent;
-  const detail = blinkEvent.detail || {};
-  if (detail.mode) setBlinkDebugMode(detail.mode);
-  if (typeof detail.speed === 'number') {
-    living.blinkSpeed = THREE.MathUtils.clamp(detail.speed, 0.35, 3.2);
-    document.body.dataset.blinkSpeed = living.blinkSpeed.toFixed(2);
-  }
-  if (detail.action === 'blink') {
-    living.blinkDebugMode = 'animate';
-    document.body.dataset.blinkMode = 'animate';
-    queueBlink(performance.now() / 1000, !!detail.double);
-  }
-});
+function setBlinkSpeed(speed) {
+  living.blinkSpeed = THREE.MathUtils.clamp(speed, 0.35, 3.2);
+  document.body.dataset.blinkSpeed = living.blinkSpeed.toFixed(2);
+}
 
-window.addEventListener('portrait:gaze-debug', (event) => {
-  const gazeEvent = event as CustomEvent;
-  const detail = gazeEvent.detail || {};
+function setBlinkRigDebug(detail) {
+  const ranges = {
+    scale: [0.35, 1.2],
+    upper: [0.2, 2.2],
+    cover: [0.2, 2.2],
+    lower: [0.2, 2.6],
+    fold: [0, 1.2],
+    twist: [0, 1],
+  };
+  for (const key of Object.keys(ranges)) {
+    if (typeof detail[key] !== 'number') continue;
+    const [min, max] = ranges[key];
+    blinkRigDebug[key] = THREE.MathUtils.clamp(detail[key], min, max);
+  }
+}
+
+function triggerDebugBlink(double = false) {
+  living.blinkDebugMode = 'animate';
+  document.body.dataset.blinkMode = 'animate';
+  queueBlink(performance.now() / 1000, double);
+}
+
+function setGazeDebugTarget(detail) {
   if (typeof detail.x === 'number') {
     living.eyeTargetX = THREE.MathUtils.clamp(detail.x, -0.026, 0.026);
     if (detail.immediate === true) living.eyeDriftX = living.eyeTargetX;
@@ -868,6 +1259,26 @@ window.addEventListener('portrait:gaze-debug', (event) => {
     if (detail.immediate === true) living.eyeDriftY = living.eyeTargetY;
   }
   living.nextSaccadeAt = performance.now() / 1000 + 99;
+}
+
+window.addEventListener('portrait:blink-debug', (event) => {
+  const blinkEvent = event as CustomEvent;
+  const detail = blinkEvent.detail || {};
+  if (detail.mode) setBlinkDebugMode(detail.mode);
+  if (typeof detail.speed === 'number') setBlinkSpeed(detail.speed);
+  if (detail.action === 'blink') {
+    triggerDebugBlink(!!detail.double);
+  }
+});
+
+window.addEventListener('portrait:blink-rig-debug', (event) => {
+  const rigEvent = event as CustomEvent;
+  setBlinkRigDebug(rigEvent.detail || {});
+});
+
+window.addEventListener('portrait:gaze-debug', (event) => {
+  const gazeEvent = event as CustomEvent;
+  setGazeDebugTarget(gazeEvent.detail || {});
 });
 
 function exposeBlinkState(amount = living.blinkAmount) {
@@ -934,7 +1345,7 @@ function updateLivingMotion(time, dt) {
     living.eyeTargetX = rand(-0.011, 0.011);
     living.eyeTargetY = rand(-0.005, 0.006);
     living.browTarget = rand(-0.045, 0.055);
-    living.mouthTarget = rand(-0.035, 0.045);
+    living.mouthTarget = rand(-0.022, 0.026);
     living.nextSaccadeAt = time + rand(6.4, 10.8);
   }
 
@@ -951,6 +1362,87 @@ function updateLivingMotion(time, dt) {
   living.mouthDrift = THREE.MathUtils.damp(living.mouthDrift, living.mouthTarget, 3.8, dt);
   return blink;
 }
+
+const debugPanel = document.getElementById('debug-panel') as HTMLElement | null;
+const debugToggle = document.getElementById('debug-toggle') as HTMLButtonElement | null;
+const debugReadout = document.getElementById('debug-readout') as HTMLPreElement | null;
+const debugSpeed = document.getElementById('debug-blink-speed') as HTMLInputElement | null;
+const debugSpeedValue = document.getElementById('debug-speed-value') as HTMLOutputElement | null;
+const debugRigInputs = [...document.querySelectorAll<HTMLInputElement>('[data-rig-param]')];
+
+function syncDebugControls() {
+  if (!debugPanel) return;
+  debugPanel.querySelectorAll<HTMLButtonElement>('[data-blink-mode]').forEach((button) => {
+    button.classList.toggle('active', button.dataset.blinkMode === living.blinkDebugMode);
+  });
+  if (debugSpeed && debugSpeed !== document.activeElement) debugSpeed.value = living.blinkSpeed.toFixed(2);
+  if (debugSpeedValue) debugSpeedValue.value = `${living.blinkSpeed.toFixed(2)}x`;
+  for (const input of debugRigInputs) {
+    const param = input.dataset.rigParam;
+    if (!param) continue;
+    const value = blinkRigDebug[param];
+    if (input !== document.activeElement) input.value = value.toFixed(2);
+    const output = document.getElementById(`${input.id}-value`) as HTMLOutputElement | null;
+    if (output) output.value = value.toFixed(2);
+  }
+  if (!debugReadout) return;
+  debugReadout.textContent = [
+    `mode ${living.blinkDebugMode} / ${living.blinkPhase}`,
+    `amount ${living.blinkAmount.toFixed(3)}  close ${document.body.dataset.blinkNativeClose ?? '--'}  rig ${document.body.dataset.blinkRigClose ?? '--'}`,
+    `eye ${document.body.dataset.eyeOpacity ?? '--'}  lash ${document.body.dataset.lashOpacity ?? '--'}  duct ${document.body.dataset.ductOpacity ?? '--'}`,
+    `blend ${document.body.dataset.blinkRigBlend ?? '--'}  bones now ${document.body.dataset.blinkRigTune ?? '--'}`,
+    `open ${document.body.dataset.blinkRigOpen ?? '--'}  blink ${document.body.dataset.blinkRigTarget ?? '--'}`,
+    `gaze x ${document.body.dataset.attentiveLookX ?? '--'}  y ${document.body.dataset.attentiveLookY ?? '--'}`,
+    `speed ${living.blinkSpeed.toFixed(2)}x`,
+  ].join('\n');
+}
+
+function setupDebugPanel() {
+  if (!debugPanel) return;
+  document.body.dataset.blinkMode = living.blinkDebugMode;
+  document.body.dataset.blinkSpeed = living.blinkSpeed.toFixed(2);
+
+  debugPanel.querySelectorAll<HTMLButtonElement>('[data-blink-mode]').forEach((button) => {
+    button.addEventListener('click', () => setBlinkDebugMode(button.dataset.blinkMode));
+  });
+
+  debugPanel.querySelector<HTMLButtonElement>('[data-blink-action="blink"]')?.addEventListener('click', () => {
+    triggerDebugBlink(false);
+  });
+  debugPanel.querySelector<HTMLButtonElement>('[data-blink-action="double"]')?.addEventListener('click', () => {
+    triggerDebugBlink(true);
+  });
+
+  debugPanel.querySelectorAll<HTMLButtonElement>('[data-gaze-x][data-gaze-y]').forEach((button) => {
+    button.addEventListener('click', () => {
+      setGazeDebugTarget({
+        x: Number(button.dataset.gazeX),
+        y: Number(button.dataset.gazeY),
+        immediate: true,
+      });
+    });
+  });
+
+  debugSpeed?.addEventListener('input', () => setBlinkSpeed(Number(debugSpeed.value)));
+  for (const input of debugRigInputs) {
+    input.addEventListener('input', () => {
+      const param = input.dataset.rigParam;
+      if (!param) return;
+      setBlinkRigDebug({ [param]: Number(input.value) });
+    });
+  }
+  debugToggle?.addEventListener('click', () => {
+    debugPanel.classList.toggle('collapsed');
+    const collapsed = debugPanel.classList.contains('collapsed');
+    debugToggle.textContent = collapsed ? 'OPEN' : 'MIN';
+    debugToggle.setAttribute('aria-label', collapsed ? 'Expand debug controls' : 'Collapse debug controls');
+  });
+
+  syncDebugControls();
+}
+
+setupDebugPanel();
+
 function select(i) {
   selected = (i + items.length) % items.length;
   motion.active = items[selected].dataset.panel;
@@ -978,14 +1470,14 @@ items.forEach((el, n) => {
 });
 document.getElementById('panel-back').addEventListener('click', closePanel);
 window.addEventListener('keydown', (e) => {
+  if (debugPanel?.contains(e.target as Node) && !e.altKey) return;
   if (e.altKey) {
     if (e.code === 'Digit0') setBlinkDebugMode('animate');
     else if (e.code === 'Digit1') setBlinkDebugMode('open');
     else if (e.code === 'Digit2') setBlinkDebugMode('half');
     else if (e.code === 'Digit3') setBlinkDebugMode('closed');
     else if (e.code === 'KeyB') {
-      living.blinkDebugMode = 'animate';
-      queueBlink(performance.now() / 1000, e.shiftKey);
+      triggerDebugBlink(e.shiftKey);
     } else {
       return;
     }
@@ -1068,8 +1560,8 @@ function animate() {
     const shoulderBreath = Math.sin(t * 0.8) * 0.012;
     const expressionAsym = Math.sin(t * 0.61) * 0.026 + Math.sin(t * 0.27 + 1.2) * 0.012 + living.eyeDriftX * 0.18;
     const browAsym = Math.sin(t * 0.92) * 0.0048 + expressionAsym * 0.24 + living.eyeDriftX * 0.008;
-    const smile = THREE.MathUtils.clamp(0.18 + expressiveMouth * 0.52 + Math.sin(t * 0.72) * 0.018, 0, 0.68);
-    const smileAsym = expressionAsym * 0.7;
+    const smile = THREE.MathUtils.clamp(0.14 + expressiveMouth * 0.38 + Math.sin(t * 0.72) * 0.012, 0, 0.48);
+    const smileAsym = expressionAsym * 0.46;
 
     setBoneRotationDeltas(rig, rig.spineMid, headPitch * -0.08, headYaw * -0.08, motion.roll * 0.08);
     setBoneRotationDeltas(rig, rig.spineUpper, headPitch * -0.12, headYaw * -0.12, motion.roll * 0.14);
@@ -1093,9 +1585,9 @@ function animate() {
     document.body.dataset.attentiveLookX = attentiveLookX.toFixed(4);
     document.body.dataset.attentiveLookY = attentiveLookY.toFixed(4);
 
-    const jawOpen = 0.01 + expressiveMouth * 0.045 + Math.sin(t * 1.45) * 0.0015;
+    const jawOpen = 0.007 + expressiveMouth * 0.03 + Math.sin(t * 1.45) * 0.001;
     setBoneRotationDeltas(rig, rig.jaw, jawOpen, 0, 0);
-    setBoneRotationDeltas(rig, rig.upperLip, -expressiveMouth * 0.02 - Math.sin(t * 1.1) * 0.001, 0, 0);
+    setBoneRotationDeltas(rig, rig.upperLip, -expressiveMouth * 0.012 - Math.sin(t * 1.1) * 0.0007, 0, 0);
     applyNativeSmile(rig, smile, smileAsym);
     document.body.dataset.facialJawOpen = jawOpen.toFixed(3);
     document.body.dataset.facialSmileAsym = smileAsym.toFixed(3);
@@ -1107,6 +1599,7 @@ function animate() {
     const blinkClose = applyNativeBlink(rig, blink, motion.squint + smile * 0.09, attentiveLookY);
     applyEyeBlinkVisibility(headGroup.userData.eyeMats, blinkClose);
     applyLashBlinkVisibility(headGroup.userData.lashMats, blinkClose);
+    applyDuctBlinkVisibility(headGroup.userData.ductMats, blinkClose);
   }
 
   // LED pulse
@@ -1122,6 +1615,7 @@ function animate() {
   camera.lookAt(FOCUS);
 
   composer.render();
+  syncDebugControls();
 }
 
 animate();

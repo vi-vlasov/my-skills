@@ -60,6 +60,82 @@
   <span style="left:79%;  top:93%">SYSTEM NOMINAL · PBR / ACES</span>
 </div>
 
+<!-- local portrait debug controls -->
+<aside class="debug-panel" id="debug-panel" aria-label="Debug controls">
+  <div class="debug-panel-head">
+    <span>PORTRAIT DEBUG</span>
+    <button type="button" id="debug-toggle" aria-label="Collapse debug controls">MIN</button>
+  </div>
+  <div class="debug-panel-body">
+    <div class="debug-section">
+      <p>BLINK STATE</p>
+      <div class="debug-actions">
+        <button type="button" data-blink-mode="animate">AUTO</button>
+        <button type="button" data-blink-mode="open">OPEN</button>
+        <button type="button" data-blink-mode="half">HALF</button>
+        <button type="button" data-blink-mode="closed">CLOSED</button>
+      </div>
+      <div class="debug-actions compact">
+        <button type="button" data-blink-action="blink">BLINK</button>
+        <button type="button" data-blink-action="double">DOUBLE</button>
+      </div>
+    </div>
+
+    <label class="debug-slider">
+      <span>SPEED</span>
+      <input id="debug-blink-speed" type="range" min="0.35" max="3.2" step="0.01" value="1.08">
+      <output id="debug-speed-value">1.08x</output>
+    </label>
+
+    <div class="debug-section debug-bone-controls">
+      <p>BONE BLINK</p>
+      <label class="debug-slider">
+        <span>RIG</span>
+        <input id="debug-rig-scale" data-rig-param="scale" type="range" min="0.35" max="1.2" step="0.01" value="0.35">
+        <output id="debug-rig-scale-value">0.35</output>
+      </label>
+      <label class="debug-slider">
+        <span>UPPER</span>
+        <input id="debug-rig-upper" data-rig-param="upper" type="range" min="0.2" max="2.2" step="0.01" value="0.2">
+        <output id="debug-rig-upper-value">0.20</output>
+      </label>
+      <label class="debug-slider">
+        <span>COVER</span>
+        <input id="debug-rig-cover" data-rig-param="cover" type="range" min="0.2" max="2.2" step="0.01" value="2">
+        <output id="debug-rig-cover-value">2.00</output>
+      </label>
+      <label class="debug-slider">
+        <span>LOWER</span>
+        <input id="debug-rig-lower" data-rig-param="lower" type="range" min="0.2" max="2.6" step="0.01" value="2">
+        <output id="debug-rig-lower-value">2.00</output>
+      </label>
+      <label class="debug-slider">
+        <span>FOLD</span>
+        <input id="debug-rig-fold" data-rig-param="fold" type="range" min="0" max="1.2" step="0.01" value="0.24">
+        <output id="debug-rig-fold-value">0.24</output>
+      </label>
+      <label class="debug-slider">
+        <span>TWIST</span>
+        <input id="debug-rig-twist" data-rig-param="twist" type="range" min="0" max="1" step="0.01" value="0">
+        <output id="debug-rig-twist-value">0.00</output>
+      </label>
+    </div>
+
+    <div class="debug-section">
+      <p>GAZE</p>
+      <div class="debug-gaze">
+        <button type="button" data-gaze-x="0" data-gaze-y="-0.01">UP</button>
+        <button type="button" data-gaze-x="-0.018" data-gaze-y="0">LEFT</button>
+        <button type="button" data-gaze-x="0" data-gaze-y="0">CENTER</button>
+        <button type="button" data-gaze-x="0.018" data-gaze-y="0">RIGHT</button>
+        <button type="button" data-gaze-x="0" data-gaze-y="0.012">DOWN</button>
+      </div>
+    </div>
+
+    <pre class="debug-readout" id="debug-readout">waiting for rig...</pre>
+  </div>
+</aside>
+
 <!-- bottom horizontal menu (DBH style) -->
 <nav class="menu" id="menu">
   <button class="item selected" data-panel="about">

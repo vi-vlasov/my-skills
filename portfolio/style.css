@@ -36,10 +36,10 @@ html, body {
     radial-gradient(ellipse 46% 58% at 50% 34%, rgba(255,255,255,0.14) 0%, rgba(245,251,255,0.052) 44%, rgba(255,255,255,0) 72%),
     radial-gradient(ellipse 94% 36% at 50% 74%, rgba(255,255,255,0.24) 0%, rgba(219,239,249,0.15) 48%, rgba(255,255,255,0) 78%),
     linear-gradient(90deg, rgba(102,178,219,0.16), rgba(255,255,255,0.035) 18%, rgba(255,255,255,0.045) 82%, rgba(96,174,218,0.17));
-  -webkit-backdrop-filter: blur(0.48px) saturate(1.035) contrast(0.982);
-  backdrop-filter: blur(0.48px) saturate(1.035) contrast(0.982);
+  -webkit-backdrop-filter: blur(0.18px) saturate(1.02) contrast(1.006);
+  backdrop-filter: blur(0.18px) saturate(1.02) contrast(1.006);
   mix-blend-mode: screen;
-  opacity: 0.66;
+  opacity: 0.42;
 }
 
 .cinematic-backdrop {
@@ -484,6 +484,179 @@ body::after {
 .contacts a { font-size: 14px; color: var(--ink); text-decoration: none; }
 .contacts a:hover { color: var(--bar-mid); }
 
+/* ---------- local debug controls ---------- */
+
+.debug-panel {
+  position: fixed;
+  top: 82px;
+  right: 32px;
+  z-index: 8;
+  width: min(320px, calc(100vw - 32px));
+  color: #dcecf6;
+  background:
+    linear-gradient(145deg, rgba(16, 35, 59, 0.86), rgba(38, 84, 124, 0.64)),
+    linear-gradient(90deg, rgba(74, 195, 238, 0.16), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(191, 229, 245, 0.34);
+  box-shadow: 0 18px 54px rgba(18, 42, 68, 0.22);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+  backdrop-filter: blur(18px) saturate(1.08);
+  font-family: var(--font);
+  pointer-events: auto;
+}
+
+.debug-panel::before,
+.debug-panel::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 14px;
+  pointer-events: none;
+  border: 0 solid rgba(210, 240, 252, 0.72);
+}
+
+.debug-panel::before {
+  top: -7px;
+  left: -8px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+}
+
+.debug-panel::after {
+  right: -8px;
+  bottom: -7px;
+  border-right-width: 2px;
+  border-bottom-width: 2px;
+}
+
+.debug-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid rgba(216, 239, 255, 0.18);
+}
+
+.debug-panel-head span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+}
+
+.debug-panel button {
+  border: 1px solid rgba(214, 238, 250, 0.24);
+  background: rgba(232, 248, 255, 0.08);
+  color: #edf8ff;
+  min-height: 29px;
+  padding: 0 10px;
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+}
+
+.debug-panel button:hover,
+.debug-panel button:focus-visible {
+  background: rgba(74, 195, 238, 0.22);
+  border-color: rgba(214, 238, 250, 0.54);
+  transform: translateY(-1px);
+}
+
+.debug-panel button.active {
+  background: linear-gradient(90deg, rgba(74, 195, 238, 0.84), rgba(63, 110, 161, 0.62));
+  border-color: rgba(235, 250, 255, 0.84);
+  color: #ffffff;
+  box-shadow: 0 0 18px rgba(74, 195, 238, 0.18);
+}
+
+.debug-panel-body {
+  display: grid;
+  gap: 13px;
+  padding: 12px 14px 14px;
+}
+
+.debug-section p,
+.debug-slider span {
+  margin-bottom: 8px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  color: rgba(226, 246, 255, 0.64);
+}
+
+.debug-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.debug-actions.compact {
+  grid-template-columns: repeat(2, 1fr);
+  margin-top: 6px;
+}
+
+.debug-slider {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.debug-slider span {
+  margin: 0;
+}
+
+.debug-slider input {
+  width: 100%;
+  accent-color: var(--led);
+}
+
+.debug-slider output {
+  min-width: 44px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: right;
+}
+
+.debug-gaze {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+.debug-gaze button:first-child,
+.debug-gaze button:last-child {
+  grid-column: 2;
+}
+
+.debug-readout {
+  min-height: 86px;
+  padding: 10px 12px;
+  overflow: hidden;
+  border: 1px solid rgba(216, 239, 255, 0.16);
+  background: rgba(7, 21, 38, 0.22);
+  color: rgba(235, 250, 255, 0.86);
+  font-size: 10px;
+  line-height: 1.7;
+  letter-spacing: 0.12em;
+  white-space: pre-wrap;
+}
+
+.debug-panel.collapsed {
+  width: auto;
+}
+
+.debug-panel.collapsed .debug-panel-body {
+  display: none;
+}
+
+.debug-panel.collapsed #debug-toggle {
+  min-width: 58px;
+}
+
 /* ---------- boot screen ---------- */
 
 .boot {
@@ -522,4 +695,5 @@ body::after {
   .lens-bloom { opacity: 0.16; }
   .brand { left: 22px; }
   .spinner { right: 22px; }
+  .debug-panel { top: 78px; right: 16px; }
 }
